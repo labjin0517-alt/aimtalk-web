@@ -2,138 +2,140 @@ import React from 'react';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-100">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-100">
       {/* --- 네비게이션 --- */}
-      <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            AimTalk v1.03
+      <nav className="fixed w-full z-50 bg-white/70 backdrop-blur-xl border-b border-slate-200/60">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-200">A</div>
+            <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+              AimTalk <span className="text-blue-600 font-medium text-sm align-top ml-1">v1.03</span>
+            </span>
           </div>
-          <div className="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
-            <a href="#features" className="hover:text-blue-600 transition">주요기능</a>
-            <a href="#manual" className="hover:text-blue-600 transition">사용단계</a>
-            <a href="#pricing" className="hover:text-blue-600 transition">라이선스</a>
+          <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-slate-500">
+            <a href="#features" className="hover:text-blue-600 transition-colors">주요기능</a>
+            <a href="#how-it-works" className="hover:text-blue-600 transition-colors">사용방법</a>
+            <a href="#pricing" className="hover:text-blue-600 transition-colors">라이선스</a>
           </div>
-          <a href="#pricing" className="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-blue-600 transition">
-            인증하기
+          <a href="#pricing" className="bg-blue-600 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-200 transition-all active:scale-95">
+            지금 시작하기
           </a>
         </div>
       </nav>
 
       {/* --- Hero 섹션 --- */}
-      <section className="pt-32 pb-20 px-6">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="inline-block px-4 py-1.5 mb-6 text-sm font-semibold text-blue-600 bg-blue-50 rounded-full">
-            📍 엑셀 명단 기반 스마트 마케팅 솔루션
+      <section className="relative pt-48 pb-32 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 text-sm font-bold text-blue-700 bg-blue-50 rounded-full border border-blue-100 animate-fade-in">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            엑셀 기반 스마트 마케팅 솔루션
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
-            카카오톡 자동 발송,<br />
-            <span className="text-blue-600">AimTalk</span>으로 해결하세요
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-10 leading-[1.1]">
+            카카오톡 발송, <br />
+            <span className="text-blue-600">완전 자동화</span>의 시작
           </h1>
-          <p className="text-lg text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
-            엑셀 명단만 업로드하면 메시지부터 파일까지 자동으로 발송됩니다. 
-            그룹별 맞춤 메시지와 실시간 모니터링으로 업무 효율을 극대화하세요.
+          <p className="text-xl text-slate-500 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
+            엑셀 명단만 업로드하면 메시지부터 파일까지 한 번에 발송됩니다. [cite: 33] <br className="hidden md:block" />
+            단순 반복 업무는 AimTalk에 맡기고 더 가치 있는 일에 집중하세요.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <a href="#pricing" className="bg-blue-600 text-white px-8 py-4 rounded-2xl text-lg font-bold hover:shadow-lg hover:shadow-blue-200 transition-all">
+          <div className="flex flex-col sm:flex-row justify-center gap-5">
+            <a href="#pricing" className="bg-slate-900 text-white px-10 py-5 rounded-2xl text-lg font-bold hover:bg-blue-600 hover:shadow-2xl hover:shadow-blue-200 transition-all active:scale-95">
               라이선스 구매하기
             </a>
-            <a href="#manual" className="bg-slate-100 text-slate-700 px-8 py-4 rounded-2xl text-lg font-bold hover:bg-slate-200 transition">
-              매뉴얼 확인하기
-            </a>
+            <button className="bg-white text-slate-600 border border-slate-200 px-10 py-5 rounded-2xl text-lg font-bold hover:bg-slate-50 transition-all">
+              체험판 다운로드
+            </button>
           </div>
+        </div>
+        {/* 배경 장식 */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-0 opacity-20 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400 rounded-full blur-[120px]"></div>
         </div>
       </section>
 
       {/* --- 주요 기능 (Features) --- */}
-      <section id="features" className="py-24 bg-slate-50 px-6">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-16 font-sans">강력한 자동화 기능</h2>
-          <div className="grid md:grid-cols-3 gap-8">
+      <section id="features" className="py-32 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-black tracking-tight mb-4">비즈니스 성장을 돕는 강력한 도구</h2>
+            <p className="text-slate-500 text-lg font-medium">업무 효율을 극대화하는 AimTalk만의 핵심 기능입니다. [cite: 34]</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-10">
             {[
-              { title: "엑셀 명단 관리", desc: "명단 로드부터 개별 추가, 수신 거부 설정까지 엑셀 기반으로 완벽하게 관리합니다." },
-              { title: "그룹별 맞춤 발송", desc: "엑셀의 그룹 열을 기준으로 그룹마다 다른 메시지와 파일을 자동으로 발송합니다." },
-              { title: "실시간 모니터링", desc: "성공/실패 인원과 예상 종료 시간을 별도 팝업창을 통해 실시간으로 확인하세요." }
+              { icon: "📊", title: "엑셀 명단 로드", desc: "복잡한 입력 없이 엑셀 파일을 그대로 업로드하여 대량의 명단을 관리합니다. [cite: 43]" },
+              { icon: "📂", title: "그룹별 맞춤 메시지", desc: "엑셀 그룹 정보를 인식해 그룹마다 다른 메시지와 파일을 자동 발송합니다. [cite: 53, 54]" },
+              { icon: "📱", title: "실시간 모니터링", desc: "진행 상황과 성공/실패 여부를 별도의 팝업창으로 실시간 확인 가능합니다. [cite: 60]" }
             ].map((feature, i) => (
-              <div key={i} className="bg-white p-10 rounded-3xl border border-slate-100 hover:border-blue-300 transition shadow-sm">
-                <h3 className="text-xl font-bold mb-4">{feature.title}</h3>
-                <p className="text-slate-500 leading-relaxed">{feature.desc}</p>
+              <div key={i} className="group p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl hover:shadow-slate-200 transition-all duration-500">
+                <div className="text-4xl mb-8 group-hover:scale-110 transition-transform inline-block">{feature.icon}</div>
+                <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
+                <p className="text-slate-500 leading-relaxed font-medium">{feature.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* --- 사용 단계 (Manual) --- */}
-      <section id="manual" className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-16">단 4단계로 끝나는 자동화</h2>
-          <div className="space-y-12">
-            {[
-              { step: "STEP 1", title: "명단 로드", desc: "엑셀 파일을 업로드하거나 개별 인원을 즉석에서 추가합니다." },
-              { step: "STEP 2", title: "발송 설정", desc: "개인별 인사말 자동 생성 및 (광고) 문구 자동 삽입을 설정합니다." },
-              { step: "STEP 3", title: "메시지 작성", desc: "그룹별 탭에서 메시지를 작성하고 파일을 드래그 앤 드롭으로 추가합니다." },
-              { step: "STEP 4", title: "발송 및 결과", desc: "F2 키로 발송을 시작하고 완료 후 생성되는 결과 엑셀 파일을 확인합니다." }
-            ].map((item, i) => (
-              <div key={i} className="flex gap-8 items-start">
-                <div className="text-blue-600 font-black text-2xl pt-1">{item.step}</div>
-                <div>
-                  <h4 className="text-xl font-bold mb-2">{item.title}</h4>
-                  <p className="text-slate-500">{item.desc}</p>
-                </div>
-              </div>
-            ))}
+      {/* --- 등급별 라이선스 (Pricing) --- */}
+      <section id="pricing" className="py-32 px-6 bg-slate-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-black tracking-tight mb-4">합리적인 라이선스 플랜</h2>
+            <p className="text-slate-500 text-lg font-medium">비즈니스 규모에 맞는 최적의 플랜을 선택하세요.</p>
           </div>
-        </div>
-      </section>
-
-      {/* --- 등급별 안내 (Pricing) --- */}
-      <section id="pricing" className="py-24 bg-slate-900 px-6 rounded-[3rem] mx-4 my-10">
-        <div className="max-w-6xl mx-auto text-white">
-          <h2 className="text-4xl font-bold text-center mb-16">라이선스 등급 선택</h2>
-          <div className="grid md:grid-cols-2 gap-10 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Basic */}
-            <div className="bg-slate-800 p-10 rounded-[2.5rem] border border-slate-700">
-              <h3 className="text-2xl font-bold mb-4">Basic (기본형)</h3>
-              <ul className="space-y-4 mb-10 text-slate-300">
-                <li>• 시간당 최대 300명 발송</li>
-                <li>• 이미지 최대 2개 첨부</li>
-                <li className="opacity-50">• 예약 발송 미지원</li>
-                <li className="opacity-50">• 맞춤 인사말 미지원</li>
+            <div className="bg-white p-12 rounded-[3rem] border border-slate-200 shadow-sm relative flex flex-col">
+              <h3 className="text-2xl font-bold mb-2">Basic</h3>
+              <p className="text-slate-400 font-medium mb-8 text-sm italic">개인 및 소규모 사업자용</p>
+              <ul className="space-y-5 mb-12 flex-grow">
+                <li className="flex items-center gap-3 text-slate-600 font-semibold">✅ 시간당 최대 300명 발송 </li>
+                <li className="flex items-center gap-3 text-slate-600 font-semibold">✅ 이미지 최대 2개 첨부 </li>
+                <li className="flex items-center gap-3 text-slate-300 line-through">❌ 예약 발송 기능</li>
+                <li className="flex items-center gap-3 text-slate-300 line-through">❌ 맞춤 인사말 설정</li>
               </ul>
-              <button className="w-full py-4 bg-white text-slate-900 rounded-2xl font-bold">선택하기</button>
+              <button className="w-full py-5 rounded-2xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-all">선택하기</button>
             </div>
             {/* Pro */}
-            <div className="bg-blue-600 p-10 rounded-[2.5rem] relative overflow-hidden shadow-2xl shadow-blue-500/20">
-              <div className="absolute top-6 right-6 bg-white text-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Best</div>
-              <h3 className="text-2xl font-bold mb-4">Pro (비즈니스형)</h3>
-              <ul className="space-y-4 mb-10 text-blue-50">
-                <li>• 시간당 최대 500명 발송</li>
-                <li>• 모든 파일 첨부 및 무제한</li>
-                <li>• 시간 예약 발송 지원</li>
-                <li>• 고객 성함 자동 삽입</li>
-                <li>• 내 카톡 실시간 현황 보고</li>
+            <div className="bg-blue-600 p-12 rounded-[3rem] shadow-2xl shadow-blue-200 relative flex flex-col transform hover:-translate-y-2 transition-all">
+              <div className="absolute top-8 right-8 bg-white/20 backdrop-blur-md text-white text-xs font-black px-4 py-1.5 rounded-full tracking-wider">RECOMMENDED</div>
+              <h3 className="text-2xl font-bold mb-2 text-white">Pro</h3>
+              <p className="text-blue-200 font-medium mb-8 text-sm italic">전문 마케터 및 기업용</p>
+              <ul className="space-y-5 mb-12 flex-grow">
+                <li className="flex items-center gap-3 text-white font-semibold">🚀 시간당 최대 500명 발송 </li>
+                <li className="flex items-center gap-3 text-white font-semibold">🚀 모든 파일 무제한 첨부 </li>
+                <li className="flex items-center gap-3 text-white font-semibold">🚀 예약 발송 (시간 설정) </li>
+                <li className="flex items-center gap-3 text-white font-semibold">🚀 개인별 맞춤 인사말 지원 [cite: 40, 50]</li>
+                <li className="flex items-center gap-3 text-white font-semibold">🚀 내 카톡으로 실시간 현황 보고 [cite: 40, 49]</li>
               </ul>
-              <button className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold">선택하기</button>
+              <button className="w-full py-5 rounded-2xl bg-white text-blue-600 font-black text-lg hover:shadow-xl transition-all shadow-lg">비즈니스 시작하기</button>
             </div>
           </div>
-          <p className="text-center mt-12 text-slate-400 text-sm">
-            ※ 원활한 작동을 위해 윈도우 디스플레이 배율을 100%로 설정해 주세요.
+          <p className="text-center mt-16 text-slate-400 text-sm font-medium">
+            ※ 정확한 작동을 위해 윈도우 디스플레이 배율을 <span className="text-slate-900 underline font-bold">100%</span>로 설정해 주세요. [cite: 67]
           </p>
         </div>
       </section>
 
       {/* --- 푸터 (사업자 정보) --- */}
-      <footer className="py-20 bg-white border-t border-slate-100 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start gap-10">
-          <div className="text-left text-sm text-slate-500 leading-relaxed">
-            <div className="text-2xl font-bold text-slate-900 mb-4">랩진 (LabJin)</div>
-            <p>상호명: 랩진 | 대표자: 이진혁</p>
-            <p>사업자등록번호: 544-33-01720</p>
-            <p>소재지: 경기도 파주시 책향기로 403, 704동 9층 901호(동패동, 숲속길마을 월드메르디앙 센트럴파크)</p>
-            <p>개업연월일: 2026년 04월 29일</p>
+      <footer className="py-24 bg-white border-t border-slate-100 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-16">
+          <div className="max-w-md">
+            <div className="text-2xl font-black mb-6 tracking-tight text-slate-900">LabJin <span className="text-blue-600">.</span></div>
+            <p className="text-sm text-slate-400 font-medium leading-loose">
+              상호명: 랩진 [cite: 7] | 대표자: 이진혁 [cite: 9] <br />
+              사업자등록번호: 544-33-01720 [cite: 3] <br />
+              소재지: 경기도 파주시 책향기로 403, 704동 9층 901호(동패동, 숲속길마을 월드메르디앙 센트럴파크) [cite: 12] <br />
+              개업연월일: 2026년 04월 29일 [cite: 11]
+            </p>
           </div>
-          <p className="text-sm text-slate-400 self-end">© 2026 LabJin. All rights reserved.</p>
+          <div className="flex flex-col md:items-end justify-between h-full">
+            <p className="text-sm text-slate-400 font-bold">© 2026 LabJin. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>
