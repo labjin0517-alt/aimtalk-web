@@ -1,156 +1,197 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 
 export default function Home() {
+  // 현재 활성화된 탭 상태 관리
+  const [activeTab, setActiveTab] = useState('usage');
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-blue-100">
-      {/* --- 네비게이션 (가톡 스타일) --- */}
-      <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/50">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">A</div>
-            <span className="text-xl font-black tracking-tighter italic">AimTalk</span>
+    <div className="min-h-screen bg-white text-slate-900 font-sans">
+      {/* --- 상단 헤더 (청색 배경 + 노란색 포인트) --- */}
+      <nav className="bg-[#1A5266] text-white py-6 sticky top-0 z-50 shadow-md">
+        <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
+          <div className="text-3xl font-black italic tracking-tighter">AimTalk</div>
+          <div className="flex gap-6 md:gap-12 text-[16px] font-bold">
+            <button 
+              onClick={() => setActiveTab('intro')}
+              className={`hover:text-yellow-400 transition ${activeTab === 'intro' ? 'text-yellow-400 underline underline-offset-8 decoration-2' : ''}`}
+            >프로그램 소개</button>
+            <button 
+              onClick={() => setActiveTab('usage')}
+              className={`hover:text-yellow-400 transition ${activeTab === 'usage' ? 'text-yellow-400 underline underline-offset-8 decoration-2' : ''}`}
+            >사용 방법</button>
+            <button 
+              onClick={() => setActiveTab('download')}
+              className={`hover:text-yellow-400 transition ${activeTab === 'download' ? 'text-yellow-400 underline underline-offset-8 decoration-2' : ''}`}
+            >다운로드</button>
+            <button 
+              onClick={() => setActiveTab('pricing')}
+              className={`hover:text-yellow-400 transition ${activeTab === 'pricing' ? 'text-yellow-400 underline underline-offset-8 decoration-2' : ''}`}
+            >가격</button>
+            <button 
+              onClick={() => setActiveTab('qna')}
+              className={`hover:text-yellow-400 transition ${activeTab === 'qna' ? 'text-yellow-400 underline underline-offset-8 decoration-2' : ''}`}
+            >Q&A</button>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-[14px] font-semibold text-slate-500">
-            <a href="#features" className="hover:text-blue-600 transition">주요기능</a>
-            <a href="#pricing" className="hover:text-blue-600 transition">이용요금</a>
-            <a href="#policy" className="hover:text-blue-600 transition">고객지원</a>
-          </div>
-          <button className="text-[13px] font-bold px-5 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
-            에임톡 다운로드
-          </button>
         </div>
       </nav>
 
-      {/* 중앙 정렬을 위한 컨테이너 폭 제한 (max-w-4xl) */}
-      <main className="max-w-4xl mx-auto px-6">
+      {/* --- 메인 컨텐츠 영역 (가로 폭 제한) --- */}
+      <main className="max-w-6xl mx-auto px-6 py-16 min-h-[600px]">
         
-        {/* --- Hero 섹션 --- */}
-        <section className="pt-40 pb-24 text-center">
-          <div className="inline-block px-4 py-1.5 mb-8 text-[13px] font-bold text-blue-700 bg-blue-50 rounded-full border border-blue-100 shadow-sm animate-bounce">
-            🎁 3일 무료 체험 프리코드: <span className="underline decoration-2 underline-offset-4">AIMFREE3</span>
+        {/* 탭 1: 프로그램 소개 */}
+        {activeTab === 'intro' && (
+          <div className="animate-in fade-in duration-500">
+            <div className="bg-[#1A5266] text-white inline-block px-6 py-2 mb-8 font-bold">AimTalk v1.03 개요</div>
+            <p className="text-xl font-bold leading-relaxed text-slate-800">
+              AimTalk은 엑셀 명단을 기반으로 카카오톡 메시지 및 파일을 자동 발송하는 스마트 마케팅 솔루션입니다.
+            </p>
+            <p className="mt-4 text-slate-600 font-medium">
+              그룹별 맞춤 메시지 설정, 예약 발송, 실시간 모니터링 기능을 통해 업무 효율을 극대화합니다.
+            </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-8 leading-[1.2]">
-            카카오톡 단체발송의 정석<br />
-            <span className="text-blue-600">에임톡 AimTalk v1.03 [cite: 31]</span>
-          </h1>
-          <p className="text-lg text-slate-500 mb-10 font-medium leading-relaxed">
-            엑셀 명단 로드만으로 메시지와 파일 발송 완료[cite: 33, 43].<br />
-            그룹별 맞춤 발송과 실시간 모니터링으로 마케팅을 자동화하세요[cite: 34, 53].
-          </p>
-          <div className="flex justify-center gap-4">
-            <button className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all active:scale-95">
-              3일 무료 사용하기
-            </button>
-          </div>
-        </section>
+        )}
 
-        {/* --- 핵심 기능 소개 (카드형) --- */}
-        <section id="features" className="py-20 border-t border-slate-100">
-          <div className="grid md:grid-cols-2 gap-4">
-            {[
-              { title: "자동 메시지 & 파일 발송", desc: "텍스트는 물론 이미지와 모든 파일을 엑셀 명단 기반으로 자동 전송합니다[cite: 33, 54].", icon: "🚀" },
-              { title: "그룹별 맞춤 타겟팅", desc: "그룹마다 다른 메시지를 작성하면 에임톡이 알아서 구분하여 발송합니다[cite: 53].", icon: "🎯" },
-              { title: "실시간 발송 모니터링", desc: "성공/실패 인원과 예상 종료 시간을 실시간 팝업창으로 확인 가능합니다[cite: 60].", icon: "📊" },
-              { title: "안전한 수신 거부 관리", desc: "수신 거부 필터링 기능을 통해 광고성 메시지 규제를 완벽히 준수합니다[cite: 46, 51].", icon: "🛡️" }
-            ].map((f, i) => (
-              <div key={i} className="p-8 bg-white border border-slate-100 rounded-3xl hover:border-blue-200 transition-all shadow-sm">
-                <div className="text-3xl mb-4">{f.icon}</div>
-                <h3 className="text-xl font-bold mb-3">{f.title}</h3>
-                <p className="text-slate-500 text-sm font-medium leading-relaxed">{f.desc}</p>
+        {/* 탭 2: 사용 방법 (슬라이드 1 재현) */}
+        {activeTab === 'usage' && (
+          <div className="flex flex-col md:flex-row gap-12 items-start animate-in slide-in-from-right duration-500">
+            <div className="flex-1 w-full bg-white border-2 border-[#1A5266] rounded-lg p-4 shadow-xl">
+              <div className="bg-[#1A5266] text-white text-center py-2 mb-4 font-bold tracking-widest">프로그램 실행화면</div>
+              {/* 실제 이미지가 있다면 아래 div를 <img> 태그로 바꾸세요 */}
+              <div className="bg-slate-100 aspect-[4/3] rounded flex items-center justify-center text-slate-400 italic border border-dashed border-slate-300">
+                [ 프로그램 메인 스크린샷 위치 ]
               </div>
-            ))}
+            </div>
+            <div className="flex-1 space-y-8">
+              <div>
+                <h3 className="text-2xl font-black mb-2">Step1. 명단 업로드 (엑셀파일)</h3>
+                <p className="text-slate-600 font-bold">- 양식 다운로드 가능</p>
+              </div>
+              <div>
+                <h3 className="text-2xl font-black mb-2">Step2. 대상 필터링</h3>
+                <p className="text-slate-600 font-bold">- 선택 제외 가능</p>
+                <p className="text-slate-600 font-bold">- 추가 및 수신거부인원 등록 가능</p>
+              </div>
+              <div>
+                <h3 className="text-2xl font-black mb-2">Step3. 발송 설정</h3>
+                <ul className="text-slate-600 font-bold space-y-1">
+                  <li>- 플랜 별 최고 발송속도 기본입력 (조절 가능)</li>
+                  <li>- 발송현황 카톡보고 사용</li>
+                  <li>- 발송 순서 (파일, 텍스트 선택)</li>
+                  <li>- 광고메세지 여부, 개별 인사말 기능</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-2xl font-black mb-2 text-blue-600">Step4. 내용 작성 및 첨부파일 등록</h3>
+              </div>
+            </div>
           </div>
-        </section>
+        )}
 
-        {/* --- 요금제 (Pricing Table) --- */}
-        <section id="pricing" className="py-24">
-          <h2 className="text-3xl font-black text-center mb-16">라이선스 플랜</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Basic */}
-            <div className="p-8 bg-white border border-slate-100 rounded-[2.5rem] flex flex-col shadow-sm">
-              <h3 className="text-slate-400 font-bold text-sm mb-4">Basic (기본형) [cite: 40]</h3>
-              <div className="text-3xl font-black mb-8">8,000원 <span className="text-[14px] font-medium text-slate-400">/ 월</span></div>
-              <ul className="text-[13px] space-y-4 mb-10 text-slate-500 font-medium flex-grow">
-                <li className="flex items-center gap-2">✅ 시간당 최대 300명 [cite: 40]</li>
-                <li className="flex items-center gap-2">✅ 이미지 최대 2개 [cite: 40]</li>
-                <li className="text-slate-300">❌ 예약 발송 미지원</li>
-              </ul>
-              <button className="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm">구독하기</button>
+        {/* 탭 3: 다운로드 (슬라이드 2 재현) */}
+        {activeTab === 'download' && (
+          <div className="animate-in slide-in-from-right duration-500">
+            <div className="flex flex-wrap gap-6 mb-16">
+              <button className="bg-[#1A5266] text-white px-12 py-4 font-black border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+                실행파일 다운로드
+              </button>
+              <button className="bg-white text-[#1A5266] px-12 py-4 font-black border-2 border-[#1A5266] shadow-[6px_6px_0px_0px_rgba(26,82,102,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+                사용 설명서
+              </button>
             </div>
-            {/* Pro */}
-            <div className="p-8 bg-white border-2 border-blue-600 rounded-[2.5rem] flex flex-col shadow-2xl shadow-blue-100 relative scale-105 z-10">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-black px-4 py-1 rounded-full">BEST CHOICE</div>
-              <h3 className="text-blue-600 font-bold text-sm mb-4">Pro (비즈니스형) [cite: 40]</h3>
-              <div className="text-3xl font-black mb-8">16,000원 <span className="text-[14px] font-medium text-slate-400">/ 월</span></div>
-              <ul className="text-[13px] space-y-4 mb-10 text-slate-600 font-bold flex-grow">
-                <li className="flex items-center gap-2">🚀 시간당 최대 500명 [cite: 40]</li>
-                <li className="flex items-center gap-2">🚀 파일 무제한 첨부 [cite: 40]</li>
-                <li className="flex items-center gap-2">🚀 예약 발송 & 맞춤 인사말 [cite: 40]</li>
-              </ul>
-              <button className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-sm hover:shadow-lg transition-all">구독하기</button>
-            </div>
-            {/* Master */}
-            <div className="p-8 bg-slate-900 text-white border border-slate-800 rounded-[2.5rem] flex flex-col">
-              <h3 className="text-slate-400 font-bold text-sm mb-4">Master (엔터프라이즈)</h3>
-              <div className="text-3xl font-black mb-8">20,000원 <span className="text-[14px] font-medium text-slate-500">/ 월</span></div>
-              <ul className="text-[13px] space-y-4 mb-10 text-slate-300 font-medium flex-grow">
-                <li className="flex items-center gap-2">🔥 시간당 최대 700명 발송</li>
-                <li className="flex items-center gap-2 font-bold text-blue-400 text-xs">✨ 신규 채팅방 자동 개설</li>
-                <li className="flex items-center gap-2">🔥 Pro 모든 기능 포함</li>
-              </ul>
-              <button className="w-full py-4 bg-white text-slate-900 rounded-2xl font-bold text-sm">구독하기</button>
+            <div className="p-8 bg-slate-50 rounded-xl border border-slate-200">
+              <h4 className="text-xl font-black mb-6 border-b-2 border-[#1A5266] inline-block pb-1">참고 사항</h4>
+              <div className="space-y-4 font-bold text-lg">
+                <p>(1) 프로그램 업데이트 : 프로그램 실행 시 업데이트 파일 다운 안내</p>
+                <p className="text-blue-700">(2) 윈도우 디스플레이 배율 100% 설정 권장</p>
+                <p className="text-slate-500 text-sm italic">※ 3일 무료 체험 프리코드: AIMFREE3</p>
+              </div>
             </div>
           </div>
-          <p className="text-center mt-12 text-slate-400 text-[12px] font-medium italic">
-            ※ 프로그램 구동을 위해 윈도우 디스플레이 배율 100% 설정이 필요합니다[cite: 67].
-          </p>
-        </section>
+        )}
 
-        {/* --- PG사 심사 필수 약관 섹션 (반드시 필요) --- */}
-        <section id="policy" className="py-24 border-t border-slate-100">
-          <h2 className="text-xl font-black mb-10 text-slate-400 text-center uppercase tracking-widest">Customer Policy</h2>
-          <div className="grid md:grid-cols-3 gap-8 text-[11px] text-slate-500 leading-relaxed">
-            <div className="space-y-4">
-              <h4 className="font-bold text-slate-800 text-[13px]">이용약관</h4>
-              <div className="h-40 overflow-y-auto bg-slate-50 p-4 rounded-xl scrollbar-hide border border-slate-100">
-                제1조 (목적) 본 약관은 랩진(이하 '회사')이 제공하는 에임톡 서비스의 이용 조건 및 절차를 규정합니다. 
-                제2조 (라이선스) 이용자는 구매한 플랜에 명시된 기능 범위 내에서 소프트웨어를 사용할 수 있습니다...
-              </div>
+        {/* 탭 4: 가격 (슬라이드 3 재현) */}
+        {activeTab === 'pricing' && (
+          <div className="animate-in slide-in-from-right duration-500">
+            <div className="bg-[#1A5266] text-white inline-block px-6 py-2 mb-8 font-bold">라이선스 플랜 가격 및 기능</div>
+            <div className="overflow-hidden border-2 border-[#1A5266] rounded-xl">
+              <table className="w-full border-collapse text-center">
+                <thead className="bg-[#1A5266] text-white">
+                  <tr>
+                    <th className="p-5 font-black border-r border-slate-400">라이선스</th>
+                    <th className="p-5 font-black border-r border-slate-400 text-slate-300">Basic</th>
+                    <th className="p-5 font-black border-r border-slate-400 text-yellow-300 underline underline-offset-4">Pro</th>
+                    <th className="p-5 font-black">Master</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 font-bold">
+                  <tr className="divide-x divide-slate-200">
+                    <td className="p-5 bg-slate-50">가격</td>
+                    <td className="p-5">8,000원</td>
+                    <td className="p-5 bg-blue-50/50 text-blue-700">16,000원</td>
+                    <td className="p-5">20,000원</td>
+                  </tr>
+                  <tr className="divide-x divide-slate-200">
+                    <td className="p-5 bg-slate-50">발송속도 (시간당)</td>
+                    <td className="p-5">최대 300명</td>
+                    <td className="p-5 bg-blue-50/50">최대 500명</td>
+                    <td className="p-5 text-blue-600">최대 700명</td>
+                  </tr>
+                  <tr className="divide-x divide-slate-200 align-top text-left">
+                    <td className="p-5 bg-slate-50 text-center">부가 기능</td>
+                    <td className="p-5 text-[13px] leading-relaxed">
+                      (1) 이미지 2개 첨부<br/>(2) 그룹별 발송<br/>(3) 수신거부
+                    </td>
+                    <td className="p-5 text-[13px] leading-relaxed bg-blue-50/50">
+                      Basic 기능 포함 +<br/>(1) 첨부파일 무제한<br/>(2) 예약발송<br/>(3) 결과 다운로드
+                    </td>
+                    <td className="p-5 text-[13px] leading-relaxed">
+                      Pro 기능 포함 +<br/>(1) 채팅방 미개설 친구 발송<br/>(2) 실시간보고, 맞춤 인사말
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div className="space-y-4">
-              <h4 className="font-bold text-slate-800 text-[13px]">개인정보처리방침</h4>
-              <div className="h-40 overflow-y-auto bg-slate-50 p-4 rounded-xl border border-slate-100">
-                회사는 이용자의 성함, 연락처, 결제 정보를 수집하며 이는 서비스 제공 및 결제 정산 목적으로만 사용됩니다. 
-                수집된 정보는 관계 법령에 따라 안전하게 보호되며 동의 없이 제3자에게 제공되지 않습니다...
-              </div>
+            <div className="mt-8 p-6 bg-slate-50 rounded-lg text-sm font-bold text-slate-500 border-l-4 border-blue-600">
+              ※ 소프트웨어 특성상 라이선스 코드가 발송된 이후에는 단순 변심 환불이 불가합니다.<br />
+              이용 내역이 없는 경우에 한해 7일 이내 환불 가능합니다.
             </div>
-            <div className="space-y-4">
-              <h4 className="font-bold text-slate-800 text-[13px]">환불 및 해지 정책</h4>
-              <div className="h-40 overflow-y-auto bg-slate-50 p-4 rounded-xl border border-slate-100 font-bold text-blue-600">
-                [환불 규정 필독]<br />
-                1. 소프트웨어 라이선스 특성상 코드가 발급 및 인증된 이후에는 단순 변심으로 인한 환불이 불가합니다.<br />
-                2. 결제 후 이용 내역이 없는 경우 7일 이내 전액 환불이 가능합니다.<br />
-                3. 정기결제 해지는 마이페이지에서 언제든 신청 가능하며 다음 결제일부터 청구되지 않습니다.
+          </div>
+        )}
+
+        {/* 탭 5: Q&A */}
+        {activeTab === 'qna' && (
+          <div className="animate-in fade-in duration-500">
+            <h2 className="text-2xl font-black mb-10 italic border-b-2 border-slate-900 inline-block">Q&A 고객 지원</h2>
+            <div className="space-y-8">
+              <div className="group">
+                <p className="text-lg font-black mb-2 text-[#1A5266]">Q. 결제 후 어떻게 사용하나요?</p>
+                <p className="text-slate-600 font-bold leading-relaxed">A. 결제 시 등록하신 이메일로 라이선스 키가 발송됩니다. 프로그램 하단 인증 창에 입력하시면 바로 사용 가능합니다.</p>
+              </div>
+              <div className="group">
+                <p className="text-lg font-black mb-2 text-[#1A5266]">Q. 다른 컴퓨터에서도 쓸 수 있나요?</p>
+                <p className="text-slate-600 font-bold leading-relaxed">A. 1 라이선스당 1대의 PC에서만 인증이 가능합니다. PC 변경이 필요한 경우 고객센터로 문의주세요.</p>
               </div>
             </div>
           </div>
-        </section>
+        )}
       </main>
 
-      {/* --- 푸터 (사업자 정보 - PG 심사 통과 핵심) --- */}
-      <footer className="py-24 bg-white border-t border-slate-100">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-12">
-            <div className="text-[12px] text-slate-400 space-y-2 font-medium">
-              <div className="text-slate-900 font-black text-2xl mb-6 italic">LabJin <span className="text-blue-600">.</span></div>
-              <p>상호명: 랩진 [cite: 7] | 대표자: 이진혁 [cite: 9]</p>
-              <p>사업자등록번호: 544-33-01720 [cite: 3]</p>
-              <p>연락처: <span className="text-blue-600 font-bold underline">010-XXXX-XXXX</span> (※실제 번호로 수정 필수)</p>
-              <p>주소: 경기도 파주시 책향기로 403, 704동 9층 901호 [cite: 12]</p>
-              <p>개업연월일: 2026년 04월 29일 [cite: 11]</p>
+      {/* --- 하단 정보 (푸터 - PG 심사 필수 정보 포함) --- */}
+      <footer className="bg-[#1A5266] text-white py-16 border-t border-slate-500">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-end gap-10">
+            <div className="text-[13px] font-medium leading-relaxed opacity-90">
+              <p className="text-2xl font-black mb-6 italic tracking-tight">LabJin</p>
+              <p>상호명: 랩진 | 대표자: 이진혁</p>
+              <p>사업자등록번호: 544-33-01720</p>
+              <p>연락처: 010-8294-8919</p>
+              <p>주소: 경기도 파주시 책향기로 403, 704동 9층 901호</p>
+              <p>개업연월일: 2026년 04월 29일</p>
             </div>
-            <div className="text-[11px] text-slate-300 self-end font-bold tracking-widest">
-              © 2026 LabJin. All rights reserved. [cite: 28]
+            <div className="text-right">
+              <p className="text-[12px] opacity-60 font-bold italic tracking-widest">© 2026 LabJin. All rights reserved.</p>
             </div>
           </div>
         </div>
