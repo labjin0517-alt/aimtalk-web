@@ -150,7 +150,7 @@ export default function Home() {
             <div className="leading-relaxed mb-6 md:mb-0">
               <p className="text-white text-base font-bold mb-2">Lab.Jin (AimTalk)</p>
               <p>상호명: Lab.Jin | 대표자: 이진혁 | 사업자등록번호: 544-33-01720</p>
-              <p>연락처: 010-8294-8919 | 이메일: support@aimtalk.com</p>
+              <p>연락처: 010-8294-8919 | 이메일: labjin0517@gmail.com</p>
               <p>주소: 경기도 파주시 책향기로 403, 704동 9층 901호</p>
             </div>
             <div className="flex flex-col items-start md:items-end gap-3">
@@ -190,7 +190,7 @@ export default function Home() {
                 <li>수집 항목: 이름, 이메일, 휴대전화 번호, 결제 기록</li>
                 <li>보유 기간: 전자상거래법에 따라 대금 결제 기록은 5년간 보관</li>
               </ul>
-              <p>개인정보 보호 책임자: 이진혁 / support@aimtalk.com</p>
+              <p>개인정보 보호책임자: 이진혁 / labjin0517@gmail.com</p>
             </div>
             <button onClick={closeModal} className="mt-6 w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-bold transition">닫기</button>
           </div>
