@@ -1,215 +1,201 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import { useState } from "react";
+import Script from "next/script";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('usage');
+  // 모달창 열고 닫기를 위한 상태(State) 관리
+  const [activeModal, setActiveModal] = useState<string | null>(null);
+
+  const openModal = (id: string) => {
+    setActiveModal(id);
+    document.body.style.overflow = "hidden"; // 배경 스크롤 방지
+  };
+
+  const closeModal = () => {
+    setActiveModal(null);
+    document.body.style.overflow = "auto"; // 배경 스크롤 복구
+  };
+
+  // 포트원 결제 함수
+  const handlePay = (plan: string, amount: number) => {
+    if (confirm(`${plan} 플랜 (${amount.toLocaleString()}원) 결제를 진행할까요?`)) {
+      if (typeof window !== "undefined" && (window as any).IMP) {
+        const IMP = (window as any).IMP;
+        IMP.init("impXXXXXXXX"); // 💡 본인의 가맹점 식별코드로 변경하세요.
+
+        IMP.request_pay(
+          {
+            pg: "html5_inicis",
+            pay_method: "card",
+            merchant_uid: "mid_" + new Date().getTime(),
+            name: "AimTalk " + plan,
+            amount: amount,
+          },
+          function (rsp: any) {
+            if (rsp.success) {
+              alert("결제 완료!");
+            } else {
+              alert("결제 실패: " + rsp.error_msg);
+            }
+          }
+        );
+      } else {
+        alert("결제 모듈을 로딩 중입니다. 잠시 후 다시 시도해 주세요.");
+      }
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9] text-slate-800 font-sans selection:bg-blue-100">
-      
-      {/* --- 상단 네비게이션 (고정형) --- */}
-      <nav className="bg-[#1A5266] text-white sticky top-0 z-50 shadow-lg">
-        <div className="max-w-5xl mx-auto px-6 h-20 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-inner">
-               <span className="text-[#1A5266] text-2xl font-black italic">A</span>
-            </div>
-            <span className="text-2xl font-black tracking-tighter italic">AimTalk</span>
-          </div>
-          
-          <div className="hidden md:flex gap-2">
-            {[
-              { id: 'intro', label: '소개' },
-              { id: 'usage', label: '사용 방법' },
-              { id: 'download', label: '다운로드' },
-              { id: 'pricing', label: '요금제' },
-              { id: 'qna', label: 'Q&A' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-300 ${
-                  activeTab === tab.id 
-                  ? 'bg-yellow-400 text-[#1A5266] shadow-md' 
-                  : 'hover:bg-white/10 text-white/80'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+    <>
+      {/* 포트원 결제 라이브러리 로드 */}
+      <Script src="https://cdn.iamport.kr/v1/iamport.js" strategy="lazyOnload" />
+
+      {/* 1. 상단 네비게이션 바 */}
+      <header className="bg-[#1e6082] text-white sticky top-0 z-50 shadow-md">
+        <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
+          <h1 className="text-xl font-bold cursor-pointer" onClick={() => (window.location.href = "/")}>
+            AimTalk
+          </h1>
+          <nav className="hidden md:flex space-x-6 text-sm font-medium">
+            <a href="#intro" className="hover:text-yellow-300">프로그램 소개</a>
+            <a href="#howto" className="hover:text-yellow-300">사용 방법</a>
+            <a href="#download" className="hover:text-yellow-300">다운로드</a>
+            <a href="#pricing" className="hover:text-yellow-300">가격안내</a>
+            <a href="#qa" className="hover:text-yellow-300">Q&A</a>
+          </nav>
         </div>
-      </nav>
+      </header>
 
-      {/* --- 메인 컨텐츠 영역 (중앙 정렬 및 폭 제한) --- */}
-      <main className="max-w-4xl mx-auto px-6 py-20 min-h-[700px]">
-        
-        {/* 1. 프로그램 소개 */}
-        {activeTab === 'intro' && (
-          <div className="bg-white rounded-[2rem] p-12 shadow-xl border border-slate-200 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <span className="inline-block px-4 py-1 bg-blue-50 text-[#1A5266] rounded-full text-xs font-black mb-6 tracking-widest uppercase">Overview</span>
-            <h2 className="text-3xl font-black text-slate-900 mb-8 leading-tight">
-              가장 스마트한 카카오톡 <br />
-              <span className="text-[#1A5266]">자동 마케팅 파트너</span>
-            </h2>
-            <p className="text-lg text-slate-600 font-medium leading-relaxed mb-8">
-              에임톡(AimTalk)은 번거로운 반복 발송 업무를 엑셀 하나로 자동화합니다. 
-              명단 로드부터 파일 첨부까지, 가장 직관적인 인터페이스를 경험하세요.
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-               <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                  <div className="text-2xl mb-2">⚡</div>
-                  <div className="font-bold text-slate-800">빠른 발송 속도</div>
-                  <div className="text-sm text-slate-500">시간당 최대 700명 발송 지원</div>
-               </div>
-               <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                  <div className="text-2xl mb-2">🎯</div>
-                  <div className="font-bold text-slate-800">정밀한 타겟팅</div>
-                  <div className="text-sm text-slate-500">그룹별 맞춤 메시지 자동 생성</div>
-               </div>
+      {/* 2. 메인 콘텐츠 영역 */}
+      <main className="flex-grow">
+        {/* 히어로 섹션 (소개) */}
+        <section id="intro" className="py-20 bg-white border-b">
+          <div className="max-w-6xl mx-auto px-6 text-center">
+            <h2 className="text-4xl font-extrabold mb-4 text-gray-900">AimTalk 카카오톡 자동화 솔루션</h2>
+            <p className="text-lg text-gray-600 mb-8">반복되는 업무는 에임톡에게 맡기고, 당신은 비즈니스에만 집중하세요.</p>
+            <div className="flex justify-center gap-4">
+              <a href="#pricing" className="bg-[#1e6082] text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-800 transition">
+                지금 시작하기
+              </a>
             </div>
           </div>
-        )}
+        </section>
 
-        {/* 2. 사용 방법 (카드형 디자인) */}
-        {activeTab === 'usage' && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-            <div className="bg-white rounded-[2rem] p-4 shadow-2xl border border-slate-200 overflow-hidden transform hover:scale-[1.01] transition-transform">
-               <div className="bg-[#1A5266] text-white py-3 text-center text-sm font-black tracking-[0.2em] rounded-t-[1.5rem]">UI PREVIEW</div>
-               <div className="bg-slate-800 aspect-video flex items-center justify-center text-white/20 font-black italic text-4xl">
-                  {/* 실제 스크린샷 <img>를 넣으면 완벽합니다 */}
-                  SCREENSHOT
-               </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {[
-                { step: "01", title: "명단 로드", desc: "양식에 맞춘 엑셀파일을 업로드합니다. 필터링 기능을 통해 전송 대상을 자유롭게 선택할 수 있습니다." },
-                { step: "02", title: "발송 설정", desc: "발송 속도, 광고 문구 포함 여부, 인사말 자동 삽입 등 핵심 옵션을 클릭 한 번으로 설정합니다." },
-                { step: "03", title: "내용 작성", desc: "텍스트 메시지와 함께 이미지, 문서 등 다양한 파일을 드래그 앤 드롭으로 추가합니다." },
-                { step: "04", title: "모니터링", desc: "발송 시작 버튼을 누르면 실시간 팝업창을 통해 성공 여부와 진행 상황을 한눈에 확인합니다." }
-              ].map((s, i) => (
-                <div key={i} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:border-[#1A5266] transition-colors group">
-                  <div className="text-2xl font-black text-[#1A5266]/20 mb-4 group-hover:text-[#1A5266] transition-colors">{s.step}</div>
-                  <h3 className="text-xl font-black text-slate-800 mb-3">{s.title}</h3>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">{s.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 3. 다운로드 (버튼 강조) */}
-        {activeTab === 'download' && (
-          <div className="text-center animate-in zoom-in-95 duration-300">
-             <div className="bg-white rounded-[3rem] p-16 shadow-xl border border-slate-200">
-                <h2 className="text-3xl font-black mb-12">설치 파일을 다운로드 하세요</h2>
-                <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
-                   <button className="flex-1 bg-[#1A5266] text-white py-5 px-10 rounded-2xl font-black text-xl hover:shadow-2xl hover:-translate-y-1 transition-all">
-                      실행파일 다운로드
-                   </button>
-                   <button className="flex-1 bg-white text-[#1A5266] py-5 px-10 rounded-2xl font-black text-xl border-2 border-[#1A5266] hover:bg-slate-50 transition-all">
-                      사용 설명서 (PDF)
-                   </button>
-                </div>
-                <div className="bg-blue-50 p-8 rounded-3xl text-left border border-blue-100">
-                   <h4 className="font-black text-[#1A5266] mb-4 text-lg">💡 필수 참고 사항</h4>
-                   <ul className="space-y-3 text-slate-600 font-bold">
-                      <li>• 원활한 발송을 위해 윈도우 배율을 100%로 설정해 주세요.</li>
-                      <li>• 처음 실행 시 'AIMFREE3' 코드로 3일간 무료 체험이 가능합니다.</li>
-                   </ul>
-                </div>
-             </div>
-          </div>
-        )}
-
-        {/* 4. 요금제 (세련된 테이블) */}
-        {activeTab === 'pricing' && (
-          <div className="animate-in fade-in duration-500">
-            <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-[#1A5266] text-white">
-                    <th className="p-6 text-sm font-black border-r border-white/10 uppercase tracking-widest">Plan</th>
-                    <th className="p-6 text-xl font-black border-r border-white/10">Basic</th>
-                    <th className="p-6 text-xl font-black border-r border-white/10 bg-yellow-400 text-[#1A5266]">Pro</th>
-                    <th className="p-6 text-xl font-black">Master</th>
-                  </tr>
-                </thead>
-                <tbody className="text-slate-700 font-bold divide-y divide-slate-100">
-                  <tr className="divide-x divide-slate-100">
-                    <td className="p-6 bg-slate-50 text-center font-black text-slate-400">월 이용료</td>
-                    <td className="p-6 text-center text-lg">8,000원</td>
-                    <td className="p-6 text-center text-2xl text-blue-600 font-black">16,000원</td>
-                    <td className="p-6 text-center text-lg">20,000원</td>
-                  </tr>
-                  <tr className="divide-x divide-slate-100">
-                    <td className="p-6 bg-slate-50 text-center font-black text-slate-400 text-xs uppercase">Speed</td>
-                    <td className="p-6 text-center">300명 / h</td>
-                    <td className="p-6 text-center font-black">500명 / h</td>
-                    <td className="p-6 text-center text-blue-600 font-black">700명 / h</td>
-                  </tr>
-                  <tr className="divide-x divide-slate-100 align-top">
-                    <td className="p-6 bg-slate-50 text-center font-black text-slate-400">주요기능</td>
-                    <td className="p-6 text-sm space-y-2 opacity-60 font-medium">
-                      • 이미지 2개 첨부<br/>• 그룹별 발송<br/>• 수신거부 필터링
-                    </td>
-                    <td className="p-6 text-sm space-y-2 bg-blue-50/50">
-                      • 파일 무제한 첨부<br/>• 예약 발송 시스템<br/>• 발송 결과 엑셀저장
-                    </td>
-                    <td className="p-6 text-sm space-y-2">
-                      • 신규 채팅방 개설<br/>• 실시간 보고 시스템<br/>• 맞춤 인사말 자동화
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div className="p-6 bg-slate-900 text-white/50 text-[11px] text-center font-medium">
-                ※ 라이선스 인증 후 환불 불가 | 결제 후 미사용 시 7일 내 환불 가능
+        {/* 가격표 섹션 (2개 플랜) */}
+        <section id="pricing" className="py-20 max-w-5xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-center mb-12">라이선스 요금제</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {/* Basic Plan */}
+            <div className="bg-white p-10 rounded-2xl shadow-sm border border-gray-200 text-center hover:shadow-lg transition">
+              <h3 className="text-xl font-bold mb-4">Basic</h3>
+              <div className="text-4xl font-bold mb-8 text-[#1e6082]">
+                8,000원 <span className="text-sm font-normal text-gray-400">/ 월</span>
               </div>
+              <ul className="text-gray-600 space-y-4 mb-10 text-left">
+                <li>• 기본 메시지 자동 발송</li>
+                <li>• 1일 발송 한도 적용</li>
+                <li>• 이메일 고객 지원</li>
+              </ul>
+              <button
+                onClick={() => handlePay("Basic", 8000)}
+                className="w-full py-4 rounded-xl border border-[#1e6082] text-[#1e6082] font-bold hover:bg-blue-50"
+              >
+                베이직 결제하기
+              </button>
+            </div>
+
+            {/* Pro Plan */}
+            <div className="bg-white p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center relative">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#1e6082] text-white px-4 py-1 rounded-full text-xs font-bold uppercase">
+                추천
+              </div>
+              <h3 className="text-xl font-bold mb-4">Pro</h3>
+              <div className="text-4xl font-bold mb-8 text-[#1e6082]">
+                16,000원 <span className="text-sm font-normal text-gray-400">/ 월</span>
+              </div>
+              <ul className="text-gray-600 space-y-4 mb-10 text-left">
+                <li className="font-bold">• Basic 기능 모두 포함</li>
+                <li className="font-bold">• 예약 발송 기능 제공</li>
+                <li className="font-bold">• 무제한 타겟 리스트 관리</li>
+                <li className="font-bold">• 원격 기술 지원</li>
+              </ul>
+              <button
+                onClick={() => handlePay("Pro", 16000)}
+                className="w-full py-4 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg"
+              >
+                프로 결제하기
+              </button>
             </div>
           </div>
-        )}
-
-        {/* 5. Q&A */}
-        {activeTab === 'qna' && (
-          <div className="space-y-4 animate-in fade-in duration-500">
-            {[
-              { q: "결제 후 라이선스는 어떻게 받나요?", a: "결제 완료 즉시 입력하신 이메일로 라이선스 코드가 자동 발송됩니다." },
-              { q: "프로그램 배율 설정이 무엇인가요?", a: "에임톡은 윈도우 좌표를 사용합니다. 설정 -> 디스플레이에서 배율을 100%로 설정하셔야 정확하게 작동합니다." },
-              { q: "구독 해지는 언제든 가능한가요?", a: "네, 마이페이지에서 언제든 자동 결제 해지가 가능하며 다음 달부터 청구되지 않습니다." }
-            ].map((item, i) => (
-              <div key={i} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-                <div className="text-[#1A5266] font-black text-lg mb-3 flex items-center gap-2">
-                   <span className="w-6 h-6 bg-[#1A5266] text-white rounded-full flex items-center justify-center text-xs italic">Q</span>
-                   {item.q}
-                </div>
-                <div className="pl-8 text-slate-500 font-medium leading-relaxed">{item.a}</div>
-              </div>
-            ))}
-          </div>
-        )}
+        </section>
       </main>
 
-      {/* --- 푸터 (정돈된 정보 레이아웃) --- */}
-      <footer className="bg-slate-900 text-white py-20 border-t border-slate-800">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between gap-12">
-            <div className="space-y-6">
-               <div className="text-3xl font-black italic tracking-tighter">LabJin.</div>
-               <div className="text-sm text-slate-400 leading-loose font-medium">
-                  상호명: 랩진 | 대표자: 이진혁<br />
-                  사업자등록번호: 544-33-01720<br />
-                  연락처: 010-8294-8919<br />
-                  주소: 경기도 파주시 책향기로 403, 704동 9층 901호
-               </div>
+      {/* 3. 하단 푸터 (PG사 준수) */}
+      <footer className="bg-gray-900 text-gray-400 text-xs p-10 mt-12 border-t border-gray-800">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between">
+          <div className="leading-relaxed mb-6 md:mb-0">
+            <p className="text-white text-base font-bold mb-2">Lab.Jin (AimTalk)</p>
+            <p>상호명: Lab.Jin | 대표자: 이진혁 | 사업자등록번호: 544-33-01720</p>
+            <p>연락처: 010-8294-8919 | 이메일: support@aimtalk.com</p>
+            <p>주소: 경기도 파주시 책향기로 403, 704동 9층 901호</p>
+          </div>
+          <div className="flex flex-col items-start md:items-end gap-3">
+            <div className="flex space-x-4">
+              <button onClick={() => openModal("terms")} className="underline hover:text-white">이용약관</button>
+              <button onClick={() => openModal("privacy")} className="underline hover:text-yellow-500">개인정보처리방침</button>
+              <button onClick={() => openModal("refund")} className="underline hover:text-white">환불규정</button>
             </div>
-            <div className="flex flex-col justify-between items-end">
-               <div className="text-slate-500 font-bold text-xs">© 2026 LabJin. All rights reserved.</div>
-            </div>
+            <p>© 2026 Lab.Jin. All rights reserved.</p>
           </div>
         </div>
       </footer>
-    </div>
+
+      {/* 4. 모달창 팝업 레이아웃 */}
+      {activeModal === "terms" && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-4 border-b pb-2">서비스 이용약관</h3>
+            <div className="text-sm leading-relaxed space-y-4">
+              <p><strong>제1조 (목적)</strong><br />본 약관은 에임톡(이하 '회사')이 제공하는 소프트웨어 및 관련 서비스의 이용조건 및 절차 등을 규정함을 목적으로 합니다.</p>
+              <p><strong>제2조 (회원의 의무)</strong><br />회원은 불법 스팸 발송 등 타인에게 피해를 주는 행위를 해서는 안 되며, 관련 메신저 플랫폼의 운영 정책을 반드시 준수해야 합니다.</p>
+              <p><strong>제3조 (회사의 면책)</strong><br />회사는 타사 플랫폼의 정책 변경으로 인해 발생하는 기능 제한이나 중단에 대해 책임을 지지 않습니다.</p>
+            </div>
+            <button onClick={closeModal} className="mt-6 w-full py-2 bg-gray-200 rounded-lg font-bold">닫기</button>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "privacy" && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-4 border-b pb-2">개인정보 처리방침</h3>
+            <div className="text-sm leading-relaxed space-y-4">
+              <p>회사는 서비스 제공을 위해 아래와 같은 개인정보를 수집합니다.</p>
+              <ul className="list-disc pl-5">
+                <li>수집 항목: 이름, 이메일, 휴대전화 번호, 결제 기록</li>
+                <li>보유 기간: 전자상거래법에 따라 대금 결제 기록은 5년간 보관</li>
+              </ul>
+              <p>개인정보 보호 책임자: 이진혁 / support@aimtalk.com</p>
+            </div>
+            <button onClick={closeModal} className="mt-6 w-full py-2 bg-gray-200 rounded-lg font-bold">닫기</button>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "refund" && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-4 border-b pb-2 text-red-600">환불 규정</h3>
+            <div className="text-sm leading-relaxed space-y-4">
+              <p><strong>제1조 (환불 원칙)</strong><br />본 서비스는 디지털 콘텐츠 특성상 라이선스 코드가 등록(사용)된 이후에는 환불이 불가합니다. 미사용 시 결제일로부터 7일 이내 환불 가능합니다.</p>
+              <p><strong>제2조 (오류 환불)</strong><br />프로그램 자체 결함으로 정상 이용이 불가능한 경우, 남은 기간을 계산하여 부분 환불해 드립니다.</p>
+              <p><strong>제3조 (불가 사유)</strong><br />타사 플랫폼 정책 변경으로 인한 작동 지연이나 사용자 계정 정지는 환불 사유가 아닙니다.</p>
+            </div>
+            <button onClick={closeModal} className="mt-6 w-full py-2 bg-gray-200 rounded-lg font-bold">닫기</button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

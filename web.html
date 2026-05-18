@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AimTalk - 카카오톡 자동화 솔루션</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 포트원 결제 라이브러리 -->
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; }
+        .bg-main { background-color: #1e6082; }
+        .text-main { color: #1e6082; }
+        .border-main { border-color: #1e6082; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-gray-800 bg-gray-50">
+
+    <!-- 1. 상단 네비게이션 바 -->
+    <header class="bg-main text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-6xl mx-auto flex justify-between items-center p-4">
+            <h1 class="text-2xl font-bold tracking-tight cursor-pointer">AimTalk</h1>
+            <nav class="hidden md:flex space-x-8 text-sm font-medium">
+                <a href="#intro" class="hover:text-yellow-300 transition">프로그램 소개</a>
+                <a href="#howto" class="hover:text-yellow-300 transition">사용 방법</a>
+                <a href="#download" class="hover:text-yellow-300 transition">다운로드</a>
+                <a href="#pricing" class="hover:text-yellow-300 transition">가격안내</a>
+                <a href="#qa" class="hover:text-yellow-300 transition">Q&A</a>
+            </nav>
+            <!-- 모바일 메뉴 버튼 (필요 시 추가) -->
+            <button class="md:hidden text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- 2. 메인 콘텐츠 영역 -->
+    <main class="flex-grow">
+        
+        <!-- 히어로 섹션 (Intro) -->
+        <section id="intro" class="py-16 bg-white border-b">
+            <div class="max-w-6xl mx-auto px-6 text-center">
+                <h2 class="text-4xl font-extrabold mb-4 text-main text-gray-900">카카오톡 자동화의 시작, AimTalk</h2>
+                <p class="text-lg text-gray-600 mb-8">비즈니스 효율을 극대화하는 스마트한 솔루션을 경험하세요.</p>
+                <div class="flex justify-center gap-4">
+                    <a href="#download" class="bg-main text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-800 transition">무료 체험하기</a>
+                    <a href="#pricing" class="bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">요금제 보기</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 요금제 섹션 (Pricing) -->
+        <section id="pricing" class="py-20 max-w-6xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 inline-block border-b-4 border-main pb-2">라이선스 플랜</h2>
+                <p class="mt-4 text-gray-500">필요한 기능에 맞는 최적의 플랜을 선택하세요.</p>
+            </div>
+
+            <!-- 카드형 가격표 레이아웃 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Basic -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 flex flex-col hover:shadow-lg transition">
+                    <h3 class="text-xl font-bold mb-2">Basic</h3>
+                    <div class="text-3xl font-bold mb-6 text-main">8,000원 <span class="text-sm font-normal text-gray-400">/ 월</span></div>
+                    <ul class="text-gray-600 space-y-3 mb-8 flex-grow text-sm">
+                        <li class="flex items-center">✅ 기본 자동 발송 기능</li>
+                        <li class="flex items-center">✅ 1일 발송 제한량 적용</li>
+                        <li class="flex items-center">✅ 기본 고객 지원</li>
+                    </ul>
+                    <button onclick="requestPay('Basic', 8000)" class="w-full py-3 rounded-xl border border-main text-main font-bold hover:bg-blue-50 transition">선택하기</button>
+                </div>
+
+                <!-- Pro (추천) -->
+                <div class="bg-white p-8 rounded-2xl shadow-xl border-2 border-main flex flex-col scale-105 relative bg-white transition">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-main text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Most Popular</div>
+                    <h3 class="text-xl font-bold mb-2">Pro</h3>
+                    <div class="text-3xl font-bold mb-6 text-main">16,000원 <span class="text-sm font-normal text-gray-400">/ 월</span></div>
+                    <ul class="text-gray-600 space-y-3 mb-8 flex-grow text-sm">
+                        <li class="flex items-center font-semibold text-gray-800">✅ Basic의 모든 기능</li>
+                        <li class="flex items-center font-semibold text-gray-800">✅ 예약 발송 기능 포함</li>
+                        <li class="flex items-center font-semibold text-gray-800">✅ 무제한 리스트 관리</li>
+                        <li class="flex items-center font-semibold text-gray-800">✅ 우선 순위 기술 지원</li>
+                    </ul>
+                    <button onclick="requestPay('Pro', 16000)" class="w-full py-3 rounded-xl bg-main text-white font-bold hover:bg-blue-800 transition">결제하기</button>
+                </div>
+
+                <!-- Master -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 flex flex-col hover:shadow-lg transition">
+                    <h3 class="text-xl font-bold mb-2">Master</h3>
+                    <div class="text-3xl font-bold mb-6 text-main">20,000원 <span class="text-sm font-normal text-gray-400">/ 월</span></div>
+                    <ul class="text-gray-600 space-y-3 mb-8 flex-grow text-sm">
+                        <li class="flex items-center font-semibold text-gray-800">✅ Pro의 모든 기능</li>
+                        <li class="flex items-center font-semibold text-gray-800">✅ API 연동 지원</li>
+                        <li class="flex items-center font-semibold text-gray-800">✅ 다중 계정 지원</li>
+                        <li class="flex items-center font-semibold text-gray-800">✅ 1:1 전담 매니저</li>
+                    </ul>
+                    <button onclick="requestPay('Master', 20000)" class="w-full py-3 rounded-xl border border-main text-main font-bold hover:bg-blue-50 transition">선택하기</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 3. 하단 푸터 (PG사 준수사항) -->
+    <footer class="bg-gray-900 text-gray-400 text-xs p-10 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="leading-loose">
+                    <h4 class="text-white text-base font-bold mb-4 italic text-main">AimTalk (Lab.Jin)</h4>
+                    <p><strong>상호명:</strong> Lab.Jin | <strong>대표자:</strong> 이진혁</p>
+                    <p><strong>사업자등록번호:</strong> 544-33-01720</p>
+                    <p><strong>연락처:</strong> 010-8294-8919 | <strong>이메일:</strong> support@aimtalk.com</p>
+                    <p><strong>주소:</strong> 경기도 파주시 책향기로 403, 704동 9층 901호</p>
+                    <p><strong>통신판매업신고번호:</strong> 제 2024-XXXX-XXXXX 호 (추후 입력)</p>
+                </div>
+                <div class="flex flex-col md:items-end justify-end space-y-4">
+                    <div class="flex space-x-6">
+                        <a href="/terms.html" class="hover:text-white underline underline-offset-4 transition">이용약관</a>
+                        <a href="/privacy.html" class="hover:text-white underline underline-offset-4 transition text-yellow-500">개인정보처리방침</a>
+                    </div>
+                    <p>© 2024 Lab.Jin. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 4. 결제 로직 스크립트 -->
+    <script>
+        // 포트원 초기화 (내 식별코드 입력 필요)
+        const IMP = window.IMP; 
+        IMP.init("impXXXXXXXX"); // 발급받으신 '가맹점 식별코드'를 여기에 넣으세요.
+
+        function requestPay(planName, amount) {
+            if(confirm(`${planName} 플랜 (${amount.toLocaleString()}원) 결제를 진행할까요?`)) {
+                IMP.request_pay({
+                    pg: "html5_inicis",           // PG사 선택 (테스트용 kcp, inicis 등)
+                    pay_method: "card",           // 결제 수단
+                    merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
+                    name: `AimTalk ${planName} 라이선스`,
+                    amount: amount,               // 결제 금액
+                    buyer_email: "test@example.com",
+                    buyer_name: "구매자이름",
+                    buyer_tel: "010-1234-5678",
+                }, function (rsp) {
+                    if (rsp.success) {
+                        alert("결제가 완료되었습니다!");
+                        // 서버로 결제 정보 전달 로직 필요
+                    } else {
+                        alert("결제에 실패하였습니다. 사유: " + rsp.error_msg);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
