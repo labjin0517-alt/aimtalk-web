@@ -4,7 +4,7 @@ import { useState } from "react";
 import Script from "next/script";
 
 export default function Home() {
-  // 1. 현재 어떤 메뉴(화면)를 보고 있는지 상태 관리 ("intro", "pricing", "howto", "download", "qa")
+  // 현재 어떤 메뉴(화면)를 보고 있는지 상태 관리 ("intro", "pricing", "howto", "download", "qa")
   const [activeSection, setActiveSection] = useState<string>("intro");
   
   // 모달창 열고 닫기를 위한 상태 관리
@@ -85,14 +85,12 @@ export default function Home() {
               >
                 사용 방법
               </button>
-              <a 
-                href="https://github.com/labjin0517-alt/AimTalk-Updates/releases" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="hover:text-yellow-300 pb-1"
+              <button 
+                onClick={() => setActiveSection("download")} 
+                className={`pb-1 transition ${activeSection === "download" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}
               >
                 다운로드
-              </a>
+              </button>
               <button 
                 onClick={() => setActiveSection("pricing")} 
                 className={`pb-1 transition ${activeSection === "pricing" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}
@@ -109,7 +107,7 @@ export default function Home() {
           </div>
         </header>
 
-        {/* 2. 메인 콘텐츠 영역 (선택된 메뉴에 따라 해당 컴포넌트만 출력) */}
+        {/* 2. 메인 콘텐츠 영역 */}
         <main className="flex-grow">
           
           {/* [메뉴 1] 프로그램 소개 화면 */}
@@ -119,12 +117,14 @@ export default function Home() {
                 <h2 className="text-4xl font-extrabold mb-4 text-gray-900">AimTalk 카카오톡 자동화 솔루션</h2>
                 <p className="text-lg text-gray-600 mb-8">반복되는 업무는 에임톡에게 맡기고, 당신은 비즈니스에만 집중하세요.</p>
                 <div className="flex justify-center gap-4 mb-12">
-                  <button onClick={() => setActiveSection("pricing")} className="bg-[#1e6082] text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-800 transition">
-                    지금 시작하기
+                  <button onClick={() => setActiveSection("download")} className="bg-[#1e6082] text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-800 transition">
+                    무료 체험하기
+                  </button>
+                  <button onClick={() => setActiveSection("pricing")} className="bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+                    요금제 보기
                   </button>
                 </div>
                 
-                {/* 💡 에임톡 관련 상세 소개 내용을 추가할 수 있는 임시 영역 */}
                 <div className="max-w-3xl mx-auto mt-16 p-8 bg-gray-50 rounded-2xl border border-dashed border-gray-300 text-left">
                   <h3 className="text-xl font-bold mb-4 text-[#1e6082]">✨ 에임톡(AimTalk) 주요 특징</h3>
                   <p className="text-gray-600 leading-relaxed mb-4">
@@ -136,9 +136,77 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 2] 가격안내 (라이선스 요금제) 화면 */}
+          {/* [메뉴 2] 다운로드 및 설치 가이드 화면 (수정된 핵심 파트) */}
+          {activeSection === "download" && (
+            <section className="py-16 max-w-4xl mx-auto px-6">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 inline-block border-b-4 border-[#1e6082] pb-2">프로그램 다운로드</h2>
+                <p className="mt-4 text-gray-500">안정적인 프로그램 실행을 위해 설치 가능 기기 및 방법을 확인해 주세요.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                {/* 설치 가능한 기기 안내 카드 */}
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                  <h3 className="text-lg font-bold mb-4 flex items-center text-gray-900">
+                    <span className="text-xl mr-2">💻</span> 설치 가능한 기기
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed mb-6">
+                    에임톡은 <strong className="text-[#1e6082]">윈도우 PC용 프로그램</strong>입니다.<br />
+                    데스크탑, 노트북, 윈도우 운영체제 기반 태블릿 PC에서 모두 구동이 가능하며, 매장에서 포스(POS) 기기로 사용 중인 PC에서도 정상 동작합니다.
+                  </p>
+                  
+                  <div className="bg-red-50 p-4 rounded-xl border border-red-100">
+                    <h4 className="text-xs font-bold text-red-600 uppercase tracking-wider mb-2">⚠️ 아래 기기에서는 지원되지 않습니다</h4>
+                    <ul className="text-xs text-gray-600 space-y-1.5 list-disc pl-4">
+                      <li>스마트폰 (아이폰, 갤럭시 등 휴대전화 전체)</li>
+                      <li>안드로이드 태블릿 및 iPad (아이패드)</li>
+                      <li>윈도우 7 이하 설치 PC <span className="text-red-500 font-medium">(윈도우 8 버전부터 작동 가능)</span></li>
+                      <li>애플 Mac OS 기반 PC (맥북, 아이맥 등)</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* 간단 설치 방법 카드 */}
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold mb-4 flex items-center text-gray-900">
+                      <span className="text-xl mr-2">🚀</span> 간단 설치 방법
+                    </h3>
+                    <ol className="text-sm text-gray-600 space-y-4">
+                      <li className="flex items-start">
+                        <span className="bg-blue-100 text-[#1e6082] rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mr-3 mt-0.5 shrink-0">1</span>
+                        <span>하단의 <strong>[에임톡 최신 버전 다운로드]</strong> 버튼을 클릭하여 공식 저장소 파일 페이지로 이동합니다.</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="bg-blue-100 text-[#1e6082] rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mr-3 mt-0.5 shrink-0">2</span>
+                        <span>이동한 릴리즈 페이지 최상단에 등록된 <strong>Assets</strong> 항목에서 실행 파일(<code className="bg-gray-100 text-red-500 px-1 rounded text-xs font-mono">.exe</code> 또는 <code className="bg-gray-100 text-red-500 px-1 rounded text-xs font-mono">.zip</code>)을 클릭하여 다운로드합니다.</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="bg-blue-100 text-[#1e6082] rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mr-3 mt-0.5 shrink-0">3</span>
+                        <span>다운로드 완료된 프로그램의 안내에 따라 실행 및 설치를 진행해 주세요.</span>
+                      </li>
+                    </ol>
+                  </div>
+
+                  {/* 실제 깃허브 링크 연동 다운로드 버튼 */}
+                  <div className="mt-8">
+                    <a 
+                      href="https://github.com/labjin0517-alt/AimTalk-Updates/releases"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full py-4 bg-[#1e6082] text-white text-center font-bold rounded-xl hover:bg-blue-800 shadow-lg transition"
+                    >
+                      에임톡 최신 버전 다운로드하기
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* [메뉴 3] 가격안내 (라이선스 요금제) 화면 */}
           {activeSection === "pricing" && (
-            <section className="py-20 max-w-5xl mx-auto px-6 animate-fade-in">
+            <section className="py-20 max-w-5xl mx-auto px-6">
               <h2 className="text-3xl font-bold text-center mb-12">라이선스 요금제</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 {/* Basic Plan */}
@@ -186,7 +254,7 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 3] 사용 방법 플레이스홀더 */}
+          {/* [메뉴 4] 사용 방법 플레이스홀더 */}
           {activeSection === "howto" && (
             <section className="py-20 max-w-4xl mx-auto px-6 text-center">
               <h2 className="text-3xl font-bold mb-6">프로그램 사용 방법</h2>
@@ -194,7 +262,7 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 4] Q&A 플레이스홀더 */}
+          {/* [메뉴 5] Q&A 플레이스홀더 */}
           {activeSection === "qa" && (
             <section className="py-20 max-w-4xl mx-auto px-6 text-center">
               <h2 className="text-3xl font-bold mb-6">자주 묻는 질문 (Q&A)</h2>
