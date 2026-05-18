@@ -98,7 +98,7 @@ export default function Home() {
               {/* 주요 특징 및 Pro 장점 섹션 */}
               <div className="py-24 max-w-6xl mx-auto px-6">
                 <div className="text-center mb-16">
-                  <h3 className="text-3xl font-bold text-gray-900 mb-4">왜 에임톡 Pro여야 할까요?</h3>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-4">왜 AimTalk Pro여야 할까요?</h3>
                   <p className="text-gray-500">강력한 비즈니스 전용 기능을 통해 압도적인 성과를 만들어냅니다.</p>
                 </div>
 
@@ -108,9 +108,9 @@ export default function Home() {
                     <div className="bg-blue-100 w-14 h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-3xl">⚡</span>
                     </div>
-                    <h4 className="text-xl font-bold mb-3 text-gray-900">압도적인 발송 속도</h4>
+                    <h4 className="text-xl font-bold mb-3 text-gray-900">빠른 발송 속도</h4>
                     <p className="text-gray-600 text-sm leading-relaxed mb-4">Pro 버전은 시간당 최대 <span className="text-[#1e6082] font-bold">500명</span>까지 발송 가능하여 대규모 마케팅 시 시간을 획기적으로 단축합니다.</p>
-                    <span className="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">Pro 전용 500명/h</span>
+                    <span className="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">Pro 버전 적용 시</span>
                   </div>
 
                   {/* 특징 2 */}
@@ -119,7 +119,7 @@ export default function Home() {
                       <span className="text-3xl">📁</span>
                     </div>
                     <h4 className="text-xl font-bold mb-3 text-gray-900">무제한 파일 및 전송</h4>
-                    <p className="text-gray-600 text-sm leading-relaxed mb-4">이미지 제한 없이 모든 형태의 파일을 무제한으로 첨부할 수 있습니다. 드래그 앤 드롭으로 간편하게 추가하세요.</p>
+                    <p className="text-gray-600 text-sm leading-relaxed mb-4">이미지 갯수 제한 없이 모든 형태의 파일을 무제한으로 첨부할 수 있습니다. 드래그 앤 드롭으로 간편하게 추가하세요.</p>
                     <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded">모든 파일 & 무제한</span>
                   </div>
 
@@ -130,7 +130,7 @@ export default function Home() {
                     </div>
                     <h4 className="text-xl font-bold mb-3 text-gray-900">스마트 예약 발송</h4>
                     <p className="text-gray-600 text-sm leading-relaxed mb-4">원하는 시간에 맞춰 자동으로 발송을 시작합니다. 퇴근 후나 주말 마케팅도 에임톡이 대신 수행합니다.</p>
-                    <span className="text-xs font-bold text-purple-500 bg-purple-50 px-2 py-1 rounded">HH:MM 예약 지원</span>
+                    <span className="text-xs font-bold text-purple-500 bg-purple-50 px-2 py-1 rounded">발송 예약 지원</span>
                   </div>
 
                   {/* 특징 4 */}
@@ -243,8 +243,8 @@ export default function Home() {
         <footer className="bg-gray-900 text-gray-400 text-[10px] md:text-xs p-10 border-t border-gray-800">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="leading-relaxed mb-6 md:mb-0">
-              <p className="text-white text-base font-bold mb-2">Lab.Jin (AimTalk)</p>
-              <p>상호명: Lab.Jin | 대표자: 이진혁 | 사업자등록번호: 544-33-01720</p>
+              <p className="text-white text-base font-bold mb-2">LabJin (AimTalk)</p>
+              <p>상호명: LabJin | 대표자: 이진혁 | 사업자등록번호: 544-33-01720</p>
               <p>연락처: 010-8294-8919 | 이메일: support@aimtalk.com</p>
               <p>주소: 경기도 파주시 책향기로 403, 704동 9층 901호</p>
             </div>
