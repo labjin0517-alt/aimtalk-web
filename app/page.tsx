@@ -152,7 +152,7 @@ export default function Home() {
                   </h3>
                   <p className="text-sm text-gray-600 leading-relaxed mb-6">
                     에임톡은 <strong className="text-[#1e6082]">윈도우 PC용 프로그램</strong>입니다.<br />
-                    데스크탑, 노트북, 윈도우 운영체제 기반 태블릿 PC에서 모두 구동이 가능하며, 매장에서 포스(POS) 기기로 사용 중인 PC에서도 정상 동작합니다.
+                    데스크탑, 노트북의 윈도우 운영체제에서만 구동이 가능합니다.
                   </p>
                   
                   <div className="bg-red-50 p-4 rounded-xl border border-red-100">
@@ -160,7 +160,6 @@ export default function Home() {
                     <ul className="text-xs text-gray-600 space-y-1.5 list-disc pl-4">
                       <li>스마트폰 (아이폰, 갤럭시 등 휴대전화 전체)</li>
                       <li>안드로이드 태블릿 및 iPad (아이패드)</li>
-                      <li>윈도우 7 이하 설치 PC <span className="text-red-500 font-medium">(윈도우 8 버전부터 작동 가능)</span></li>
                       <li>애플 Mac OS 기반 PC (맥북, 아이맥 등)</li>
                     </ul>
                   </div>
