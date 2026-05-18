@@ -186,7 +186,7 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-12">
                 <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200">
                   <h3 className="text-lg font-bold mb-4 flex items-center text-gray-900"><span className="mr-2">💻</span> 설치 가능 기기</h3>
-                  <p className="text-sm text-gray-600 mb-6 leading-relaxed">데스크탑, 노트북의 윈도우 운영체제에서만 구동 가능합니다. (포스기 포함)</p>
+                  <p className="text-sm text-gray-600 mb-6 leading-relaxed">데스크탑, 노트북의 윈도우 운영체제에서만 구동 가능합니다.</p>
                   <div className="bg-red-50 p-4 rounded-xl border border-red-100">
                     <h4 className="text-xs font-bold text-red-600 mb-2 uppercase">⚠️ 미지원 기기</h4>
                     <ul className="text-xs text-gray-600 space-y-1 list-disc pl-4">
