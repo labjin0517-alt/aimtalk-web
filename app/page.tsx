@@ -73,7 +73,14 @@ export default function Home() {
             <nav className="hidden md:flex space-x-6 text-sm font-medium">
               <a href="#intro" className="hover:text-yellow-300">프로그램 소개</a>
               <a href="#howto" className="hover:text-yellow-300">사용 방법</a>
-              <a href="#download" className="hover:text-yellow-300">다운로드</a>
+              <a 
+                href="https://github.com/labjin0517-alt/AimTalk-Updates/releases" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-yellow-300"
+              >
+                다운로드
+              </a>
               <a href="#pricing" className="hover:text-yellow-300">가격안내</a>
               <a href="#qa" className="hover:text-yellow-300">Q&A</a>
             </nav>
