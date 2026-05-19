@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       headers: {
         "Content-Type": "application/json",
         // 발급받으신 API Secret을 여기에 넣습니다. 외부 유출 방지를 위해 백엔드에서만 처리합니다.
-        "Authorization": "qSrPh5ZOdQIeADqDfo83AWcx4sAOgTaFxB0cmklOPe2diONAetFDxoGpaNTOO1glayP2wYwuGxdnSdrl", 
+        "Authorization": "PortOne qSrPh5ZOdQIeADqDfo83AWcx4sAOgTaFxB0cmklOPe2diONAetFDxoGpaNTOO1glayP2wYwuGxdnSdrl", 
       },
       body: JSON.stringify({
         storeId: storeId,
