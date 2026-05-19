@@ -32,18 +32,18 @@ export default function Home() {
           const storeId = "store-10a2f63e-992c-449a-b25e-1846bf3a86ae";
           const channelKey = "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e";
 
-          // 포트원 V2 일반 결제창 호출 (사전등록 API 불필요)
+          // 백엔드 사전등록 단계를 거치지 않고 포트원 V2 일반 결제창을 즉시 팝업합니다.
           const response = await PortOne.requestPayment({
             storeId: storeId,
             channelKey: channelKey,
-            paymentId: "payment_" + new Date().getTime(),
+            paymentId: "payment_" + new Date().getTime(), // 단건 결제용 고유 ID 발급 규칙
             orderName: "AimTalk " + currentPlan + " 이용권",
             totalAmount: amount,
             currency: "CURRENCY_KRW",
             payMethod: "CARD",
           });
 
-          // 결제 완료 및 취소 처리
+          // 결제창 실패 및 취소 처리
           if (response.code !== undefined) {
             alert(`결제 실패: ${response.message}`);
           } else {
@@ -115,7 +115,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 특징 섹션 (6대 기능 복원 완료) */}
+              {/* 특징 섹션 (6대 기능 완벽 복원) */}
               <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="text-center mb-12 md:mb-16">
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">왜 AimTalk Pro여야 할까요?</h3>
@@ -181,7 +181,7 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 2] 다운로드 페이지 (복원 완료) */}
+          {/* [메뉴 2] 다운로드 페이지 */}
           {activeSection === "download" && (
             <section className="py-12 max-w-4xl mx-auto px-4 sm:px-6">
               <div className="text-center mb-10">
@@ -274,7 +274,7 @@ export default function Home() {
         </footer>
       </div>
 
-      {/* 모달 팝업 레이어 구성 (약관 전문 전체 복원) */}
+      {/* 모달 팝업 레이어 구성 (약관 전문 복원 완료) */}
       {activeModal === "terms" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[80vh] overflow-y-auto">
