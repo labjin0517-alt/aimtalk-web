@@ -29,13 +29,14 @@ export default function Home() {
 
         try {
           const response = await PortOne.requestPayment({
-            storeId: "store-4f516f4d-b6a6-4074-9585-78e88f615367", // 고객사 식별코드 주입
+            storeId: "store-10a2f63e-992c-494a-b25e-1846bf3a86ae", // 고객사 식별코드 주입
             channelKey: "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e", // 테스트 채널키 주입
             paymentId: "mid_" + new Date().getTime(),
             orderName: "AimTalk " + plan,
             totalAmount: amount,
             currency: "CURRENCY_KRW",
             payMethod: "CARD",
+            redirectUrl: "https://aimtalk.cloud",
           });
 
           // 결제 실패 혹은 창 닫기 처리
