@@ -21,25 +21,36 @@ export default function Home() {
     }
   };
 
-  const handlePay = (plan: string, amount: number) => {
+  // 포트원 V2 식별 값 주입 완료된 결제 연동 함수
+  const handlePay = async (plan: string, amount: number) => {
     if (confirm(`${plan} 플랜 (${amount.toLocaleString()}원) 결제를 진행할까요?`)) {
-      if (typeof window !== "undefined" && (window as any).IMP) {
-        const IMP = (window as any).IMP;
-        IMP.init("impXXXXXXXX"); 
+      if (typeof window !== "undefined" && (window as any).PortOne) {
+        const PortOne = (window as any).PortOne;
 
-        IMP.request_pay(
-          {
-            pg: "html5_inicis",
-            pay_method: "card",
-            merchant_uid: "mid_" + new Date().getTime(),
-            name: "AimTalk " + plan,
-            amount: amount,
-          },
-          function (rsp: any) {
-            if (rsp.success) { alert("결제 완료!"); } 
-            else { alert("결제 실패: " + rsp.error_msg); }
+        try {
+          const response = await PortOne.requestPayment({
+            storeId: "store-10a2f63e-992c-449a-b25e-1846bf3a86ae", // 고객사 식별코드 주입
+            channelKey: "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e", // 테스트 채널키 주입
+            paymentId: "mid_" + new Date().getTime(),
+            orderName: "AimTalk " + plan,
+            totalAmount: amount,
+            currency: "CURRENCY_KRW",
+            payMethod: "CARD",
+          });
+
+          // 결제 실패 혹은 창 닫기 처리
+          if (response.code !== undefined) {
+            alert(`결제 실패: ${response.message}`);
+          } else {
+            // 결제 성공 완료 처리
+            alert("테스트 결제 성공! (안전한 테스트 환경이므로 실제 대금 결제는 발생하지 않습니다.)");
           }
-        );
+        } catch (error) {
+          console.error("포트원 결제 에러:", error);
+          alert("결제창 오픈 중 예기치 못한 기술적 오류가 발생했습니다.");
+        }
+      } else {
+        alert("결제 모듈을 로드하고 있습니다. 잠시 후 버튼을 다시 클릭해 주세요.");
       }
     }
   };
@@ -47,7 +58,8 @@ export default function Home() {
   return (
     <>
       <Script src="https://cdn.tailwindcss.com" strategy="beforeInteractive" />
-      <Script src="https://cdn.iamport.kr/v1/iamport.js" strategy="lazyOnload" />
+      {/* 포트원 V2 최신 통합 브라우저 SDK 리소스 로드 */}
+      <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="lazyOnload" />
 
       <style dangerouslySetInnerHTML={{__html: `
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght=400;600;700&display=swap');
@@ -57,13 +69,12 @@ export default function Home() {
 
       <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800 overflow-x-hidden">
         
-        {/* 상단 네비게이션 (모바일 스크롤 고려 패딩 조정) */}
+        {/* 상단 네비게이션 */}
         <header className="bg-[#1e6082] text-white sticky top-0 z-50 shadow-md">
           <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
             <h1 className="text-xl font-bold cursor-pointer" onClick={() => setActiveSection("intro")}>
               AimTalk
             </h1>
-            {/* 모바일에서도 메뉴 가독성을 위해 간격 조정 및 스크롤 지원 */}
             <nav className="flex space-x-4 md:space-x-6 text-xs sm:text-sm font-medium overflow-x-auto no-scrollbar max-w-[70%] md:max-w-none">
               <button onClick={() => setActiveSection("intro")} className={`pb-1 whitespace-nowrap ${activeSection === "intro" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>소개</button>
               <button onClick={() => setActiveSection("howto")} className={`pb-1 whitespace-nowrap ${activeSection === "howto" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>사용법</button>
@@ -79,7 +90,6 @@ export default function Home() {
           {/* [메뉴 1] 프로그램 소개 (메인 화면) */}
           {activeSection === "intro" && (
             <section className="bg-white">
-              {/* 히어로 섹션 (모바일 가변 패딩 및 폰트 크기 적용) */}
               <div className="py-12 md:py-24 text-center border-b bg-gradient-to-b from-blue-50 to-white">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6">
                   <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-4 md:mb-6 text-gray-900 leading-tight">
@@ -91,7 +101,6 @@ export default function Home() {
                     비즈니스 효율을 극대화하는 스마트 마케팅 솔루션을 지금 만나보세요.
                   </p>
                   
-                  {/* 반응형 대형 버튼: 모바일에서는 화면에 꽉 차게, 태블릿 이상에선 넓고 크게 작동 */}
                   <div className="flex justify-center px-2">
                     <button 
                       onClick={() => setActiveSection("download")} 
@@ -103,7 +112,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 주요 특징 및 Pro 장점 섹션 (설명서 내용 기반 완벽 동기화) */}
+              {/* 특징 섹션 */}
               <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="text-center mb-12 md:mb-16">
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">왜 AimTalk Pro여야 할까요?</h3>
@@ -111,7 +120,6 @@ export default function Home() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-                  {/* 특징 1 */}
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="bg-blue-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-2xl md:text-3xl">⚡</span>
@@ -121,7 +129,6 @@ export default function Home() {
                     <span className="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">Pro 전용: 최대 500명/h</span>
                   </div>
 
-                  {/* 특징 2 */}
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="bg-green-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-2xl md:text-3xl">📁</span>
@@ -131,7 +138,6 @@ export default function Home() {
                     <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded">모든 파일 & 무제한 전송</span>
                   </div>
 
-                  {/* 특징 3 */}
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="bg-purple-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-2xl md:text-3xl">🕒</span>
@@ -141,7 +147,6 @@ export default function Home() {
                     <span className="text-xs font-bold text-purple-500 bg-purple-50 px-2 py-1 rounded">발송 예약 스케줄링</span>
                   </div>
 
-                  {/* 특징 4 */}
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="bg-orange-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-2xl md:text-3xl">👤</span>
@@ -151,7 +156,6 @@ export default function Home() {
                     <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">고객 성함 자동 치환</span>
                   </div>
 
-                  {/* 특징 5 */}
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="bg-red-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-2xl md:text-3xl">📊</span>
@@ -161,7 +165,6 @@ export default function Home() {
                     <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded">실시간 메신저 알림 보고</span>
                   </div>
 
-                  {/* 특징 6 */}
                   <div className="feature-card p-6 md:p-8 bg-[#1e6082] rounded-3xl shadow-lg">
                     <div className="bg-white/20 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-2xl md:text-3xl text-white">✨</span>
@@ -247,7 +250,7 @@ export default function Home() {
 
         </main>
 
-        {/* 푸터 (모바일 텍스트 정렬 최적화) */}
+        {/* 푸터 */}
         <footer className="bg-gray-900 text-gray-400 text-[11px] sm:text-xs p-6 md:p-10 border-t border-gray-800">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="leading-relaxed">
