@@ -21,9 +21,9 @@ export default function Home() {
     }
   };
 
-  // 백엔드 사전등록 연동 기능과 Vercel 빌드 검사를 모두 완벽하게 마친 결제 함수
+  // 일반 결제창(단건 결제) 규격에 완벽히 맞춘 결제 함수
   const handlePay = async (plan: string, amount: number) => {
-    if (confirm(`${plan} 플랜 (${amount.toLocaleString()}원) 정기 결제를 진행할까요?`)) {
+    if (confirm(`${plan} 플랜 (${amount.toLocaleString()}원) 결제를 진행할까요?`)) {
       if (typeof window !== "undefined" && (window as any).PortOne) {
         const PortOne = (window as any).PortOne;
 
@@ -31,39 +31,26 @@ export default function Home() {
           const currentPlan = plan;
           const storeId = "store-10a2f63e-992c-449a-b25e-1846bf3a86ae";
           const channelKey = "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e";
-          const billingKeyPaymentId = "billing_" + new Date().getTime();
-          const issueName = "AimTalk " + currentPlan + " 정기구독";
 
-          // [블로그 분석 반영] 결제창을 열기 전, 방금 만드신 백엔드 API 서버에 사전등록을 요청합니다.
-          const prepareRes = await fetch("/api/payment/prepare", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ billingKeyPaymentId, storeId, issueName }),
+          // 포트원 V2 일반 결제창 호출 (사전등록 API 불필요)
+          const response = await PortOne.requestPayment({
+            storeId: storeId,
+            channelKey: channelKey,
+            paymentId: "payment_" + new Date().getTime(),
+            orderName: "AimTalk " + currentPlan + " 이용권",
+            totalAmount: amount,
+            currency: "CURRENCY_KRW",
+            payMethod: "CARD",
           });
 
-          const prepareData = await prepareRes.json();
-          if (!prepareRes.ok) {
-            alert(`결제 준비 실패: ${prepareData.error || "알 수 없는 오류"}`);
-            return;
-          }
-
-          // 사전등록이 백엔드에서 정상 승인되면 포트원 V2 카드 정보 등록창을 팝업합니다.
-          const response = await PortOne.requestIssueBillingKey({
-            storeId,
-            channelKey,
-            billingKeyPaymentId,
-            issueName,
-            billingKeyMethod: "CARD",
-          });
-
-          // 결제창 실패 및 취소 처리
+          // 결제 완료 및 취소 처리
           if (response.code !== undefined) {
             alert(`결제 실패: ${response.message}`);
           } else {
-            alert("테스트 정기 결제 빌링키 발급 성공! (안전한 테스트 환경이므로 실제 출금은 발생하지 않습니다)");
+            alert("테스트 결제가 완료되었습니다! (안전한 테스트 환경이므로 실제 출금은 발생하지 않습니다)");
           }
         } catch (error) {
-          console.error("포트원 정기결제 연동 에러:", error);
+          console.error("포트원 결제 연동 에러:", error);
           alert("결제 모듈 실행 중 예기치 못한 오류가 발생했습니다.");
         }
       } else {
@@ -103,7 +90,7 @@ export default function Home() {
 
         <main className="flex-grow">
           
-          {/* [메뉴 1] 프로그램 소개 */}
+          {/* [메뉴 1] 프로그램 소개 (메인 화면) */}
           {activeSection === "intro" && (
             <section className="bg-white">
               <div className="py-12 md:py-24 text-center border-b bg-gradient-to-b from-blue-50 to-white">
@@ -128,7 +115,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 6대 핵심 특징 복원 완료 */}
+              {/* 특징 섹션 (6대 기능 복원 완료) */}
               <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="text-center mb-12 md:mb-16">
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">왜 AimTalk Pro여야 할까요?</h3>
@@ -194,7 +181,7 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 2] 다운로드 페이지 */}
+          {/* [메뉴 2] 다운로드 페이지 (복원 완료) */}
           {activeSection === "download" && (
             <section className="py-12 max-w-4xl mx-auto px-4 sm:px-6">
               <div className="text-center mb-10">
@@ -287,17 +274,18 @@ export default function Home() {
         </footer>
       </div>
 
-      {/* [복원] 모달 팝업 레이어 구성 */}
+      {/* 모달 팝업 레이어 구성 (약관 전문 전체 복원) */}
       {activeModal === "terms" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[80vh] overflow-y-auto">
-            <h3 className="text-xl font-bold mb-4 border-b pb-2">서비스 이용약관</h3>
-            <div className="text-sm leading-relaxed space-y-4">
-              <p><strong>제1조 (목적)</strong><br />본 약관은 에임톡(이하 '회사')이 제공하는 소프트웨어 및 관련 서비스의 이용조건 및 절차 등을 규정함을 목적으로 합니다.</p>
-              <p><strong>제2조 (회원의 의무)</strong><br />회원은 불법 스팸 발송 등 타인에게 피해를 주는 행위를 해서는 안 되며, 관련 메신저 플랫폼의 운영 정책을 반드시 준수해야 합니다.</p>
-              <p><strong>제3조 (회사의 면책)</strong><br />회사는 타사 플랫폼의 정책 변경으로 인해 발생하는 기능 제한이나 중단에 대해 책임을 지지 않습니다.</p>
+            <h3 className="text-xl font-bold mb-4 border-b pb-2 text-gray-950">서비스 이용약관</h3>
+            <div className="text-xs sm:text-sm leading-relaxed space-y-4 text-gray-600">
+              <p><strong>제 1 조 (목적)</strong><br />본 약관은 LabJin(이하 "회사"라 합니다)이 제공하는 에임톡(AimTalk) 프로그램 및 관련 서비스(이하 "서비스")를 이용함에 있어 회사와 이용자 간의 권리, 의무, 책임사항 및 기타 필요한 사항을 규정함을 목적으로 합니다.</p>
+              <p><strong>제 2 조 (용어의 정의)</strong><br />1. "서비스"라 함은 회사가 개발하여 제공하는 카카오톡 메시지 자동 발송 보조 프로그램 및 일체의 부가 서비스를 의미합니다.<br />2. "이용자"란 본 약관에 따라 회사가 제공하는 서비스를 이용하는 회원 및 비회원을 말합니다.</p>
+              <p><strong>제 3 조 (이용자의 의무 및 제약)</strong><br />1. 이용자는 본 프로그램을 활용하여 영리 목적의 광고성 정보를 전송할 경우 정보통신망법 등 관련 법령에 따른 의무 사항을 준수해야 합니다.<br />2. 타인에게 불법 스팸을 발송하거나 메신저 운영사(주식회사 카카오)의 이용약관을 위반하여 발생하는 모든 계정 정지, 제재 및 민형사상 법적 책임은 이용자 본인에게 있습니다.</p>
+              <p><strong>제 4 조 (서비스 제공의 중단 및 면책)</strong><br />1. 회사는 연중무휴 1일 24시간 서비스 제공을 원칙으로 하나, 컴퓨터 등 정보통신설비의 보수점검, 교체 및 고장, 통신두절 등의 사유가 발생한 경우 서비스 제공을 일시적으로 중단할 수 있습니다.<br />2. 카카오톡 메신저 프로그램 자체의 대규모 업데이트, 정책 변경 또는 기술적 사유로 인해 본 프로그램의 기능 일부 또는 전체가 제한될 경우 회사는 이에 대해 책임을 지지 않습니다.</p>
             </div>
-            <button onClick={closeModal} className="mt-6 w-full py-2 bg-gray-200 rounded-lg font-bold">닫기</button>
+            <button onClick={closeModal} className="mt-6 w-full py-3 bg-gray-200 rounded-lg font-bold text-gray-800 hover:bg-gray-300 transition">약관 닫기</button>
           </div>
         </div>
       )}
@@ -305,16 +293,14 @@ export default function Home() {
       {activeModal === "privacy" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[80vh] overflow-y-auto">
-            <h3 className="text-xl font-bold mb-4 border-b pb-2 text-gray-900">개인정보 처리방침</h3>
-            <div className="text-sm leading-relaxed space-y-4">
-              <p>회사는 서비스 제공을 위해 아래와 같은 개인정보를 수집합니다.</p>
-              <ul className="list-disc pl-5">
-                <li>수집 항목: 이름, 이메일, 휴대전화 번호, 결제 기록</li>
-                <li>보유 기간: 전자상거래법에 따라 대금 결제 기록은 5년간 보관</li>
-              </ul>
-              <p>개인정보 보호 책임자: 이진혁 / labjin0517@gmail.com</p>
+            <h3 className="text-xl font-bold mb-4 border-b pb-2 text-gray-950">개인정보 처리방침</h3>
+            <div className="text-xs sm:text-sm leading-relaxed space-y-4 text-gray-600">
+              <p>LabJin(이하 "회사")은 이용자의 개인정보를 소중하게 처리하며, 개인정보보호법에 따라 이용자의 개인정보 및 권익을 보호하고 이와 관련된 고충을 원활하게 처리할 수 있도록 다음과 같은 처리방침을 두고 있습니다.</p>
+              <p><strong>1. 수집하는 개인정보 항목 및 목적</strong><br />회사는 서비스 제공, 라이선스 발급 및 관리, 대금 결제 처리를 위해 최소한의 개인정보를 수집하고 있습니다.<br />• 수집 항목: 이름, 이메일 주소, 휴대전화 번호, 결제 기록<br />• 수집 목적: 라이선스 코드 발급, 고객 상담 및 본인 확인, 결제 서비스 제공</p>
+              <p><strong>2. 개인정보의 보유 및 이용기간</strong><br />이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다. 단, 관계법령의 규정에 의하여 보존할 필요가 있는 경우 다음과 같이 보유합니다.<br />• 계약 또는 청약철회 등에 관한 기록: 5년 (전자상거래등에서의 소비자보호에 관한 법률)<br />• 대금결제 및 재화 등의 공급에 관한 기록: 5년 (전자상거래등에서의 소비자보호에 관한 법률)</p>
+              <p><strong>3. 개인정보 보호책임자</strong><br />서비스를 이용하시면서 발생하는 모든 개인정보보호 관련 민원은 보호책임자에게 문의하실 수 있습니다.<br />• 책임자: 이진혁<br />• 이메일: labjin0517@gmail.com</p>
             </div>
-            <button onClick={closeModal} className="mt-6 w-full py-2 bg-gray-200 rounded-lg font-bold">닫기</button>
+            <button onClick={closeModal} className="mt-6 w-full py-3 bg-gray-200 rounded-lg font-bold text-gray-800 hover:bg-gray-300 transition">방침 닫기</button>
           </div>
         </div>
       )}
@@ -322,13 +308,13 @@ export default function Home() {
       {activeModal === "refund" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[80vh] overflow-y-auto">
-            <h3 className="text-xl font-bold mb-4 border-b pb-2 text-red-600">환불 규정</h3>
-            <div className="text-sm leading-relaxed space-y-4">
-              <p><strong>제1조 (환불 원칙)</strong><br />본 서비스는 디지털 콘텐츠 특성상 라이선스 코드가 등록(사용)된 이후에는 환불이 불가합니다. 미사용 시 결제일로부터 7일 이내 환불 가능합니다.</p>
-              <p><strong>제2조 (오류 환불)</strong><br />프로그램 자체 결함으로 정상 이용이 불가능한 경우, 남은 기간을 계산하여 부분 환불해 드립니다.</p>
-              <p><strong>제3조 (불가 사유)</strong><br />타사 플랫폼 정책 변경으로 인한 작동 지연이나 사용자 계정 정지는 환불 사유가 아닙니다.</p>
+            <h3 className="text-xl font-bold mb-4 border-b pb-2 text-red-600">환불 규정 및 안내</h3>
+            <div className="text-xs sm:text-sm leading-relaxed space-y-4 text-gray-600">
+              <p><strong>제 1 조 (디지털 콘텐츠 환불 원칙)</strong><br />본 서비스에서 제공하는 소프트웨어 라이선스는 전자상거래법 제17조 제2항 제5호(소비자의 주문에 따라 개별적으로 생산되는 재화 또는 이와 유사한 재화) 및 디지털 콘텐츠의 특성상, **라이선스 코드가 생성 및 인도(등록/사용)된 이후에는 단순 변심으로 인한 환불이 불가능**합니다.</p>
+              <p><strong>제 2 조 (청약 철회 가능 범위)</strong><br />결제 후 라이선스 코드가 미사용 상태이며, 결제일로부터 **7일 이내**에 고객센터(이메일 또는 연락처)를 통해 요청 시 전액 환불 처리가 가능합니다.</p>
+              <p><strong>제 3 조 (면책 사유 및 부분 환불)</strong><br />1. 프로그램 자체의 중대한 결함으로 인해 정상적인 이용이 불가능한 경우, 회사는 이를 신속히 보수하며 보수가 불가능할 경우 이용 기간의 잔여 일수를 계산하여 부분 환불을 진행합니다.<br />2. 외부 메신저 플랫폼(카카오톡)의 강제적인 정책 변화, 업데이트, 사용자의 무분별한 스팸 발송으로 인한 계정 보호조치 및 이용 정지는 본 프로그램의 환불 사유에 해당하지 않습니다.</p>
             </div>
-            <button onClick={closeModal} className="mt-6 w-full py-2 bg-gray-200 rounded-lg font-bold">닫기</button>
+            <button onClick={closeModal} className="mt-6 w-full py-3 bg-red-50 text-red-600 rounded-lg font-bold hover:bg-red-100 transition">규정 닫기</button>
           </div>
         </div>
       )}
