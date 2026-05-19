@@ -21,37 +21,34 @@ export default function Home() {
     }
   };
 
-  // 포트원 V2 식별 값 주입 완료된 결제 연동 함수
+  // 포트원 V2 빌링키(정기 결제용 수단) 발급 연동 함수
   const handlePay = async (plan: string, amount: number) => {
-    if (confirm(`${plan} 플랜 (${amount.toLocaleString()}원) 결제를 진행할까요?`)) {
+    if (confirm(`${plan} 플랜 (${amount.toLocaleString()}원) 정기 결제를 진행할까요?`)) {
       if (typeof window !== "undefined" && (window as any).PortOne) {
         const PortOne = (window as any).PortOne;
 
         try {
-          const response = await PortOne.requestPayment({
-            storeId: "store-10a2f63e-992c-494a-b25e-1846bf3a86ae", // 고객사 식별코드 주입
-            channelKey: "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e", // 테스트 채널키 주입
-            paymentId: "mid_" + new Date().getTime(),
-            orderName: "AimTalk " + plan,
-            totalAmount: amount,
-            currency: "CURRENCY_KRW",
-            payMethod: "CARD",
-            redirectUrl: "https://aimtalk.cloud",
+          // 정기결제 전용 함수인 requestIssueBillingKey를 호출합니다.
+          const response = await PortOne.requestIssueBillingKey({
+            storeId: "store-10a2f63e-992c-449a-b25e-1846bf3a86ae", // 내 상점 ID
+            channelKey: "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e", // 생성한 테스트 채널 키
+            billingKeyPaymentId: "billing_" + new Date().getTime(), // 정기결제 시도 고유 ID 규칙
+            issueName: "AimTalk " + plan + " 정기구독",
           });
 
-          // 결제 실패 혹은 창 닫기 처리
+          // 결제창 내에서 실패했거나 비정상 종료된 경우 처리
           if (response.code !== undefined) {
             alert(`결제 실패: ${response.message}`);
           } else {
-            // 결제 성공 완료 처리
-            alert("테스트 결제 성공! (안전한 테스트 환경이므로 실제 대금 결제는 발생하지 않습니다.)");
+            // 카드 등록 및 정기 결제 빌링키 발급 인증 성공
+            alert("테스트 정기 결제 빌링키 발급 성공! (안전한 테스트 환경이므로 실제 출금은 발생하지 않습니다)");
           }
         } catch (error) {
-          console.error("포트원 결제 에러:", error);
-          alert("결제창 오픈 중 예기치 못한 기술적 오류가 발생했습니다.");
+          console.error("포트원 정기결제 연동 에러:", error);
+          alert("결제 모듈 실행 중 예기치 못한 오류가 발생했습니다.");
         }
       } else {
-        alert("결제 모듈을 로드하고 있습니다. 잠시 후 버튼을 다시 클릭해 주세요.");
+        alert("결제 라이브러리가 로드 중입니다. 잠시 후 다시 시도해 주세요.");
       }
     }
   };
