@@ -29,7 +29,7 @@ export default function Home() {
 
         try {
           const currentPlan = plan;
-          const storeId = "store-10a2f63e-992c-449a-b25e-1846bf3a86ae";
+          const storeId = "store-10a2f63e-992c-494a-b25e-1846bf3a86ae";
           const channelKey = "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e";
 
           // 백엔드 사전등록 단계를 거치지 않고 포트원 V2 일반 결제창을 즉시 팝업합니다.
