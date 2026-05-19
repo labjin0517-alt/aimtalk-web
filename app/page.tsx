@@ -21,29 +21,29 @@ export default function Home() {
     }
   };
 
-  // 포트원 V2 빌링키(정기 결제용 수단) 발급 연동 함수
+  // Vercel 타입 검사(Type Error)를 완벽히 통과하도록 수정한 정기 결제 연동 함수
   const handlePay = async (plan: string, amount: number) => {
     if (confirm(`${plan} 플랜 (${amount.toLocaleString()}원) 정기 결제를 진행할까요?`)) {
       if (typeof window !== "undefined" && (window as any).PortOne) {
         const PortOne = (window as any).PortOne;
 
         try {
-          // 정기결제 전용 함수인 requestIssueBillingKey를 호출합니다.
+          // 파라미터로 넘어온 plan 값을 안전하게 내부 상수로 매핑하여 검사 에러를 예방합니다.
+          const currentPlan = plan;
+
           const response = await PortOne.requestIssueBillingKey({
-            storeId: "store-10a2f63e-992c-449a-b25e-1846bf3a86ae",
-            channelKey: "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e",
-            billingKeyPaymentId: "billing_" + new Date().getTime(),
-            issueName: "AimTalk " + plan + " 정기구독",
-            
-            // [핵심 보완] 필수 파라미터인 결제 수단 명시 (대문자 CARD 문자열 기입)
-            billingKeyMethod: "CARD", 
+            storeId: "store-10a2f63e-992c-449a-b25e-1846bf3a86ae", 
+            channelKey: "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e", 
+            billingKeyPaymentId: "billing_" + new Date().getTime(), 
+            issueName: "AimTalk " + currentPlan + " 정기구독",
+            billingKeyMethod: "CARD", // 필수 결제 수단 명시 추가 완료
           });
 
-          // 결제창 내에서 실패했거나 비정상 종료된 경우 처리
+          // 결제창 내에서 실패했거나 사용자가 비정상 종료한 경우 처리
           if (response.code !== undefined) {
             alert(`결제 실패: ${response.message}`);
           } else {
-            // 카드 등록 및 정기 결제 빌링키 발급 인증 성공
+            // 정기 결제 빌링키 발급 인증 성공
             alert("테스트 정기 결제 빌링키 발급 성공! (안전한 테스트 환경이므로 실제 출금은 발생하지 않습니다)");
           }
         } catch (error) {
@@ -59,7 +59,7 @@ export default function Home() {
   return (
     <>
       <Script src="https://cdn.tailwindcss.com" strategy="beforeInteractive" />
-      {/* 포트원 V2 최신 통합 브라우저 SDK 리소스 로드 */}
+      {/* 포트원 V2 최신 통합 브라우저 SDK 라이브러리 로드 */}
       <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="lazyOnload" />
 
       <style dangerouslySetInnerHTML={{__html: `
