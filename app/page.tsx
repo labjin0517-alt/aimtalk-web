@@ -30,10 +30,13 @@ export default function Home() {
         try {
           // 정기결제 전용 함수인 requestIssueBillingKey를 호출합니다.
           const response = await PortOne.requestIssueBillingKey({
-            storeId: "store-10a2f63e-992c-449a-b25e-1846bf3a86ae", // 내 상점 ID
-            channelKey: "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e", // 생성한 테스트 채널 키
-            billingKeyPaymentId: "billing_" + new Date().getTime(), // 정기결제 시도 고유 ID 규칙
+            storeId: "store-10a2f63e-992c-449a-b25e-1846bf3a86ae",
+            channelKey: "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e",
+            billingKeyPaymentId: "billing_" + new Date().getTime(),
             issueName: "AimTalk " + plan + " 정기구독",
+            
+            // [핵심 보완] 필수 파라미터인 결제 수단 명시 (대문자 CARD 문자열 기입)
+            billingKeyMethod: "CARD", 
           });
 
           // 결제창 내에서 실패했거나 비정상 종료된 경우 처리
