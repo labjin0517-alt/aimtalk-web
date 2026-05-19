@@ -29,7 +29,7 @@ export default function Home() {
 
         try {
           const currentPlan = plan;
-          const storeId = "store-10a2f63e-992c-494a-b25e-1846bf3a86ae";
+          const storeId = "store-10a2f63e-992c-449a-b25e-1846bf3a86ae";
           const channelKey = "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e";
 
           const response = await PortOne.requestPayment({
@@ -109,7 +109,7 @@ export default function Home() {
                   
                   <div className="flex justify-center px-2">
                     <button 
-                      onClick={() => setActiveSection("download")} 
+                      onClick={() => openModal("trial")} 
                       className="w-full sm:w-auto bg-[#1e6082] text-white px-8 py-4 sm:px-16 sm:py-6 rounded-2xl text-lg sm:text-2xl font-bold hover:bg-blue-800 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
                     >
                       🚀 지금 무료 체험하기
@@ -118,7 +118,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 특징 섹션 (6대 기능) */}
+              {/* 특징 섹션 (6대 기능 스타일 전격 통일) */}
               <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="text-center mb-12 md:mb-16">
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">왜 AimTalk Pro여야 할까요?</h3>
@@ -172,13 +172,14 @@ export default function Home() {
                     <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded">실시간 메신저 알림 보고</span>
                   </div>
 
-                  <div className="feature-card p-6 md:p-8 bg-[#1e6082] rounded-3xl shadow-lg">
-                    <div className="bg-white/20 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
-                      <span className="text-2xl md:text-3xl text-white">✨</span>
+                  {/* [수정됨] 다른 카드들과 완벽히 일치하도록 배경색 및 텍스트 톤을 화이트 카드 형태로 교정 */}
+                  <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
+                    <div className="bg-teal-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
+                      <span className="text-2xl md:text-3xl text-teal-600">✨</span>
                     </div>
-                    <h4 className="text-lg md:text-xl font-bold mb-3 text-white">그룹별 멀티 타겟 메시징</h4>
-                    <p className="text-white/80 text-xs md:text-sm leading-relaxed mb-4">엑셀 시트 내 '그룹' 분류 필터링 정보를 연동하여 생성된 탭 레이아웃마다 완벽히 분리된 맞춤형 본문과 첨부 문서를 할당합니다.</p>
-                    <span className="text-xs font-bold text-[#1e6082] bg-white px-2 py-1 rounded">엑셀 그룹 탭 연동</span>
+                    <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">그룹별 멀티 타겟 메시징</h4>
+                    <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">엑셀 시트 내 '그룹' 분류 필터링 정보를 연동하여 생성된 탭 레이아웃마다 완벽히 분리된 맞춤형 본문과 첨부 문서를 할당합니다.</p>
+                    <span className="text-xs font-bold text-teal-500 bg-teal-50 px-2 py-1 rounded">엑셀 그룹 탭 연동</span>
                   </div>
                 </div>
               </div>
@@ -252,7 +253,7 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 4] 사용방법 (화면 및 가이드 추가) */}
+          {/* [메뉴 4] 사용방법 */}
           {activeSection === "howto" && (
             <section className="py-16 md:py-24 max-w-5xl mx-auto px-4 sm:px-6">
               <div className="text-center mb-10 md:mb-14">
@@ -260,7 +261,7 @@ export default function Home() {
                 <p className="text-sm md:text-lg text-gray-600">단 4단계면 충분합니다. 빠르고 쉽게 자동 발송을 시작해 보세요.</p>
               </div>
 
-              {/* 프로그램 실행 화면 이미지 추가 */}
+              {/* 프로그램 실행 화면 이미지 */}
               <div className="mb-12 md:mb-16 flex justify-center">
                 <img 
                   src="/image_3ffb56.png" 
@@ -318,7 +319,7 @@ export default function Home() {
                     <p>• 이상이 없다면 <strong>[발송 시작 (F2)]</strong> 버튼을 누릅니다!</p>
                     <p>• 실시간 모니터링 대시보드가 팝업되며 발송 현황, 속도, 예상 소요 시간을 보여줍니다.</p>
                     <div className="bg-red-500/20 border border-red-400/50 p-3 rounded-xl mt-2 text-white">
-                      <strong>🚨 주의:</strong> 발송이 진행되는 동안에는 마우스와 키보드 사용을 멈춰주세요. 발송을 멈추고 싶을 땐 언제든 <strong>[발송 중지 (F3)]</strong>를 누르시면 됩니다.
+                      <strong>🚨 주의:</strong> 발송이 진행되는 동안에는 마우스 and 키보드 사용을 멈춰주세요. 발송을 멈추고 싶을 땐 언제든 <strong>[발송 중지 (F3)]</strong>를 누르시면 됩니다.
                     </div>
                   </div>
                 </div>
@@ -360,6 +361,48 @@ export default function Home() {
           </div>
         </footer>
       </div>
+
+      {/* 3일 무료 체험 프로모션 안내 팝업창 */}
+      {activeModal === "trial" && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl text-center border border-gray-100">
+            <div className="w-16 h-16 bg-blue-50 text-[#1e6082] text-3xl flex items-center justify-center rounded-full mx-auto mb-4">
+              🎁
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">에임톡 3일 무료 체험</h3>
+            <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-6">
+              프로그램을 다운로드한 후, 우측 하단의<br />
+              <span className="font-semibold text-gray-800">[프로그램 정보 및 인증]</span> 칸에 아래 코드를 기입하시면 Pro 버전의 모든 기능이 3일간 즉시 개방됩니다!
+            </p>
+            
+            {/* 프로모션 코드 노출 박스 */}
+            <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-4 mb-6 relative group">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block mb-1">체험판 프로모션 코드</span>
+              <strong className="text-2xl font-mono text-[#1e6082] tracking-widest select-all">FREE3DAYS</strong>
+              <div className="text-[10px] text-gray-400 mt-1">드래그하거나 마우스로 더블 클릭하여 복사하세요</div>
+            </div>
+
+            {/* 하단 제어 버튼 행 */}
+            <div className="flex space-x-3">
+              <button 
+                onClick={closeModal}
+                className="w-1/3 py-3.5 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition"
+              >
+                닫기
+              </button>
+              <button 
+                onClick={() => {
+                  closeModal();
+                  setActiveSection("download");
+                }}
+                className="w-2/3 py-3.5 bg-[#1e6082] text-white font-bold rounded-xl hover:bg-blue-800 transition shadow-md shadow-blue-800/20"
+              >
+                프로그램 다운로드
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 모달 팝업 레이어: 이용약관 전문 고도화 */}
       {activeModal === "terms" && (
@@ -443,7 +486,7 @@ export default function Home() {
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">4. 개인정보의 파기 절차 및 방법</h4>
-                <p>이용자의 개인정보는 목적 달성 후 지체 없이 파기됩니다. 전자적 파일 형태의 정보는 기록을 재생할 수 없는 기술적 방법을 사용하여 삭제하며, 종이 문서에 출력된 개인정보는 분쇄기로 파쇄합니다.</p>
+                <p>이용자의 개인정보는 목적 달성 후 지체 없이 파기합니다. 전자적 파일 형태의 정보는 기록을 재생할 수 없는 기술적 방법을 사용하여 삭제하며, 종이 문서에 출력된 개인정보는 분쇄기로 파쇄합니다.</p>
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">5. 제3자 제공 및 위탁</h4>
