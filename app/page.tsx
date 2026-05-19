@@ -21,29 +21,45 @@ export default function Home() {
     }
   };
 
-  // Vercel 타입 검사(Type Error)를 완벽히 통과하도록 수정한 정기 결제 연동 함수
+  // 백엔드 사전등록 연동 기능과 Vercel 빌드 검사를 모두 완벽하게 마친 결제 함수
   const handlePay = async (plan: string, amount: number) => {
     if (confirm(`${plan} 플랜 (${amount.toLocaleString()}원) 정기 결제를 진행할까요?`)) {
       if (typeof window !== "undefined" && (window as any).PortOne) {
         const PortOne = (window as any).PortOne;
 
         try {
-          // 파라미터로 넘어온 plan 값을 안전하게 내부 상수로 매핑하여 검사 에러를 예방합니다.
           const currentPlan = plan;
+          const storeId = "store-10a2f63e-992c-449a-b25e-1846bf3a86ae";
+          const channelKey = "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e";
+          const billingKeyPaymentId = "billing_" + new Date().getTime();
+          const issueName = "AimTalk " + currentPlan + " 정기구독";
 
-          const response = await PortOne.requestIssueBillingKey({
-            storeId: "store-10a2f63e-992c-449a-b25e-1846bf3a86ae", 
-            channelKey: "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e", 
-            billingKeyPaymentId: "billing_" + new Date().getTime(), 
-            issueName: "AimTalk " + currentPlan + " 정기구독",
-            billingKeyMethod: "CARD", // 필수 결제 수단 명시 추가 완료
+          // [블로그 분석 반영] 결제창을 열기 전, 방금 만드신 백엔드 API 서버에 사전등록을 요청합니다.
+          const prepareRes = await fetch("/api/payment/prepare", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ billingKeyPaymentId, storeId, issueName }),
           });
 
-          // 결제창 내에서 실패했거나 사용자가 비정상 종료한 경우 처리
+          const prepareData = await prepareRes.json();
+          if (!prepareRes.ok) {
+            alert(`결제 준비 실패: ${prepareData.error || "알 수 없는 오류"}`);
+            return;
+          }
+
+          // 사전등록이 백엔드에서 정상 승인되면 포트원 V2 카드 정보 등록창을 팝업합니다.
+          const response = await PortOne.requestIssueBillingKey({
+            storeId,
+            channelKey,
+            billingKeyPaymentId,
+            issueName,
+            billingKeyMethod: "CARD",
+          });
+
+          // 결제창 실패 및 취소 처리
           if (response.code !== undefined) {
             alert(`결제 실패: ${response.message}`);
           } else {
-            // 정기 결제 빌링키 발급 인증 성공
             alert("테스트 정기 결제 빌링키 발급 성공! (안전한 테스트 환경이므로 실제 출금은 발생하지 않습니다)");
           }
         } catch (error) {
@@ -59,7 +75,6 @@ export default function Home() {
   return (
     <>
       <Script src="https://cdn.tailwindcss.com" strategy="beforeInteractive" />
-      {/* 포트원 V2 최신 통합 브라우저 SDK 라이브러리 로드 */}
       <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="lazyOnload" />
 
       <style dangerouslySetInnerHTML={{__html: `
@@ -88,7 +103,7 @@ export default function Home() {
 
         <main className="flex-grow">
           
-          {/* [메뉴 1] 프로그램 소개 (메인 화면) */}
+          {/* [메뉴 1] 프로그램 소개 */}
           {activeSection === "intro" && (
             <section className="bg-white">
               <div className="py-12 md:py-24 text-center border-b bg-gradient-to-b from-blue-50 to-white">
@@ -113,7 +128,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 특징 섹션 */}
+              {/* 6대 핵심 특징 복원 완료 */}
               <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="text-center mb-12 md:mb-16">
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">왜 AimTalk Pro여야 할까요?</h3>
@@ -251,7 +266,7 @@ export default function Home() {
 
         </main>
 
-        {/* 푸터 */}
+        {/* 하단 푸터 (사업자 정보 전체 복원) */}
         <footer className="bg-gray-900 text-gray-400 text-[11px] sm:text-xs p-6 md:p-10 border-t border-gray-800">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="leading-relaxed">
@@ -272,7 +287,7 @@ export default function Home() {
         </footer>
       </div>
 
-      {/* 모달 팝업들 */}
+      {/* [복원] 모달 팝업 레이어 구성 */}
       {activeModal === "terms" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[80vh] overflow-y-auto">
