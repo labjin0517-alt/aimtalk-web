@@ -32,18 +32,22 @@ export default function Home() {
           const storeId = "store-10a2f63e-992c-494a-b25e-1846bf3a86ae";
           const channelKey = "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e";
 
-          // 백엔드 사전등록 단계를 거치지 않고 포트원 V2 일반 결제창을 즉시 팝업합니다.
           const response = await PortOne.requestPayment({
             storeId: storeId,
             channelKey: channelKey,
-            paymentId: "payment_" + new Date().getTime(), // 단건 결제용 고유 ID 발급 규칙
+            paymentId: "payment_" + new Date().getTime(), 
             orderName: "AimTalk " + currentPlan + " 이용권",
             totalAmount: amount,
             currency: "CURRENCY_KRW",
             payMethod: "CARD",
+            // [핵심 추가] 이니시스 필수 요구 사항인 고객 정보(이메일 등) 주입
+            customer: {
+              fullName: "에임톡 고객",
+              phoneNumber: "010-1234-5678",
+              email: "test@aimtalk.cloud",
+            }
           });
 
-          // 결제창 실패 및 취소 처리
           if (response.code !== undefined) {
             alert(`결제 실패: ${response.message}`);
           } else {
