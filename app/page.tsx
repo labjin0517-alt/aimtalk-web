@@ -84,10 +84,9 @@ export default function Home() {
             </h1>
             <nav className="flex space-x-4 md:space-x-6 text-xs sm:text-sm font-medium overflow-x-auto no-scrollbar max-w-[70%] md:max-w-none">
               <button onClick={() => setActiveSection("intro")} className={`pb-1 whitespace-nowrap ${activeSection === "intro" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>소개</button>
-              <button onClick={() => setActiveSection("howto")} className={`pb-1 whitespace-nowrap ${activeSection === "howto" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>사용법</button>
+              <button onClick={() => setActiveSection("howto")} className={`pb-1 whitespace-nowrap ${activeSection === "howto" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>사용방법</button>
               <button onClick={() => setActiveSection("download")} className={`pb-1 whitespace-nowrap ${activeSection === "download" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>다운로드</button>
-              <button onClick={() => setActiveSection("pricing")} className={`pb-1 whitespace-nowrap ${activeSection === "pricing" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>가격</button>
-              <button onClick={() => setActiveSection("qa")} className={`pb-1 whitespace-nowrap ${activeSection === "qa" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>Q&A</button>
+              <button onClick={() => setActiveSection("pricing")} className={`pb-1 whitespace-nowrap ${activeSection === "pricing" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>라이선스 구입</button>
             </nav>
           </div>
         </header>
@@ -154,7 +153,7 @@ export default function Home() {
                     <span className="text-xs font-bold text-purple-500 bg-purple-50 px-2 py-1 rounded">발송 예약 스케줄링</span>
                   </div>
 
-                  {/* [수정됨] 신규 대화방 자동 개설 발송 */}
+                  {/* 신규 대화방 자동 개설 발송 */}
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="bg-orange-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-2xl md:text-3xl">💬</span>
@@ -221,7 +220,7 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 3] 가격안내 */}
+          {/* [메뉴 3] 라이선스 구입 (가격안내) */}
           {activeSection === "pricing" && (
             <section className="py-12 md:py-20 max-w-5xl mx-auto px-4 sm:px-6">
               <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">라이선스 요금제</h2>
@@ -253,12 +252,21 @@ export default function Home() {
             </section>
           )}
 
-          {/* [수정됨] 사용 방법 가이드 화면 추가 */}
+          {/* [메뉴 4] 사용방법 (화면 및 가이드 추가) */}
           {activeSection === "howto" && (
             <section className="py-16 md:py-24 max-w-5xl mx-auto px-4 sm:px-6">
-              <div className="text-center mb-12 md:mb-16">
+              <div className="text-center mb-10 md:mb-14">
                 <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4">에임톡(AimTalk) 시작하기</h2>
                 <p className="text-sm md:text-lg text-gray-600">단 4단계면 충분합니다. 빠르고 쉽게 자동 발송을 시작해 보세요.</p>
+              </div>
+
+              {/* 프로그램 실행 화면 이미지 추가 */}
+              <div className="mb-12 md:mb-16 flex justify-center">
+                <img 
+                  src="/image_3ffb56.png" 
+                  alt="에임톡 프로그램 메인 화면" 
+                  className="w-full max-w-4xl rounded-xl shadow-lg border border-gray-200"
+                />
               </div>
 
               <div className="space-y-8 md:space-y-12">
@@ -330,11 +338,9 @@ export default function Home() {
             </section>
           )}
 
-          {activeSection === "qa" && <section className="py-20 text-center px-4"><h2 className="text-2xl sm:text-3xl font-bold mb-6">Q&A</h2><p className="text-gray-600 text-sm">준비 중입니다.</p></section>}
-
         </main>
 
-        {/* 하단 푸터 (사업자 정보 전체 복원) */}
+        {/* 하단 푸터 */}
         <footer className="bg-gray-900 text-gray-400 text-[11px] sm:text-xs p-6 md:p-10 border-t border-gray-800">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="leading-relaxed">
@@ -345,9 +351,9 @@ export default function Home() {
             </div>
             <div className="flex flex-col md:items-end gap-3 w-full md:w-auto border-t border-gray-800 md:border-none pt-4 md:pt-0">
               <div className="flex space-x-4">
-                <button onClick={() => openModal("terms")} className="underline hover:text-white">이용약관</button>
-                <button onClick={() => openModal("privacy")} className="underline hover:text-yellow-500">개인정보처리방침</button>
-                <button onClick={() => openModal("refund")} className="underline hover:text-white">환불규정</button>
+                <button onClick={() => openModal("terms")} className="underline hover:text-white transition">이용약관</button>
+                <button onClick={() => openModal("privacy")} className="underline hover:text-yellow-500 transition">개인정보처리방침</button>
+                <button onClick={() => openModal("refund")} className="underline hover:text-white transition">환불규정</button>
               </div>
               <p>© 2026 Lab.Jin. All rights reserved.</p>
             </div>
@@ -355,47 +361,146 @@ export default function Home() {
         </footer>
       </div>
 
-      {/* 모달 팝업 레이어 구성 (약관 전문 복원 완료) */}
+      {/* 모달 팝업 레이어: 이용약관 전문 고도화 */}
       {activeModal === "terms" && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[80vh] overflow-y-auto">
-            <h3 className="text-xl font-bold mb-4 border-b pb-2 text-gray-950">서비스 이용약관</h3>
-            <div className="text-xs sm:text-sm leading-relaxed space-y-4 text-gray-600">
-              <p><strong>제 1 조 (목적)</strong><br />본 약관은 LabJin(이하 "회사"라 합니다)이 제공하는 에임톡(AimTalk) 프로그램 및 관련 서비스(이하 "서비스")를 이용함에 있어 회사와 이용자 간의 권리, 의무, 책임사항 및 기타 필요한 사항을 규정함을 목적으로 합니다.</p>
-              <p><strong>제 2 조 (용어의 정의)</strong><br />1. "서비스"라 함은 회사가 개발하여 제공하는 카카오톡 메시지 자동 발송 보조 프로그램 및 일체의 부가 서비스를 의미합니다.<br />2. "이용자"란 본 약관에 따라 회사가 제공하는 서비스를 이용하는 회원 및 비회원을 말합니다.</p>
-              <p><strong>제 3 조 (이용자의 의무 및 제약)</strong><br />1. 이용자는 본 프로그램을 활용하여 영리 목적의 광고성 정보를 전송할 경우 정보통신망법 등 관련 법령에 따른 의무 사항을 준수해야 합니다.<br />2. 타인에게 불법 스팸을 발송하거나 메신저 운영사(주식회사 카카오)의 이용약관을 위반하여 발생하는 모든 계정 정지, 제재 및 민형사상 법적 책임은 이용자 본인에게 있습니다.</p>
-              <p><strong>제 4 조 (서비스 제공의 중단 및 면책)</strong><br />1. 회사는 연중무휴 1일 24시간 서비스 제공을 원칙으로 하나, 컴퓨터 등 정보통신설비의 보수점검, 교체 및 고장, 통신두절 등의 사유가 발생한 경우 서비스 제공을 일시적으로 중단할 수 있습니다.<br />2. 카카오톡 메신저 프로그램 자체의 대규모 업데이트, 정책 변경 또는 기술적 사유로 인해 본 프로그램의 기능 일부 또는 전체가 제한될 경우 회사는 이에 대해 책임을 지지 않습니다.</p>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
+              <h3 className="text-2xl font-bold text-gray-900">서비스 이용약관</h3>
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
-            <button onClick={closeModal} className="mt-6 w-full py-3 bg-gray-200 rounded-lg font-bold text-gray-800 hover:bg-gray-300 transition">약관 닫기</button>
+            <div className="text-sm leading-relaxed space-y-6 text-gray-700">
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제1조 (목적)</h4>
+                <p>본 약관은 LabJin(이하 "회사")이 제공하는 소프트웨어 프로그램 '에임톡(AimTalk)' 및 관련 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자 간의 권리, 의무, 책임사항 및 기타 필요한 제반 사항을 규정함을 목적으로 합니다.</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제2조 (용어의 정의)</h4>
+                <p>1. "서비스"라 함은 회사가 개발하여 제공하는 PC 기반의 카카오톡 메시지 자동 발송 보조 솔루션을 의미합니다.<br/>
+                   2. "이용자"란 본 약관에 동의하고 회사가 제공하는 서비스를 이용하는 개인 또는 법인 회원을 말합니다.<br/>
+                   3. "라이선스"란 회사가 이용자에게 부여하는 특정 기간 동안의 서비스 사용 권한(소프트웨어 인증 키)을 의미합니다.</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제3조 (서비스의 제공 및 변경)</h4>
+                <p>1. 회사는 이용자에게 정해진 요금제에 따른 기능(Basic, Pro 등)을 제공합니다.<br/>
+                   2. 회사는 기술적 사양의 변경, 품질 개선, 타사 플랫폼(카카오톡 등)의 정책 변경 대응을 위해 서비스의 내용을 사전 고지 없이 변경하거나 업데이트할 수 있습니다.</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제4조 (이용자의 의무)</h4>
+                <p>1. 이용자는 본 서비스를 이용함에 있어 대한민국 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」을 비롯한 스팸 방지 관련 법령을 철저히 준수해야 합니다.<br/>
+                   2. 이용자는 타인의 권리 침해, 공서양속 저해, 불법적인 영리 활동 목적으로 본 서비스를 이용해서는 안 됩니다.<br/>
+                   3. 플랫폼 제공사(주식회사 카카오)의 이용약관 및 운영정책 위반으로 인해 발생하는 계정 정지, 영구 제재, 손해배상 등의 모든 법적 책임은 전적으로 서비스를 실행한 이용자 본인에게 있습니다.</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제5조 (계약의 해지 및 이용 제한)</h4>
+                <p>회사는 이용자가 제4조(이용자의 의무)를 위반하거나, 불법적인 방법으로 라이선스를 우회 및 재배포하는 경우 사전 통보 없이 서비스 이용을 제한하고 라이선스 계약을 직권으로 해지할 수 있습니다.</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제6조 (면책 조항)</h4>
+                <p>1. 회사는 천재지변, 전시, 파업, 화재 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는 서비스 제공에 관한 책임이 면제됩니다.<br/>
+                   2. 회사는 연동되는 외부 플랫폼(카카오톡)의 대규모 업데이트, 서버 다운, 일방적인 정책 변경 및 기능 제한 조치로 인해 본 소프트웨어가 정상 작동하지 않는 경우 이에 대해 어떠한 법적 책임이나 손해배상 책임을 지지 않습니다.</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제7조 (관할 법원)</h4>
+                <p>본 서비스 이용과 관련하여 회사와 이용자 간에 발생한 분쟁에 대하여는 회사의 본점 소재지를 관할하는 법원을 전속 관할법원으로 합니다.</p>
+              </section>
+            </div>
+            <div className="mt-8 pt-4 border-t border-gray-200">
+              <button onClick={closeModal} className="w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition shadow-md">약관 확인 및 닫기</button>
+            </div>
           </div>
         </div>
       )}
 
+      {/* 모달 팝업 레이어: 개인정보처리방침 전문 고도화 */}
       {activeModal === "privacy" && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[80vh] overflow-y-auto">
-            <h3 className="text-xl font-bold mb-4 border-b pb-2 text-gray-950">개인정보 처리방침</h3>
-            <div className="text-xs sm:text-sm leading-relaxed space-y-4 text-gray-600">
-              <p>LabJin(이하 "회사")은 이용자의 개인정보를 소중하게 처리하며, 개인정보보호법에 따라 이용자의 개인정보 및 권익을 보호하고 이와 관련된 고충을 원활하게 처리할 수 있도록 다음과 같은 처리방침을 두고 있습니다.</p>
-              <p><strong>1. 수집하는 개인정보 항목 및 목적</strong><br />회사는 서비스 제공, 라이선스 발급 및 관리, 대금 결제 처리를 위해 최소한의 개인정보를 수집하고 있습니다.<br />• 수집 항목: 이름, 이메일 주소, 휴대전화 번호, 결제 기록<br />• 수집 목적: 라이선스 코드 발급, 고객 상담 및 본인 확인, 결제 서비스 제공</p>
-              <p><strong>2. 개인정보의 보유 및 이용기간</strong><br />이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다. 단, 관계법령의 규정에 의하여 보존할 필요가 있는 경우 다음과 같이 보유합니다.<br />• 계약 또는 청약철회 등에 관한 기록: 5년 (전자상거래등에서의 소비자보호에 관한 법률)<br />• 대금결제 및 재화 등의 공급에 관한 기록: 5년 (전자상거래등에서의 소비자보호에 관한 법률)</p>
-              <p><strong>3. 개인정보 보호책임자</strong><br />서비스를 이용하시면서 발생하는 모든 개인정보보호 관련 민원은 보호책임자에게 문의하실 수 있습니다.<br />• 책임자: 이진혁<br />• 이메일: labjin0517@gmail.com</p>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
+              <h3 className="text-2xl font-bold text-gray-900">개인정보 처리방침</h3>
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
-            <button onClick={closeModal} className="mt-6 w-full py-3 bg-gray-200 rounded-lg font-bold text-gray-800 hover:bg-gray-300 transition">방침 닫기</button>
+            <div className="text-sm leading-relaxed space-y-6 text-gray-700">
+              <p>LabJin(이하 "회사")은 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.</p>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">1. 수집하는 개인정보의 항목 및 수집 방법</h4>
+                <p>회사는 라이선스 발급, 고객 지원, 대금 결제 처리를 위해 아래의 개인정보를 수집합니다.<br/>
+                   • 수집 항목: 성명, 이메일 주소, 휴대전화 번호, 접속 IP 정보, 기기 고유 식별값(HWID), 결제 기록<br/>
+                   • 수집 방법: 웹사이트 회원가입/결제 페이지, 고객센터 이메일 문의, 프로그램 구동 시 자동 수집</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">2. 개인정보의 수집 및 이용 목적</h4>
+                <p>수집한 개인정보는 다음의 목적을 위해 활용됩니다.<br/>
+                   • 서비스 제공: 소프트웨어 라이선스 발급, 본인 인증, 서비스 부정 이용 방지(1PC 1라이선스 관리)<br/>
+                   • 고객 관리: 이용 문의 응대, 불만 처리, 중요 공지사항 전달<br/>
+                   • 결제 및 정산: 유료 서비스 이용에 따른 요금 결제 및 영수증 발급</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">3. 개인정보의 보유 및 이용 기간</h4>
+                <p>회사는 원칙적으로 개인정보의 수집 및 이용 목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다. 단, 관계법령에 의해 보존할 필요가 있는 경우 아래와 같이 보관합니다.<br/>
+                   • 계약 또는 청약철회, 대금결제 및 재화 공급에 관한 기록: 5년 (전자상거래법)<br/>
+                   • 소비자 불만 또는 분쟁 처리에 관한 기록: 3년 (전자상거래법)</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">4. 개인정보의 파기 절차 및 방법</h4>
+                <p>이용자의 개인정보는 목적 달성 후 지체 없이 파기됩니다. 전자적 파일 형태의 정보는 기록을 재생할 수 없는 기술적 방법을 사용하여 삭제하며, 종이 문서에 출력된 개인정보는 분쇄기로 파쇄합니다.</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">5. 제3자 제공 및 위탁</h4>
+                <p>회사는 이용자의 동의 없이 개인정보를 외부(제3자)에 제공하지 않습니다. 단, 결제 처리를 위해 PG사(KG이니시스 등 포트원 결제 모듈)에 결제에 필요한 필수 정보(이메일, 연락처 등)가 안전한 통신망을 통해 위탁 제공됩니다.</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">6. 개인정보 보호책임자 및 담당 부서</h4>
+                <p>회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 관련 민원 처리를 위해 아래와 같이 책임자를 지정하고 있습니다.<br/>
+                   • 책임자: 이진혁<br/>
+                   • 이메일: labjin0517@gmail.com</p>
+              </section>
+            </div>
+            <div className="mt-8 pt-4 border-t border-gray-200">
+              <button onClick={closeModal} className="w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition shadow-md">방침 확인 및 닫기</button>
+            </div>
           </div>
         </div>
       )}
 
+      {/* 모달 팝업 레이어: 환불 규정 전문 고도화 */}
       {activeModal === "refund" && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[80vh] overflow-y-auto">
-            <h3 className="text-xl font-bold mb-4 border-b pb-2 text-red-600">환불 규정 및 안내</h3>
-            <div className="text-xs sm:text-sm leading-relaxed space-y-4 text-gray-600">
-              <p><strong>제 1 조 (디지털 콘텐츠 환불 원칙)</strong><br />본 서비스에서 제공하는 소프트웨어 라이선스는 전자상거래법 제17조 제2항 제5호(소비자의 주문에 따라 개별적으로 생산되는 재화 또는 이와 유사한 재화) 및 디지털 콘텐츠의 특성상, **라이선스 코드가 생성 및 인도(등록/사용)된 이후에는 단순 변심으로 인한 환불이 불가능**합니다.</p>
-              <p><strong>제 2 조 (청약 철회 가능 범위)</strong><br />결제 후 라이선스 코드가 미사용 상태이며, 결제일로부터 **7일 이내**에 고객센터(이메일 또는 연락처)를 통해 요청 시 전액 환불 처리가 가능합니다.</p>
-              <p><strong>제 3 조 (면책 사유 및 부분 환불)</strong><br />1. 프로그램 자체의 중대한 결함으로 인해 정상적인 이용이 불가능한 경우, 회사는 이를 신속히 보수하며 보수가 불가능할 경우 이용 기간의 잔여 일수를 계산하여 부분 환불을 진행합니다.<br />2. 외부 메신저 플랫폼(카카오톡)의 강제적인 정책 변화, 업데이트, 사용자의 무분별한 스팸 발송으로 인한 계정 보호조치 및 이용 정지는 본 프로그램의 환불 사유에 해당하지 않습니다.</p>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
+              <h3 className="text-2xl font-bold text-red-600">환불 규정 및 취소 안내</h3>
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
-            <button onClick={closeModal} className="mt-6 w-full py-3 bg-red-50 text-red-600 rounded-lg font-bold hover:bg-red-100 transition">규정 닫기</button>
+            <div className="text-sm leading-relaxed space-y-6 text-gray-700">
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제1조 (환불의 기본 원칙)</h4>
+                <p>본 서비스가 제공하는 '에임톡'은 디지털 소프트웨어 콘텐츠입니다. 「전자상거래 등에서의 소비자보호에 관한 법률」 제17조 제2항 제5호에 따라, **라이선스 코드가 생성되어 구매자에게 인도(이메일 전송 또는 화면 노출)된 이후에는 복제 가능성이 있으므로 원칙적으로 단순 변심에 의한 청약 철회 및 전액 환불이 불가능**합니다.</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제2조 (청약 철회 및 예외적 전액 환불)</h4>
+                <p>이용자는 다음의 조건을 모두 충족하는 경우에 한하여 결제일로부터 **7일 이내**에 고객센터를 통해 전액 환불을 요청할 수 있습니다.<br/>
+                   1. 발급받은 라이선스 코드를 프로그램에 등록(인증)한 이력이 서버에 전혀 존재하지 않는 경우 (미사용 상태)<br/>
+                   2. 회사가 결제 취소를 승인하기 전까지 지속적으로 미사용 상태를 유지하는 경우</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제3조 (프로그램 중대 결함에 따른 부분 환불)</h4>
+                <p>회사 측의 서버 오류, 프로그램의 치명적이고 지속적인 결함으로 인해 사용자가 본래 목적대로 서비스를 전혀 이용할 수 없는 경우, 회사는 결함 발생일로부터 잔여 이용 기간을 일할 계산하여 부분 환불을 진행합니다.</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제4조 (환불 및 보상 불가 사유)</h4>
+                <p>다음의 사유로 인한 서비스 이용 제한은 회사의 귀책사유가 아니므로 환불 및 보상 대상에서 엄격히 제외됩니다.<br/>
+                   1. 이용자 PC 환경의 특수성(윈도우 7 이하, 백신 프로그램의 강제 차단, 권한 부족 등)으로 인한 구동 불가<br/>
+                   2. 이용자의 스팸 발송, 무분별한 매크로 사용으로 인한 카카오톡 계정 정지, 보호조치 및 서비스 이용 제한<br/>
+                   3. 타사 플랫폼(카카오톡)의 대규모 클라이언트 업데이트, 구조 변경, 자체 보안 강화로 인해 본 소프트웨어의 기능이 일시적 또는 영구적으로 작동하지 않는 경우</p>
+              </section>
+              <section>
+                <h4 className="font-bold text-gray-900 mb-2">제5조 (환불 절차)</h4>
+                <p>환불을 원하시는 이용자는 결제 내역(주문번호, 연락처)과 환불 사유를 작성하여 고객센터 이메일(labjin0517@gmail.com)로 접수하셔야 합니다. 환불 승인 시 PG사(결제대행사)의 정책에 따라 영업일 기준 3~7일 내에 승인 취소 처리가 완료됩니다.</p>
+              </section>
+            </div>
+            <div className="mt-8 pt-4 border-t border-gray-200">
+              <button onClick={closeModal} className="w-full py-3.5 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 hover:text-red-700 transition shadow-sm border border-red-100">규정 동의 및 닫기</button>
+            </div>
           </div>
         </div>
       )}
