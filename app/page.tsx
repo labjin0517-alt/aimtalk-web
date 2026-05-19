@@ -40,7 +40,7 @@ export default function Home() {
             totalAmount: amount,
             currency: "CURRENCY_KRW",
             payMethod: "CARD",
-            // [핵심 추가] 이니시스 필수 요구 사항인 고객 정보(이메일 등) 주입
+            // 이니시스 필수 요구 사항인 고객 정보(이메일 등) 주입
             customer: {
               fullName: "에임톡 고객",
               phoneNumber: "010-1234-5678",
@@ -119,7 +119,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 특징 섹션 (6대 기능 완벽 복원) */}
+              {/* 특징 섹션 (6대 기능) */}
               <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="text-center mb-12 md:mb-16">
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">왜 AimTalk Pro여야 할까요?</h3>
@@ -154,13 +154,14 @@ export default function Home() {
                     <span className="text-xs font-bold text-purple-500 bg-purple-50 px-2 py-1 rounded">발송 예약 스케줄링</span>
                   </div>
 
+                  {/* [수정됨] 신규 대화방 자동 개설 발송 */}
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="bg-orange-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
-                      <span className="text-2xl md:text-3xl">👤</span>
+                      <span className="text-2xl md:text-3xl">💬</span>
                     </div>
-                    <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">고객 개인별 맞춤 인사말</h4>
-                    <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">"안녕하세요 [성함]님" 형태로 데이터베이스에 등록된 수신자의 실제 이름을 메시지 첫머리에 자동 치환 주입해 줍니다.</p>
-                    <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">고객 성함 자동 치환</span>
+                    <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">신규 대화방 자동 개설 발송</h4>
+                    <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">기존에 카카오톡 대화 기록이 전혀 없는 새로운 고객이신가요? 문제없습니다! 에임톡은 채팅방이 없어도 친구 목록을 탐색하여 새로운 1:1 채팅방을 엽니다.</p>
+                    <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">친구 탭 기반 정밀 탐색</span>
                   </div>
 
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
@@ -252,7 +253,83 @@ export default function Home() {
             </section>
           )}
 
-          {activeSection === "howto" && <section className="py-20 text-center px-4"><h2 className="text-2xl sm:text-3xl font-bold mb-6">사용 방법 가이드</h2><p className="text-gray-600 text-sm">준비 중입니다.</p></section>}
+          {/* [수정됨] 사용 방법 가이드 화면 추가 */}
+          {activeSection === "howto" && (
+            <section className="py-16 md:py-24 max-w-5xl mx-auto px-4 sm:px-6">
+              <div className="text-center mb-12 md:mb-16">
+                <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4">에임톡(AimTalk) 시작하기</h2>
+                <p className="text-sm md:text-lg text-gray-600">단 4단계면 충분합니다. 빠르고 쉽게 자동 발송을 시작해 보세요.</p>
+              </div>
+
+              <div className="space-y-8 md:space-y-12">
+                {/* STEP 0 */}
+                <div className="flex flex-col md:flex-row bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+                  <div className="md:w-1/4 mb-4 md:mb-0">
+                    <span className="inline-block bg-gray-100 text-gray-600 font-bold px-3 py-1 rounded-full text-sm mb-2">사전 준비</span>
+                    <h3 className="text-xl font-bold text-[#1e6082]">라이선스 인증 및 양식 다운로드</h3>
+                  </div>
+                  <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-2">
+                    <p>• 프로그램 우측 하단 <strong>[프로그램 정보 및 인증]</strong> 란에 구매하신 라이선스 키를 입력하고 인증해 주세요.</p>
+                    <p>• 좌측 상단의 <strong>[📋 양식]</strong> 버튼을 눌러 에임톡 전용 엑셀 업로드 양식을 다운로드합니다.</p>
+                  </div>
+                </div>
+
+                {/* STEP 1 */}
+                <div className="flex flex-col md:flex-row bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+                  <div className="md:w-1/4 mb-4 md:mb-0">
+                    <span className="inline-block bg-blue-100 text-blue-600 font-bold px-3 py-1 rounded-full text-sm mb-2">STEP 1</span>
+                    <h3 className="text-xl font-bold text-[#1e6082]">명단 로드 (엑셀 업로드)</h3>
+                  </div>
+                  <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-2">
+                    <p>• 작성하신 엑셀 파일을 프로그램 좌측 영역에 <strong>드래그 앤 드롭</strong> 하거나, <strong>[📂 엑셀 업로드]</strong> 버튼을 눌러 불러옵니다.</p>
+                    <p>• 수신 거부 명단이 있다면 자동으로 필터링되며, 리스트에서 마우스 클릭으로 특정 인원만 체크하여 발송할 수도 있습니다.</p>
+                  </div>
+                </div>
+
+                {/* STEP 2 */}
+                <div className="flex flex-col md:flex-row bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+                  <div className="md:w-1/4 mb-4 md:mb-0">
+                    <span className="inline-block bg-blue-100 text-blue-600 font-bold px-3 py-1 rounded-full text-sm mb-2">STEP 2</span>
+                    <h3 className="text-xl font-bold text-[#1e6082]">메시지 및 첨부파일 설정</h3>
+                  </div>
+                  <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-2">
+                    <p>• 우측 상단의 <strong>[STEP 3. 발송 설정]</strong> 영역에서 발송 속도(명/시간)와 파일/텍스트 발송 순서를 세팅합니다.</p>
+                    <p>• 하단 그룹 탭을 클릭하여 전송할 메시지를 입력합니다.</p>
+                    <p>• 첨부할 이미지나 문서는 우측 파일 리스트 박스에 <strong>드래그 앤 드롭</strong>으로 쉽게 추가 및 순서 변경이 가능합니다. (Basic 요금제는 이미지 2개로 제한됩니다.)</p>
+                  </div>
+                </div>
+
+                {/* STEP 3 */}
+                <div className="flex flex-col md:flex-row bg-[#1e6082] text-white p-6 md:p-8 rounded-3xl shadow-md">
+                  <div className="md:w-1/4 mb-4 md:mb-0">
+                    <span className="inline-block bg-white/20 text-white font-bold px-3 py-1 rounded-full text-sm mb-2">STEP 3</span>
+                    <h3 className="text-xl font-bold">발송 시작 및 모니터링</h3>
+                  </div>
+                  <div className="md:w-3/4 md:pl-8 text-white/90 text-sm md:text-base leading-relaxed space-y-3">
+                    <p>• 모든 세팅이 끝났다면 <strong>[테스트 발송 (F1)]</strong>을 눌러 내 카카오톡으로 메시지가 잘 오는지 미리 확인합니다.</p>
+                    <p>• 이상이 없다면 <strong>[발송 시작 (F2)]</strong> 버튼을 누릅니다!</p>
+                    <p>• 실시간 모니터링 대시보드가 팝업되며 발송 현황, 속도, 예상 소요 시간을 보여줍니다.</p>
+                    <div className="bg-red-500/20 border border-red-400/50 p-3 rounded-xl mt-2 text-white">
+                      <strong>🚨 주의:</strong> 발송이 진행되는 동안에는 마우스와 키보드 사용을 멈춰주세요. 발송을 멈추고 싶을 땐 언제든 <strong>[발송 중지 (F3)]</strong>를 누르시면 됩니다.
+                    </div>
+                  </div>
+                </div>
+
+                {/* STEP 4 */}
+                <div className="flex flex-col md:flex-row bg-gray-50 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-200">
+                  <div className="md:w-1/4 mb-4 md:mb-0">
+                    <span className="inline-block bg-gray-200 text-gray-700 font-bold px-3 py-1 rounded-full text-sm mb-2">STEP 4</span>
+                    <h3 className="text-xl font-bold text-gray-800">발송 결과 확인</h3>
+                  </div>
+                  <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-2">
+                    <p>• 발송이 모두 완료되면 내 카카오톡으로 <strong>'발송 결과 리포트'</strong>가 자동 전송됩니다.</p>
+                    <p>• 동시에 원본 엑셀 파일이 있던 폴더에 성공/실패 여부와 시간이 기록된 <strong>결과 엑셀 파일</strong>이 자동으로 저장됩니다.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
           {activeSection === "qa" && <section className="py-20 text-center px-4"><h2 className="text-2xl sm:text-3xl font-bold mb-6">Q&A</h2><p className="text-gray-600 text-sm">준비 중입니다.</p></section>}
 
         </main>
