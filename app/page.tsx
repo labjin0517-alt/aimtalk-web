@@ -6,6 +6,7 @@ import Script from "next/script";
 export default function Home() {
   const [activeSection, setActiveSection] = useState<string>("intro");
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [isCopied, setIsCopied] = useState<boolean>(false); // 복사 상태 관리
 
   const openModal = (id: string) => {
     setActiveModal(id);
@@ -18,6 +19,17 @@ export default function Home() {
     setActiveModal(null);
     if (typeof document !== "undefined") {
       document.body.style.overflow = "auto";
+    }
+  };
+
+  // 프로모션 코드 복사 함수
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText("FREE3DAYS");
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000); // 2초 후 원래 상태로 복귀
+    } catch (err) {
+      alert("복사에 실패했습니다. 직접 선택하여 복사해주세요.");
     }
   };
 
@@ -118,7 +130,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 특징 섹션 (6대 기능 스타일 전격 통일) */}
+              {/* 특징 섹션 */}
               <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="text-center mb-12 md:mb-16">
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">왜 AimTalk Pro여야 할까요?</h3>
@@ -126,6 +138,7 @@ export default function Home() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+                  {/* ...기존 feature-card 내용 유지... */}
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="bg-blue-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-2xl md:text-3xl">⚡</span>
@@ -153,7 +166,6 @@ export default function Home() {
                     <span className="text-xs font-bold text-purple-500 bg-purple-50 px-2 py-1 rounded">발송 예약 스케줄링</span>
                   </div>
 
-                  {/* 신규 대화방 자동 개설 발송 */}
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="bg-orange-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-2xl md:text-3xl">💬</span>
@@ -172,7 +184,6 @@ export default function Home() {
                     <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded">실시간 메신저 알림 보고</span>
                   </div>
 
-                  {/* [수정됨] 다른 카드들과 완벽히 일치하도록 배경색 및 텍스트 톤을 화이트 카드 형태로 교정 */}
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="bg-teal-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-2xl md:text-3xl text-teal-600">✨</span>
@@ -188,7 +199,7 @@ export default function Home() {
 
           {/* [메뉴 2] 다운로드 페이지 */}
           {activeSection === "download" && (
-            <section className="py-12 max-w-4xl mx-auto px-4 sm:px-6">
+            <section className="py-12 max-w-5xl mx-auto px-4 sm:px-6">
               <div className="text-center mb-10">
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-900 inline-block border-b-4 border-[#1e6082] pb-2">프로그램 다운로드</h2>
                 <p className="mt-4 text-sm text-gray-500">에임톡은 윈도우 PC 전용 솔루션입니다.</p>
@@ -218,6 +229,64 @@ export default function Home() {
                   <a href="https://github.com/labjin0517-alt/AimTalk-Updates/releases" target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-[#1e6082] text-white text-center font-bold rounded-xl hover:bg-blue-800 shadow-lg transition">에임톡 최신 버전 다운로드</a>
                 </div>
               </div>
+
+              {/* 다운로드 안내 추가 섹션 */}
+              <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200 mt-8">
+                <div className="text-center mb-8">
+                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">🛡️ 다운로드 차단 해제 안내</h3>
+                  <p className="text-sm text-gray-600">
+                    실행 파일(.exe) 특성상 웹 브라우저에서 다운로드를 차단할 수 있습니다.<br className="hidden md:block" />
+                    AimTalk는 안전한 소프트웨어이므로, 아래 순서에 따라 다운로드를 진행해 주세요.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* STEP 1 */}
+                  <div className="border border-gray-100 rounded-xl p-4 bg-gray-50 flex flex-col h-full">
+                    <div className="mb-3">
+                      <span className="inline-block bg-[#1e6082] text-white px-3 py-1 rounded text-xs font-bold mb-2">STEP 1</span>
+                      <p className="text-sm text-gray-700 font-medium">다운로드 경고창이 뜨면 우측의 <strong>[ ⋯ ]</strong> 아이콘을 클릭합니다.</p>
+                    </div>
+                    <div className="mt-auto overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                      <img src="/다운로드1.png" alt="다운로드 안내 1단계" className="w-full object-cover" />
+                    </div>
+                  </div>
+
+                  {/* STEP 2 */}
+                  <div className="border border-gray-100 rounded-xl p-4 bg-gray-50 flex flex-col h-full">
+                    <div className="mb-3">
+                      <span className="inline-block bg-[#1e6082] text-white px-3 py-1 rounded text-xs font-bold mb-2">STEP 2</span>
+                      <p className="text-sm text-gray-700 font-medium">나타나는 메뉴에서 <strong>[ 유지 ]</strong> 버튼을 클릭합니다.</p>
+                    </div>
+                    <div className="mt-auto overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                      <img src="/다운로드2.png" alt="다운로드 안내 2단계" className="w-full object-cover" />
+                    </div>
+                  </div>
+
+                  {/* STEP 3 */}
+                  <div className="border border-gray-100 rounded-xl p-4 bg-gray-50 flex flex-col h-full">
+                    <div className="mb-3">
+                      <span className="inline-block bg-[#1e6082] text-white px-3 py-1 rounded text-xs font-bold mb-2">STEP 3</span>
+                      <p className="text-sm text-gray-700 font-medium">안전 여부 확인 창에서 <strong>[ 더 보기 ]</strong> 또는 화살표(v)를 클릭합니다.</p>
+                    </div>
+                    <div className="mt-auto overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                      <img src="/다운로드3.png" alt="다운로드 안내 3단계" className="w-full object-cover" />
+                    </div>
+                  </div>
+
+                  {/* STEP 4 */}
+                  <div className="border border-gray-100 rounded-xl p-4 bg-gray-50 flex flex-col h-full">
+                    <div className="mb-3">
+                      <span className="inline-block bg-[#1e6082] text-white px-3 py-1 rounded text-xs font-bold mb-2">STEP 4</span>
+                      <p className="text-sm text-gray-700 font-medium"><strong>[ 그래도 계속 ]</strong>을 클릭하면 다운로드가 정상 완료됩니다.</p>
+                    </div>
+                    <div className="mt-auto overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                      <img src="/다운로드4.png" alt="다운로드 안내 4단계" className="w-full object-cover" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </section>
           )}
 
@@ -230,9 +299,8 @@ export default function Home() {
                   <h3 className="text-xl font-bold mb-4">Basic</h3>
                   <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">8,000원 <span className="text-sm font-normal text-gray-400">/ 월</span></div>
                   <ul className="text-gray-600 space-y-4 mb-10 text-left text-sm">
-                    <li>• 기본 메시지 자동 발송 (300명/h)</li>
+                    <li>• 기본 메시지 자동 발송 (시간당 300명)</li>
                     <li>• 이미지 최대 2개 첨부</li>
-                    <li>• 이메일 고객 지원</li>
                   </ul>
                   <button onClick={() => handlePay("Basic", 8000)} className="w-full py-4 rounded-xl border border-[#1e6082] text-[#1e6082] font-bold hover:bg-blue-50 transition">베이직 결제하기</button>
                 </div>
@@ -242,10 +310,10 @@ export default function Home() {
                   <h3 className="text-xl font-bold mb-4 text-[#1e6082]">Pro</h3>
                   <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">16,000원 <span className="text-sm font-normal text-gray-400">/ 월</span></div>
                   <ul className="text-gray-600 space-y-4 mb-10 text-left text-sm">
-                    <li className="font-bold text-gray-800">• 고속 발송 (500명/h)</li>
+                    <li className="font-bold text-gray-800">• 고속 발송 (시간당 500명)</li>
                     <li className="font-bold text-gray-800">• 모든 파일 무제한 첨부</li>
                     <li className="font-bold text-gray-800">• 스마트 예약 발송 & 맞춤 인사말</li>
-                    <li className="font-bold text-gray-800">• 실시간 보고 & 원격 지원</li>
+                    <li className="font-bold text-gray-800">• 테스트발송 및 중간, 결과보고</li>
                   </ul>
                   <button onClick={() => handlePay("Pro", 16000)} className="w-full py-4 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg transition">프로 결제하기</button>
                 </div>
@@ -264,7 +332,7 @@ export default function Home() {
               {/* 프로그램 실행 화면 이미지 */}
               <div className="mb-12 md:mb-16 flex justify-center">
                 <img 
-                  src="/image_3ffb56.png" 
+                  src="/에임톡v1.06.png" 
                   alt="에임톡 프로그램 메인 화면" 
                   className="w-full max-w-4xl rounded-xl shadow-lg border border-gray-200"
                 />
@@ -343,14 +411,35 @@ export default function Home() {
 
         {/* 하단 푸터 */}
         <footer className="bg-gray-900 text-gray-400 text-[11px] sm:text-xs p-6 md:p-10 border-t border-gray-800">
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="leading-relaxed">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8 md:gap-4">
+            
+            {/* 좌측: 사업자 정보 */}
+            <div className="leading-relaxed flex-1">
               <p className="text-white text-base font-bold mb-2">LabJin (AimTalk)</p>
               <p>상호명: LabJin | 대표자: 이진혁 | 사업자등록번호: 544-33-01720</p>
               <p>연락처: 010-8294-8919 | 이메일: labjin0517@gmail.com</p>
               <p>주소: 경기도 파주시 책향기로 403, 704동 9층 901호</p>
             </div>
-            <div className="flex flex-col md:items-end gap-3 w-full md:w-auto border-t border-gray-800 md:border-none pt-4 md:pt-0">
+
+            {/* 중앙: 오픈카톡 QR 코드 (신규 추가) */}
+            <div className="flex flex-col items-start md:items-center gap-2 flex-1 border-t border-gray-800 md:border-none pt-6 md:pt-0 w-full md:w-auto">
+              <div className="flex items-center gap-4">
+                <div className="bg-white p-1.5 rounded-lg shadow-sm">
+                  <img src="/오픈카톡.png" alt="오픈카카오톡 이용문의 QR코드" className="w-16 h-16 sm:w-20 sm:h-20 object-cover" />
+                </div>
+                <div>
+                  <p className="text-white font-bold text-sm mb-1">💬 1:1 이용문의</p>
+                  <p className="text-gray-400 text-[11px] sm:text-xs leading-tight">
+                    궁금한 점이 있으신가요?<br />
+                    스마트폰 카메라로 QR코드를 스캔하여<br />
+                    오픈카톡으로 간편하게 문의해주세요.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 우측: 약관 및 저작권 */}
+            <div className="flex flex-col md:items-end gap-3 flex-1 border-t border-gray-800 md:border-none pt-6 md:pt-0 w-full md:w-auto">
               <div className="flex space-x-4">
                 <button onClick={() => openModal("terms")} className="underline hover:text-white transition">이용약관</button>
                 <button onClick={() => openModal("privacy")} className="underline hover:text-yellow-500 transition">개인정보처리방침</button>
@@ -358,6 +447,7 @@ export default function Home() {
               </div>
               <p>© 2026 Lab.Jin. All rights reserved.</p>
             </div>
+
           </div>
         </footer>
       </div>
@@ -375,11 +465,22 @@ export default function Home() {
               <span className="font-semibold text-gray-800">[프로그램 정보 및 인증]</span> 칸에 아래 코드를 기입하시면 Pro 버전의 모든 기능이 3일간 즉시 개방됩니다!
             </p>
             
-            {/* 프로모션 코드 노출 박스 */}
-            <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-4 mb-6 relative group">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block mb-1">체험판 프로모션 코드</span>
-              <strong className="text-2xl font-mono text-[#1e6082] tracking-widest select-all">FREE3DAYS</strong>
-              <div className="text-[10px] text-gray-400 mt-1">드래그하거나 마우스로 더블 클릭하여 복사하세요</div>
+            {/* 프로모션 코드 노출 박스 (복사 버튼 추가) */}
+            <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-5 mb-6 relative">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block mb-3">체험판 프로모션 코드</span>
+              <div className="flex items-center justify-center gap-3">
+                <strong className="text-2xl font-mono text-[#1e6082] tracking-widest select-all">FREE3DAYS</strong>
+                <button 
+                  onClick={handleCopyCode}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all shadow-sm ${
+                    isCopied 
+                      ? "bg-green-500 text-white" 
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  {isCopied ? "복사완료 ✔" : "복사하기 📋"}
+                </button>
+              </div>
             </div>
 
             {/* 하단 제어 버튼 행 */}
@@ -404,7 +505,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 모달 팝업 레이어: 이용약관 전문 고도화 */}
+      {/* 모달 팝업 레이어: 이용약관 */}
       {activeModal === "terms" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -412,6 +513,7 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-gray-900">서비스 이용약관</h3>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
+            {/* ...기존 이용약관 내용 유지... */}
             <div className="text-sm leading-relaxed space-y-6 text-gray-700">
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제1조 (목적)</h4>
@@ -455,7 +557,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 모달 팝업 레이어: 개인정보처리방침 전문 고도화 */}
+      {/* 모달 팝업 레이어: 개인정보처리방침 */}
       {activeModal === "privacy" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -463,6 +565,7 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-gray-900">개인정보 처리방침</h3>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
+            {/* ...기존 개인정보처리방침 내용 유지... */}
             <div className="text-sm leading-relaxed space-y-6 text-gray-700">
               <p>LabJin(이하 "회사")은 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.</p>
               <section>
@@ -506,7 +609,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 모달 팝업 레이어: 환불 규정 전문 고도화 */}
+      {/* 모달 팝업 레이어: 환불 규정 */}
       {activeModal === "refund" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -514,6 +617,7 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-red-600">환불 규정 및 취소 안내</h3>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
+            {/* ...기존 환불규정 내용 유지... */}
             <div className="text-sm leading-relaxed space-y-6 text-gray-700">
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제1조 (환불의 기본 원칙)</h4>
