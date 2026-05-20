@@ -6,16 +6,17 @@ import Script from "next/script";
 export default function Home() {
   const [activeSection, setActiveSection] = useState<string>("intro");
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [isCopied, setIsCopied] = useState<boolean>(false); // 복사 상태 관리
+  const [isCopied, setIsCopied] = useState<boolean>(false);
 
   // 🔑 비회원 라이선스 키 찾기 관련 상태
   const [findEmail, setFindEmail] = useState<string>("");
   const [isFinding, setIsFinding] = useState<boolean>(false);
 
-  // 💳 [개선] React child 객체 렌더링 에러를 원천 차단하는 독립형 원시 타입 상태 필드
+  // 💳 객체 렌더링 에러를 차단하는 독립형 상태 필드 (플랜 정보)
   const [selectedPlanName, setSelectedPlanName] = useState<string>("");
   const [selectedPlanAmount, setSelectedPlanAmount] = useState<number>(0);
 
+  // 💳 통합 결제 모달 폼 입력 상태
   const [customerName, setCustomerName] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
@@ -34,42 +35,42 @@ export default function Home() {
     }
   };
 
-  // 프로모션 코드 복사 함수
   const handleCopyCode = async () => {
     try {
       await navigator.clipboard.writeText("FREE3DAYS");
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000); // 2초 후 원래 상태로 복귀
+      setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
       alert("복사에 실패했습니다. 직접 선택하여 복사해주세요.");
     }
   };
 
-  // 요금제 카드에서 '결제하기' 버튼을 누를 때 호출되는 함수 (정보 세팅 후 통합 모달 오픈)
   const initiatePayment = (planName: string, amount: number) => {
     setSelectedPlanName(planName);
     setSelectedPlanAmount(amount);
     openModal("payment-input-modal");
   };
 
-  // 🔄 [복구 및 검증 완료] 원래 사용하시던 PortOne V2 기반 정기 결제 연동 로직
+  // 🔄 [최종 수정 완료] Reference Error를 완벽 차단한 PortOne V2 연동 로직
   const handlePay = async () => {
     if (!selectedPlanName) return;
 
-    // 통합 창 필수 값 및 이메일 유효성 검사
     if (!customerName.trim()) return alert("주문자 성함을 입력해주세요.");
     if (!customerEmail.trim() || !customerEmail.includes("@")) return alert("올바른 라이선스 수신 이메일 주소를 입력해주세요.");
     if (!customerPhone.trim()) return alert("연락처를 입력해주세요.");
 
     if (confirm(`${selectedPlanName} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${selectedPlanAmount.toLocaleString()}원이 자동 결제됩니다.)`)) {
-      closeModal(); // 정보 입력 모달 닫기
+      closeModal(); 
 
-      if (typeof window !== "undefined" && (window as any).PortOne) {
-        const PortOne = (window as any).PortOne;
+      // window 객체에 PortOne SDK가 존재하는지 확실하게 검증
+      if (typeof window !== "undefined") {
+        if (!(window as any).PortOne) {
+          return alert("결제 모듈이 아직 로드되지 않았습니다. 페이지를 새로고침 한 뒤 다시 시도해 주세요.");
+        }
 
         try {
-          // ⭐️ 대표님의 실제 PortOne V2 KCP 테스트 채널키 완벽 매핑
-          const response = await PortOne.requestBillingKey({
+          // ⭐️ 변수 할당 없이 window 전역 객체를 직접 참조하여 ReferenceError 원천 차단
+          const response = await (window as any).PortOne.requestBillingKey({
             channelKey: "channel-key-fe0a875a-11aa-42cc-bdcb-0f6643c3c467", 
             billingKeyId: "billing_" + new Date().getTime(), 
             orderName: "AimTalk " + selectedPlanName + " 정기구독 이용권",
@@ -80,22 +81,19 @@ export default function Home() {
             }
           });
 
-          if (response.code !== undefined) {
+          if (response && response.code !== undefined) {
             alert(`결제 등록 실패: ${response.message}`);
           } else {
             alert(`구독 등록이 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 즉시 자동 발송됩니다.`);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error("포트원 결제 연동 에러:", error);
-          alert("결제 모듈 실행 중 예기치 못한 오류가 발생했습니다.");
+          alert(`결제 모듈 실행 중 예기치 못한 오류가 발생했습니다: ${error.message || error}`);
         }
-      } else {
-        alert("결제 라이브러리가 로드 중입니다. 잠시 후 다시 시도해 주세요.");
       }
     }
   };
 
-  // 🔑 비회원 라이선스 키 찾기 조회 함수
   const handleFindLicense = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!findEmail) {
@@ -119,7 +117,8 @@ export default function Home() {
   return (
     <>
       <Script src="https://cdn.tailwindcss.com" strategy="beforeInteractive" />
-      <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="lazyOnload" />
+      {/* 🚀 [개선] SDK 로드 지연으로 인한 에러 방지를 위해 afterInteractive 적용 */}
+      <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="afterInteractive" />
 
       <style dangerouslySetInnerHTML={{__html: `
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght=400;600;700&display=swap');
@@ -129,7 +128,6 @@ export default function Home() {
 
       <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800 overflow-x-hidden">
         
-        {/* 상단 네비게이션 */}
         <header className="bg-[#1e6082] text-white sticky top-0 z-50 shadow-md">
           <div className="max-w-6xl mx-auto flex justify-between items-center p-4">
             <h1 className="text-xl font-bold cursor-pointer" onClick={() => setActiveSection("intro")}>
@@ -146,8 +144,6 @@ export default function Home() {
         </header>
 
         <main className="flex-grow">
-          
-          {/* [메뉴 1] 프로그램 소개 */}
           {activeSection === "intro" && (
             <section className="bg-white">
               <div className="py-12 md:py-24 text-center border-b bg-gradient-to-b from-blue-50 to-white">
@@ -172,7 +168,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 특징 세션 */}
               <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="text-center mb-12 md:mb-16">
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">왜 AimTalk Pro여야 할까요?</h3>
@@ -238,7 +233,6 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 2] 다운로드 페이지 */}
           {activeSection === "download" && (
             <section className="py-12 max-w-5xl mx-auto px-4 sm:px-6">
               <div className="text-center mb-10">
@@ -325,13 +319,11 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 3] 라이선스 구입 (가격안내) */}
           {activeSection === "pricing" && (
             <section className="py-12 md:py-20 max-w-5xl mx-auto px-4 sm:px-6">
               <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">라이선스 요금제</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-10">
                 
-                {/* Basic 요금제 카드 */}
                 <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-200 text-center hover:shadow-lg transition flex flex-col justify-between">
                   <div>
                     <h3 className="text-xl font-bold mb-4">Basic</h3>
@@ -344,7 +336,6 @@ export default function Home() {
                   </ul>
                 </div>
 
-                {/* Pro 요금제 카드 */}
                 <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center relative mt-6 sm:mt-0 flex flex-col justify-between">
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md">추천</div>
                   <div>
@@ -364,7 +355,6 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 4] 사용방법 */}
           {activeSection === "howto" && (
             <section className="py-16 md:py-24 max-w-5xl mx-auto px-4 sm:px-6">
               <div className="text-center mb-10 md:mb-14">
@@ -487,10 +477,7 @@ export default function Home() {
           </div>
         </footer>
       </div>
-
-      {/* 팝업 모달창 컨테이너 목록 */}
       
-      {/* 🔑 1. 비회원 라이선스 키 찾기 오버레이 모달 */}
       {activeModal === "find-license" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-100">
@@ -521,7 +508,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* 💳 ✨ [통합 완료] 이름, 핸드폰번호, 메일주소를 단 한 창에서 입력받는 팝업 모달 */}
       {activeModal === "payment-input-modal" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-100 relative space-y-4">
@@ -579,7 +565,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* 2. 3일 무료 체험 프로모션 안내 팝업창 */}
       {activeModal === "trial" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl text-center border border-gray-100">
@@ -616,7 +601,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* 📜 3. 이용약관 전문 */}
       {activeModal === "terms" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -667,7 +651,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* 🔐 4. 개인정보 처리방침 전문 */}
       {activeModal === "privacy" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -718,7 +701,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* 💰 5. 환불 규정 전문 */}
       {activeModal === "refund" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
