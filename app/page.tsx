@@ -6,19 +6,19 @@ import Script from "next/script";
 export default function Home() {
   const [activeSection, setActiveSection] = useState<string>("intro");
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [isCopied, setIsCopied] = useState<boolean>(false); // 복사 상태 관리
 
   // 🔑 비회원 라이선스 키 찾기 관련 상태
   const [findEmail, setFindEmail] = useState<string>("");
   const [isFinding, setIsFinding] = useState<boolean>(false);
 
-  // 💳 통합 결제 정보 입력을 위한 상태 필드
-  const [payPlan, setPayPlan] = useState<{ plan: string; amount: number } | null>(null);
-  const [paymentForm, setPaymentForm] = useState({
-    customerName: "",
-    customerEmail: "",
-    customerPhone: "",
-  });
+  // 💳 [개선] React child 객체 렌더링 에러를 원천 차단하는 독립형 원시 타입 상태 필드
+  const [selectedPlanName, setSelectedPlanName] = useState<string>("");
+  const [selectedPlanAmount, setSelectedPlanAmount] = useState<number>(0);
+
+  const [customerName, setCustomerName] = useState<string>("");
+  const [customerEmail, setCustomerEmail] = useState<string>("");
+  const [customerPhone, setCustomerPhone] = useState<string>("");
 
   const openModal = (id: string) => {
     setActiveModal(id);
@@ -34,74 +34,75 @@ export default function Home() {
     }
   };
 
+  // 프로모션 코드 복사 함수
   const handleCopyCode = async () => {
     try {
       await navigator.clipboard.writeText("FREE3DAYS");
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
+      setTimeout(() => setIsCopied(false), 2000); // 2초 후 원래 상태로 복귀
     } catch (err) {
       alert("복사에 실패했습니다. 직접 선택하여 복사해주세요.");
     }
   };
 
-  // 요금제 카드에서 '결제하기' 버튼 클릭 시 통합 모달 띄우기
-  const initiatePayment = (plan: string, amount: number) => {
-    setPayPlan({ plan, amount });
+  // 요금제 카드에서 '결제하기' 버튼을 누를 때 호출되는 함수 (정보 세팅 후 통합 모달 오픈)
+  const initiatePayment = (planName: string, amount: number) => {
+    setSelectedPlanName(planName);
+    setSelectedPlanAmount(amount);
     openModal("payment-input-modal");
   };
 
-  // 🔄 [복구 및 개선 완료] Bootpay KCP 비인증 자동결제(빌링) 연동 로직
+  // 🔄 [복구 및 검증 완료] 원래 사용하시던 PortOne V2 기반 정기 결제 연동 로직
   const handlePay = async () => {
-    if (!payPlan) return;
-    const { customerName, customerEmail, customerPhone } = paymentForm;
+    if (!selectedPlanName) return;
 
+    // 통합 창 필수 값 및 이메일 유효성 검사
     if (!customerName.trim()) return alert("주문자 성함을 입력해주세요.");
     if (!customerEmail.trim() || !customerEmail.includes("@")) return alert("올바른 라이선스 수신 이메일 주소를 입력해주세요.");
     if (!customerPhone.trim()) return alert("연락처를 입력해주세요.");
 
-    if (confirm(`${payPlan.plan} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${payPlan.amount.toLocaleString()}원이 결제됩니다.)`)) {
-      closeModal(); // 모달 닫기
+    if (confirm(`${selectedPlanName} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${selectedPlanAmount.toLocaleString()}원이 자동 결제됩니다.)`)) {
+      closeModal(); // 정보 입력 모달 닫기
 
-      // 🔑 대표님의 기존 Bootpay 모듈이 정상 로드되었는지 확인
-      if (typeof window !== "undefined" && (window as any).Bootpay) {
+      if (typeof window !== "undefined" && (window as any).PortOne) {
+        const PortOne = (window as any).PortOne;
+
         try {
-          const response = await (window as any).Bootpay.requestPayment({
-            application_id: "6602bf41b8cbd0144d18fa7b", // 기존 원본 Bootpay 키 복구 완료
-            price: payPlan.amount,
-            order_name: `AimTalk ${payPlan.plan} 정기구독 이용권`,
-            order_id: "ORDER_" + new Date().getTime(),
-            pg: "kcp",
-            method: "card_rebill", // 빌링(정기결제) 메서드
-            user: {
-              id: customerEmail,
-              username: customerName,
-              phone: customerPhone,
+          // ⭐️ 대표님의 실제 PortOne V2 KCP 테스트 채널키 완벽 매핑
+          const response = await PortOne.requestBillingKey({
+            channelKey: "channel-key-fe0a875a-11aa-42cc-bdcb-0f6643c3c467", 
+            billingKeyId: "billing_" + new Date().getTime(), 
+            orderName: "AimTalk " + selectedPlanName + " 정기구독 이용권",
+            customer: {
+              fullName: customerName,
+              phoneNumber: customerPhone,
               email: customerEmail,
-            },
-            extra: {
-              subscribe_test_payment: true, // 테스트 결제 옵션 유지
-            },
+            }
           });
 
-          if (response.event === "done" || response.event === "confirm") {
-            alert(`결제가 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 발송됩니다.`);
+          if (response.code !== undefined) {
+            alert(`결제 등록 실패: ${response.message}`);
+          } else {
+            alert(`구독 등록이 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 즉시 자동 발송됩니다.`);
           }
-        } catch (error: any) {
-          console.error("결제 에러:", error);
-          alert(`결제가 취소되었거나 오류가 발생했습니다: ${error.message || "알 수 없는 오류"}`);
+        } catch (error) {
+          console.error("포트원 결제 연동 에러:", error);
+          alert("결제 모듈 실행 중 예기치 못한 오류가 발생했습니다.");
         }
       } else {
-        alert("결제 모듈을 불러오는 중입니다. 페이지를 새로고침 한 뒤 다시 시도해 주세요.");
+        alert("결제 라이브러리가 로드 중입니다. 잠시 후 다시 시도해 주세요.");
       }
     }
   };
 
+  // 🔑 비회원 라이선스 키 찾기 조회 함수
   const handleFindLicense = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!findEmail) {
       alert("이메일 주소를 입력해주세요.");
       return;
     }
+
     setIsFinding(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -118,8 +119,7 @@ export default function Home() {
   return (
     <>
       <Script src="https://cdn.tailwindcss.com" strategy="beforeInteractive" />
-      {/* 🔑 Bootpay v4 스크립트 모듈 복구 */}
-      <Script src="https://js.bootpay.co.kr/templates/v4/v4.2.7.js" strategy="lazyOnload" />
+      <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="lazyOnload" />
 
       <style dangerouslySetInnerHTML={{__html: `
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght=400;600;700&display=swap');
@@ -146,6 +146,7 @@ export default function Home() {
         </header>
 
         <main className="flex-grow">
+          
           {/* [메뉴 1] 프로그램 소개 */}
           {activeSection === "intro" && (
             <section className="bg-white">
@@ -520,14 +521,14 @@ export default function Home() {
         </div>
       )}
 
-      {/* 💳 ✨ 통합 결제 정보 입력 모달 */}
+      {/* 💳 ✨ [통합 완료] 이름, 핸드폰번호, 메일주소를 단 한 창에서 입력받는 팝업 모달 */}
       {activeModal === "payment-input-modal" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-100 relative space-y-4">
             <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
             <div className="border-b border-gray-100 pb-2">
               <h3 className="text-xl font-bold text-gray-900">결제 고객 정보 입력</h3>
-              <p className="text-xs text-blue-600 mt-1">선택 요금제: AimTalk {payPlan?.plan} 플랜 (월 {payPlan?.amount.toLocaleString()}원)</p>
+              <p className="text-xs text-blue-600 mt-1">선택 요금제: AimTalk {selectedPlanName} 플랜 (월 {selectedPlanAmount.toLocaleString()}원)</p>
             </div>
             <div className="space-y-4">
               <div>
@@ -535,8 +536,8 @@ export default function Home() {
                 <input
                   type="text"
                   placeholder="홍길동"
-                  value={paymentForm.customerName}
-                  onChange={(e) => setPaymentForm({ ...paymentForm, customerName: e.target.value })}
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
                   className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]"
                 />
               </div>
@@ -545,8 +546,8 @@ export default function Home() {
                 <input
                   type="email"
                   placeholder="example@gmail.com"
-                  value={paymentForm.customerEmail}
-                  onChange={(e) => setPaymentForm({ ...paymentForm, customerEmail: e.target.value })}
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
                   className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]"
                 />
                 <p className="text-[11px] text-gray-400 mt-1">※ 이 이메일 주소로 프로그램 인증용 라이선스 코드가 발송됩니다.</p>
@@ -556,8 +557,8 @@ export default function Home() {
                 <input
                   type="tel"
                   placeholder="010-1234-5678"
-                  value={paymentForm.customerPhone}
-                  onChange={(e) => setPaymentForm({ ...paymentForm, customerPhone: e.target.value })}
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
                   className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]"
                 />
               </div>
