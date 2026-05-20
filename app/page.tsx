@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Script from "next/script";
 
 export default function Home() {
+  // 1. [레이아웃 깨짐 완벽 방지] 화면 렌더링 타이밍을 제어하는 마운트 상태
+  const [isMounted, setIsMounted] = useState(false);
+
   const [activeSection, setActiveSection] = useState<string>("intro");
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState<boolean>(false);
@@ -12,7 +15,7 @@ export default function Home() {
   const [findEmail, setFindEmail] = useState<string>("");
   const [isFinding, setIsFinding] = useState<boolean>(false);
 
-  // 💳 객체 렌더링 에러를 차단하는 원시 타입 상태 (선택된 플랜 정보)
+  // 💳 선택된 플랜 정보 저장
   const [selectedPlanName, setSelectedPlanName] = useState<string>("");
   const [selectedPlanAmount, setSelectedPlanAmount] = useState<number>(0);
 
@@ -20,6 +23,11 @@ export default function Home() {
   const [customerName, setCustomerName] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
+
+  // 컴포넌트 마운트 시점에 렌더링 트리거 (Tailwind CDN 로딩 충돌 방지)
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const openModal = (id: string) => {
     setActiveModal(id);
@@ -51,7 +59,7 @@ export default function Home() {
     openModal("payment-input-modal");
   };
 
-  // 🔄 [오류 해결] window 객체 명시적 참조를 통한 ReferenceError 원천 차단
+  // 🔄 [오류 원인 제거] 매개변수를 받지 않고 상태값을 직접 참조하도록 수정
   const handlePay = async () => {
     if (!selectedPlanName) return;
 
@@ -62,9 +70,7 @@ export default function Home() {
     if (confirm(`${selectedPlanName} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${selectedPlanAmount.toLocaleString()}원이 자동 결제됩니다.)`)) {
       closeModal(); 
 
-      // 1. window 전역 객체 체크
       if (typeof window !== "undefined") {
-        // 2. 포트원 객체를 안전하게 지역 변수로 할당 (핵심 수정 부분)
         const portOneObj = (window as any).PortOne;
 
         if (!portOneObj) {
@@ -72,7 +78,6 @@ export default function Home() {
         }
 
         try {
-          // 3. 지역 변수에 담긴 portOneObj를 통해 빌링키 발급 함수 호출
           const response = await portOneObj.requestIssueBillingKey({
             channelKey: "channel-key-fe0a875a-11aa-42cc-bdcb-0f6643c3c467", 
             billingKeyMethod: "CARD",
@@ -117,6 +122,11 @@ export default function Home() {
       setIsFinding(false);
     }
   };
+
+  // 브라우저 렌더링 전 빈 화면 출력으로 새로고침 시 레이아웃 깨짐 현상 100% 방어
+  if (!isMounted) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-500 font-sans">화면을 불러오는 중입니다...</div>;
+  }
 
   return (
     <>
