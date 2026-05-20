@@ -433,6 +433,7 @@ export default function Home() {
                     궁금한 점이 있으신가요?<br />
                     스마트폰 카메라로 QR코드를 스캔하여<br />
                     오픈카톡으로 간편하게 문의해주세요.
+                    링 크 : https://open.kakao.com/o/suO3WGvi
                   </p>
                 </div>
               </div>
