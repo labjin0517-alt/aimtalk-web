@@ -37,7 +37,7 @@ export default function Home() {
     }
   };
 
-  // 🔄 NHN KCP 비인증 자동결제(빌링) 계약 조건에 맞춘 정기 구독 결제 함수 [cite: 120]
+  // 🔄 NHN KCP 비인증 자동결제(빌링) 계약 조건에 맞춘 정기 구독 결제 함수
   const handlePay = async (plan: string, amount: number) => {
     // 비회원 운영 및 라이선스 이메일 발송을 위한 고객 필수 정보 3종 수집
     const customerName = prompt("주문자 성함을 입력해주세요:");
@@ -58,7 +58,7 @@ export default function Home() {
           const storeId = "store-10a2f63e-992c-449a-b25e-1846bf3a86ae";
           const channelKey = "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e";
 
-          // KCP 비인증 정기결제를 위한 requestBillingKey 호출 [cite: 120]
+          // KCP 비인증 정기결제를 위한 requestBillingKey 호출
           const response = await PortOne.requestBillingKey({
             storeId: storeId,
             channelKey: channelKey,
@@ -322,33 +322,42 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 3] 라이선스 구입 (가격안내) */}
+          {/* [메뉴 3] 라이선스 구입 (가격안내) - ⭐️ 피드백 반영 레이아웃 고도화 완료 */}
           {activeSection === "pricing" && (
             <section className="py-12 md:py-20 max-w-5xl mx-auto px-4 sm:px-6">
               <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">라이선스 요금제</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-10">
-                <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-200 text-center hover:shadow-lg transition">
-                  <h3 className="text-xl font-bold mb-4">Basic</h3>
-                  <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">8,000원 <span className="text-sm font-normal text-gray-400">/ 월</span></div>
-                  <ul className="text-gray-600 space-y-4 mb-10 text-left text-sm">
-                    <li>• 기본 메시지 자동 발송 (시간당 300명)</li>
-                    <li>• 이미지 최대 2개 첨부</li>
+                
+                {/* Basic 요금제 카드 */}
+                <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-200 text-center hover:shadow-lg transition flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold mb-4">Basic</h3>
+                    <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">8,000원 <span className="text-sm font-normal text-gray-400">/ 월</span></div>
+                    <button onClick={() => handlePay("Basic", 8000)} className="w-full py-4 rounded-xl border border-[#1e6082] text-[#1e6082] font-bold hover:bg-blue-50 transition mb-8">베이직 결제하기</button>
+                  </div>
+                  <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
+                    <li className="flex items-center gap-2"><span className="text-[#1e6082]">✔</span> 기본 메시지 자동 발송 (시간당 300명)</li>
+                    <li className="flex items-center gap-2"><span className="text-[#1e6082]">✔</span> 이미지 최대 2개 첨부 제한</li>
                   </ul>
-                  <button onClick={() => handlePay("Basic", 8000)} className="w-full py-4 rounded-xl border border-[#1e6082] text-[#1e6082] font-bold hover:bg-blue-50 transition">베이직 결제하기</button>
                 </div>
 
-                <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center relative mt-6 sm:mt-0">
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#1e6082] text-white px-4 py-1 rounded-full text-xs font-bold">추천</div>
-                  <h3 className="text-xl font-bold mb-4 text-[#1e6082]">Pro</h3>
-                  <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">16,000원 <span className="text-sm font-normal text-gray-400">/ 월</span></div>
-                  <ul className="text-gray-600 space-y-4 mb-10 text-left text-sm">
-                    <li className="font-bold text-gray-800">• 고속 발송 (시간당 500명)</li>
-                    <li className="font-bold text-gray-800">• 모든 파일 무제한 첨부</li>
-                    <li className="font-bold text-gray-800">• 스마트 예약 발송 & 맞춤 인사말</li>
-                    <li className="font-bold text-gray-800">• 테스트발송 및 중간, 결과보고</li>
+                {/* Pro 요금제 카드 */}
+                <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center relative mt-6 sm:mt-0 flex flex-col justify-between">
+                  {/* 정중앙 정렬 및 폰트 크기 업그레이드 완료 */}
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md">추천</div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-4 text-[#1e6082]">Pro</h3>
+                    <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">16,000원 <span className="text-sm font-normal text-gray-400">/ 월</span></div>
+                    <button onClick={() => handlePay("Pro", 16000)} className="w-full py-4 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg transition mb-8">프로 결제하기</button>
+                  </div>
+                  <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
+                    <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 고속 발송 (시간당 500명)</li>
+                    <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 모든 파일 무제한 첨부 지원</li>
+                    <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 스마트 예약 발송 & 맞춤형 인사말 시스템</li>
+                    <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 실시간 테스트발송 및 중간·최종 결과 현황보고</li>
                   </ul>
-                  <button onClick={() => handlePay("Pro", 16000)} className="w-full py-4 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg transition">프로 결제하기</button>
                 </div>
+
               </div>
             </section>
           )}
@@ -435,21 +444,19 @@ export default function Home() {
 
         </main>
 
-        {/* 🧾 카드사/KCP 무반려 심사 통과용 법적 규격 푸터 정보 (구조 최적화) */}
+        {/* 🧾 하단 푸터 - [cite] 찌꺼기 텍스트 파싱 흔적 전면 박멸 완료 */}
         <footer className="bg-gray-900 text-gray-400 text-[11px] sm:text-xs p-6 md:p-10 border-t border-gray-800">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8 md:gap-4">
             
-            {/* 좌측: 사업자 필수 고지 정보 6가지 만족 [cite: 55] */}
             <div className="leading-relaxed flex-1 space-y-1">
               <p className="text-white text-base font-bold mb-2">랩진 (LabJin)</p>
-              <p>상호명: 랩진 | 대표자명: 대표 이진혁 | 사업자등록번호: 544-33-01720 [cite: 34, 39, 56]</p>
+              <p>상호명: 랩진 | 대표자명: 대표 이진혁 | 사업자등록번호: 544-33-01720</p>
               <p>통신판매업신고번호: 제 2026-서울마포-XXXX 호 (발급 후 기입)</p>
-              <p>연락처: 010-8294-8919 | 이메일: labjin0517@gmail.com [cite: 112]</p>
+              <p>연락처: 010-8294-8919 | 이메일: labjin0517@gmail.com</p>
               <p>주소: 경기도 파주시 책향기로 403, 704동 9층 901호</p>
               <p className="text-gray-500 pt-1">고객님은 안전거래를 위해 현금 결제 시 저희 쇼핑몰에서 가입한 NHN KCP의 구매안전(에스크로) 서비스를 이용하실 수 있습니다.</p>
             </div>
 
-            {/* 중앙: 오픈카톡 QR 코드 */}
             <div className="flex flex-col items-start md:items-center gap-2 flex-1 border-t border-gray-800 md:border-none pt-6 md:pt-0 w-full md:w-auto">
               <div className="flex items-center gap-4">
                 <div className="bg-white p-1.5 rounded-lg shadow-sm">
@@ -467,7 +474,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 우측: 법정 의무 약관 팝업 연동 */}
             <div className="flex flex-col md:items-end gap-3 flex-1 border-t border-gray-800 md:border-none pt-6 md:pt-0 w-full md:w-auto">
               <div className="flex space-x-4">
                 <button onClick={() => openModal("terms")} className="underline hover:text-white transition">이용약관</button>
@@ -551,7 +557,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 📜 3. 원본 약관 텍스트 무누락 연동 (제1조 ~ 제7조 전문 보존) */}
+      {/* 📜 3. 이용약관 전문 */}
       {activeModal === "terms" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -588,7 +594,7 @@ export default function Home() {
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제6조 (면책 조항)</h4>
                 <p>1. 회사는 천재지변, 전시, 파업, 화재 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는 서비스 제공에 관한 책임이 면제됩니다.<br/>
-                   2. 회사는 연동되는 외부 플랫폼(카카오톡)의 대규모 업데이트, 서버 다운, 일방적인 정책 변경 및 기능 제한 조치로 인해 본 소프트웨어가 정상 작동하지 않는 경우 이에 대해 어떠 한 법적 책임이나 손해배상 책임을 지지 않습니다.</p>
+                   2. 회사는 연동되는 외부 플랫폼(카카오톡)의 대규모 업데이트, 서버 다운, 일방적인 정책 변경 및 기능 제한 조치로 인해 본 소프트웨어가 정상 작동하지 않는 경우 이에 대해 어떠한 법적 책임이나 손해배상 책임을 지지 않습니다.</p>
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제7조 (관할 법원)</h4>
@@ -602,7 +608,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 🔐 4. 원본 개인정보 처리방침 텍스트 (항목 1~6 전체 보존) */}
+      {/* 🔐 4. 개인정보 처리방침 전문 */}
       {activeModal === "privacy" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -653,7 +659,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 💰 5. 원본 환불 규정 텍스트 (제1조 ~ 제5조 전체 보존) */}
+      {/* 💰 5. 환불 규정 전문 */}
       {activeModal === "refund" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -678,7 +684,7 @@ export default function Home() {
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제4조 (환불 및 보상 불가 사유)</h4>
-                <p>다음의 사유로 인한 service 이용 제한은 회사의 귀책사유가 아니므로 환불 및 보상 대상에서 엄격히 제외됩니다.<br/>
+                <p>다음의 사유로 인한 서비스 이용 제한은 회사의 귀책사유가 아니므로 환불 및 보상 대상에서 엄격히 제외됩니다.<br/>
                    1. 이용자 PC 환경의 특수성(윈도우 7 이하, 백신 프로그램의 강제 차단, 권한 부족 등)으로 인한 구동 불가<br/>
                    2. 이용자의 스팸 발송, 무분별한 매크로 사용으로 인한 카카오톡 계정 정지, 보호조치 및 서비스 이용 제한<br/>
                    3. 타사 플랫폼(카카오톡)의 대규모 클라이언트 업데이트, 구조 변경, 자체 보안 강화로 인해 본 소프트웨어의 기능이 일시적 또는 영구적으로 작동하지 않는 경우</p>
