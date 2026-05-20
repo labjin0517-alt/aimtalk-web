@@ -12,7 +12,7 @@ export default function Home() {
   const [findEmail, setFindEmail] = useState<string>("");
   const [isFinding, setIsFinding] = useState<boolean>(false);
 
-  // 💳 [개선] 단일 모달 통합 결제 정보 입력을 위한 상태 필드
+  // 💳 단일 모달 통합 결제 정보 입력을 위한 상태 필드
   const [payPlan, setPayPlan] = useState<{ plan: string; amount: number } | null>(null);
   const [paymentForm, setPaymentForm] = useState({
     customerName: "",
@@ -198,7 +198,7 @@ export default function Home() {
                     </div>
                     <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">모든 파일 무제한 첨부</h4>
                     <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">기본형과 달리 이미지 포맷 제한이 없으며 복수의 문서, 파일 등 다양한 포맷을 용량/개수 제한 없이 무제한 전송합니다.</p>
-                    <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded">모든 파일 & 무제한 전송</span>
+                    <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded">모든 파일 &amp; 무제한 전송</span>
                   </div>
 
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
@@ -233,7 +233,7 @@ export default function Home() {
                       <span className="text-2xl md:text-3xl text-teal-600">✨</span>
                     </div>
                     <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">그룹별 멀티 타겟 메시징</h4>
-                    <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">엑셀 시트 내 '그룹' 분류 필터링 정보를 연동하여 생성된 탭 레이아웃마다 완벽히 분리된 맞춤형 본문과 첨부 문서를 할당합니다.</p>
+                    <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">엑셀 시트 내 &apos;그룹&apos; 분류 필터링 정보를 연동하여 생성된 탭 레이아웃마다 완벽히 분리된 맞춤형 본문과 첨부 문서를 할당합니다.</p>
                     <span className="text-xs font-bold text-teal-500 bg-teal-50 px-2 py-1 rounded">엑셀 그룹 탭 연동</span>
                   </div>
                 </div>
@@ -358,7 +358,7 @@ export default function Home() {
                   <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
                     <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 고속 발송 (시간당 500명)</li>
                     <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 모든 파일 무제한 첨부 지원</li>
-                    <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 스마트 예약 발송 & 맞춤형 인사말 시스템</li>
+                    <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 스마트 예약 발송 &amp; 맞춤형 인사말 시스템</li>
                     <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 실시간 테스트발송 및 중간·최종 결과 현황보고</li>
                   </ul>
                 </div>
@@ -439,7 +439,7 @@ export default function Home() {
                     <h3 className="text-xl font-bold text-gray-800">발송 결과 확인</h3>
                   </div>
                   <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-2">
-                    <p>• 발송이 모두 완료되면 내 카카오톡으로 <strong>'발송 결과 리포트'</strong>가 자동 전송됩니다.</p>
+                    <p>• 발송이 모두 완료되면 내 카카오톡으로 <strong>&apos;발송 결과 리포트&apos;</strong>가 자동 전송됩니다.</p>
                     <p>• 동시에 원본 엑셀 파일이 있던 폴더에 성공/실패 여부와 시간이 기록된 <strong>결과 엑셀 파일</strong>이 자동으로 저장됩니다.</p>
                   </div>
                 </div>
@@ -630,13 +630,13 @@ export default function Home() {
             <div className="text-sm leading-relaxed space-y-6 text-gray-700">
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제1조 (목적)</h4>
-                <p>본 약관은 LabJin(이하 "회사")이 제공하는 소프트웨어 프로그램 '에임톡(AimTalk)' 및 관련 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자 간의 권리, 의무, 책임사항 및 기타 필요한 제반 사항을 규정함을 목적으로 합니다.</p>
+                <p>본 약관은 LabJin(이하 &quot;회사&quot;)이 제공하는 소프트웨어 프로그램 &apos;에임톡(AimTalk)&apos; 및 관련 서비스(이하 &quot;서비스&quot;)의 이용과 관련하여 회사와 이용자 간의 권리, 의무, 책임사항 및 기타 필요한 제반 사항을 규정함을 목적으로 합니다.</p>
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제2조 (용어의 정의)</h4>
-                <p>1. "서비스"라 함은 회사가 개발하여 제공하는 PC 기반의 카카오톡 메시지 자동 발송 보조 솔루션을 의미합니다.<br/>
-                   2. "이용자"란 본 약관에 동의하고 회사가 제공하는 서비스를 이용하는 개인 또는 법인 회원을 말합니다.<br/>
-                   3. "라이선스"란 회사가 이용자에게 부여하는 특정 기간 동안의 서비스 사용 권한(소프트웨어 인증 키)을 의미합니다.</p>
+                <p>1. &quot;서비스&quot;라 함은 회사가 개발하여 제공하는 PC 기반의 카카오톡 메시지 자동 발송 보조 솔루션을 의미합니다.<br/>
+                   2. &quot;이용자&quot;란 본 약관에 동의하고 회사가 제공하는 서비스를 이용하는 개인 또는 법인 회원을 말합니다.<br/>
+                   3. &quot;라이선스&quot;란 회사가 이용자에게 부여하는 특정 기간 동안의 서비스 사용 권한(소프트웨어 인증 키)을 의미합니다.</p>
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제3조 (서비스의 제공 및 변경)</h4>
@@ -679,7 +679,7 @@ export default function Home() {
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
             <div className="text-sm leading-relaxed space-y-6 text-gray-700">
-              <p>LabJin(이하 "회사")은 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.</p>
+              <p>LabJin(이하 &quot;회사&quot;)은 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.</p>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">1. 수집하는 개인정보의 항목 및 수집 방법</h4>
                 <p>회사는 라이선스 발급, 고객 지원, 대금 결제 처리를 위해 아래의 개인정보를 수집합니다.<br/>
@@ -732,11 +732,11 @@ export default function Home() {
             <div className="text-sm leading-relaxed space-y-6 text-gray-700">
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제1조 (환불의 기본 원칙)</h4>
-                <p>본 서비스가 제공하는 '에임톡'은 디지털 소프트웨어 콘텐츠입니다. 「전자상거래 등에서의 소비자보호에 관한 법률」 제17조 제2항 제5호에 따라, **라이선스 코드가 생성되어 구매자에게 인도(이메일 전송 또는 화면 노출)된 이후에는 복제 가능성이 있으므로 원칙적으로 단순 변심에 의한 청약 철회 및 전액 환불이 불가능**합니다.</p>
+                <p>본 서비스가 제공하는 &apos;에임톡&apos;은 디지털 소프트웨어 콘텐츠입니다. 「전자상거래 등에서의 소비자보호에 관한 법률」 제17조 제2항 제5호에 따라, <strong>라이선스 코드가 생성되어 구매자에게 인도(이메일 전송 또는 화면 노출)된 이후에는 복제 가능성이 있으므로 원칙적으로 단순 변심에 의한 청약 철회 및 전액 환불이 불가능</strong>합니다.</p>
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제2조 (청약 철회 및 예외적 전액 환불)</h4>
-                <p>이용자는 다음의 조건을 모두 충족하는 경우에 한하여 결제일로부터 **7일 이내**에 고객센터를 통해 전액 환불을 요청할 수 있습니다.<br/>
+                <p>이용자는 다음의 조건을 모두 충족하는 경우에 한하여 결제일로부터 <strong>7일 이내</strong>에 고객센터를 통해 전액 환불을 요청할 수 있습니다.<br/>
                    1. 발급받은 라이선스 코드를 프로그램에 등록(인증)한 이력이 서버에 전혀 존재하지 않는 경우 (미사용 상태)<br/>
                    2. 회사가 결제 취소를 승인하기 전까지 지속적으로 미사용 상태를 유지하는 경우</p>
               </section>
