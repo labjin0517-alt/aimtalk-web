@@ -51,7 +51,7 @@ export default function Home() {
     openModal("payment-input-modal");
   };
 
-  // 🔄 [공식 문서 V2 반영] NHN KCP 정기결제(빌링키) 발급 전용 로직
+  // 🔄 [오류 해결] window 객체 명시적 참조를 통한 ReferenceError 원천 차단
   const handlePay = async () => {
     if (!selectedPlanName) return;
 
@@ -62,18 +62,21 @@ export default function Home() {
     if (confirm(`${selectedPlanName} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${selectedPlanAmount.toLocaleString()}원이 자동 결제됩니다.)`)) {
       closeModal(); 
 
-      // PortOne 객체 로드 검증
+      // 1. window 전역 객체 체크
       if (typeof window !== "undefined") {
-        if (!(window as any).PortOne) {
+        // 2. 포트원 객체를 안전하게 지역 변수로 할당 (핵심 수정 부분)
+        const portOneObj = (window as any).PortOne;
+
+        if (!portOneObj) {
           return alert("포트원 결제 모듈이 아직 로드되지 않았습니다. 잠시 후 다시 시도해 주세요.");
         }
 
         try {
-          // ⭐️ V2 빌링키(정기결제) 발급 전용 함수 및 필수 파라미터 적용
-          const response = await (window as any).PortOne.requestIssueBillingKey({
+          // 3. 지역 변수에 담긴 portOneObj를 통해 빌링키 발급 함수 호출
+          const response = await portOneObj.requestIssueBillingKey({
             channelKey: "channel-key-fe0a875a-11aa-42cc-bdcb-0f6643c3c467", 
-            billingKeyMethod: "CARD", // 필수: 빌링키 결제 수단
-            issueName: `AimTalk ${selectedPlanName} 정기구독`, // 필수: V2 빌링키 전용 상품명 파라미터
+            billingKeyMethod: "CARD",
+            issueName: `AimTalk ${selectedPlanName} 정기구독`,
             customer: {
               fullName: customerName,
               phoneNumber: customerPhone,
@@ -81,12 +84,10 @@ export default function Home() {
             }
           });
 
-          // response.code가 존재하는 경우 예외(취소/실패) 처리
           if (response.code !== undefined) {
             return alert(`결제 등록 실패: ${response.message}`);
           } 
           
-          // 발급 성공 시 (response.billingKey 반환됨)
           alert(`구독 등록이 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 즉시 자동 발송됩니다.`);
           
         } catch (error: any) {
@@ -120,7 +121,6 @@ export default function Home() {
   return (
     <>
       <Script src="https://cdn.tailwindcss.com" strategy="beforeInteractive" />
-      {/* 🚀 포트원 V2 브라우저 SDK (우선 로드) */}
       <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="afterInteractive" />
 
       <style dangerouslySetInnerHTML={{__html: `
