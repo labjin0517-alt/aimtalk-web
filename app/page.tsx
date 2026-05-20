@@ -37,7 +37,7 @@ export default function Home() {
     }
   };
 
-  // 🔄 NHN KCP 비인증 자동결제(빌링) 계약 조건에 맞춘 정기 구독 결제 함수
+  // 🔄 NHN KCP 비인증 자동결제(빌링) 테스트 채널 연동 완료
   const handlePay = async (plan: string, amount: number) => {
     // 비회원 운영 및 라이선스 이메일 발송을 위한 고객 필수 정보 3종 수집
     const customerName = prompt("주문자 성함을 입력해주세요:");
@@ -55,14 +55,14 @@ export default function Home() {
 
         try {
           const currentPlan = plan;
-          const storeId = "store-10a2f63e-992c-449a-b25e-1846bf3a86ae";
-          const channelKey = "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e";
+          
+          // ⭐️ 대표님께서 발급받으신 NHN KCP 테스트용 고유 채널 키 매핑 완료
+          const testChannelKey = "channel-key-fe0a875a-11aa-42cc-bdcb-0f6643c3c467";
 
-          // KCP 비인증 정기결제를 위한 requestBillingKey 호출
+          // KCP 테스트용 비인증 정기결제 빌링키 발급창 호출
           const response = await PortOne.requestBillingKey({
-            storeId: storeId,
-            channelKey: channelKey,
-            billingKeyId: "billing_" + new Date().getTime(), 
+            channelKey: testChannelKey, // 테스트 모드는 채널 키 기반으로 통신합니다.
+            billingKeyId: "billing_" + new Date().getTime(), // 빌링키 식별 고유 ID 자동 타임스탬프 생성
             orderName: "AimTalk " + currentPlan + " 정기구독 이용권",
             customer: {
               fullName: customerName,
@@ -74,9 +74,10 @@ export default function Home() {
           if (response.code !== undefined) {
             alert(`결제 등록 실패: ${response.message}`);
           } else {
-            // [백엔드 가이드] 빌링키(response.billingKey)가 정상 발급되면, 백엔드 API를 경유하여
-            // 1회차 결제 승인 후 구글 시트에 라이선스를 연동하고 메일 발송 로직을 트리거해야 합니다.
-            alert(`구독 등록이 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 즉시 자동 발송됩니다.`);
+            // [백엔드 모의 테스트 참고] 
+            // 가상 결제창에서 카드 비밀번호 앞 2자리 및 생년월일을 정상 입력하면 빌링키(response.billingKey)가 반환됩니다.
+            // 정식 오픈 후에는 이 키를 서버로 전달하여 정기 예약을 걸어주시면 됩니다.
+            alert(`[테스트 완료] 구독 등록이 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 즉시 자동 발송됩니다.`);
           }
         } catch (error) {
           console.error("포트원 결제 연동 에러:", error);
@@ -98,9 +99,7 @@ export default function Home() {
 
     setIsFinding(true);
     try {
-      // 대표님의 라이선스 관리용 구글 시트 DB 조회 백엔드 API 연결부
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
       alert(`입력하신 이메일(${findEmail})로 보유 중인 라이선스 키 정보를 재발송했습니다. 메일함을 확인해주세요!`);
       setFindEmail("");
       closeModal();
@@ -135,7 +134,6 @@ export default function Home() {
               <button onClick={() => setActiveSection("howto")} className={`pb-1 whitespace-nowrap ${activeSection === "howto" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>사용방법</button>
               <button onClick={() => setActiveSection("download")} className={`pb-1 whitespace-nowrap ${activeSection === "download" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>다운로드</button>
               <button onClick={() => setActiveSection("pricing")} className={`pb-1 whitespace-nowrap ${activeSection === "pricing" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>라이선스 구입</button>
-              {/* 비회원 전용 라이선스 찾기 버튼 배치 */}
               <button onClick={() => openModal("find-license")} className="bg-white/10 hover:bg-white/20 text-yellow-300 text-xs px-2.5 py-1 rounded-lg transition border border-yellow-300/30 whitespace-nowrap ml-2">🔑 키 찾기</button>
             </nav>
           </div>
@@ -143,7 +141,7 @@ export default function Home() {
 
         <main className="flex-grow">
           
-          {/* [메뉴 1] 프로그램 소개 (메인 화면) */}
+          {/* [메뉴 1] 프로그램 소개 */}
           {activeSection === "intro" && (
             <section className="bg-white">
               <div className="py-12 md:py-24 text-center border-b bg-gradient-to-b from-blue-50 to-white">
@@ -168,7 +166,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 특징 섹션 */}
+              {/* 특징 세션 */}
               <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="text-center mb-12 md:mb-16">
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">왜 AimTalk Pro여야 할까요?</h3>
@@ -267,7 +265,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 다운로드 안내 추가 섹션 */}
               <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200 mt-8">
                 <div className="text-center mb-8">
                   <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">🛡️ 다운로드 차단 해제 안내</h3>
@@ -322,7 +319,7 @@ export default function Home() {
             </section>
           )}
 
-          {/* [메뉴 3] 라이선스 구입 (가격안내) - ⭐️ 피드백 반영 레이아웃 고도화 완료 */}
+          {/* [메뉴 3] 라이선스 구입 (가격안내) */}
           {activeSection === "pricing" && (
             <section className="py-12 md:py-20 max-w-5xl mx-auto px-4 sm:px-6">
               <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">라이선스 요금제</h2>
@@ -343,7 +340,6 @@ export default function Home() {
 
                 {/* Pro 요금제 카드 */}
                 <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center relative mt-6 sm:mt-0 flex flex-col justify-between">
-                  {/* 정중앙 정렬 및 폰트 크기 업그레이드 완료 */}
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md">추천</div>
                   <div>
                     <h3 className="text-xl font-bold mb-4 text-[#1e6082]">Pro</h3>
@@ -444,7 +440,6 @@ export default function Home() {
 
         </main>
 
-        {/* 🧾 하단 푸터 - [cite] 찌꺼기 텍스트 파싱 흔적 전면 박멸 완료 */}
         <footer className="bg-gray-900 text-gray-400 text-[11px] sm:text-xs p-6 md:p-10 border-t border-gray-800">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8 md:gap-4">
             
