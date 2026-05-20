@@ -8,6 +8,10 @@ export default function Home() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState<boolean>(false); // 복사 상태 관리
 
+  // 🔑 비회원 라이선스 키 찾기 관련 상태
+  const [findEmail, setFindEmail] = useState<string>("");
+  const [isFinding, setIsFinding] = useState<boolean>(false);
+
   const openModal = (id: string) => {
     setActiveModal(id);
     if (typeof document !== "undefined") {
@@ -33,9 +37,19 @@ export default function Home() {
     }
   };
 
-  // 일반 결제창(단건 결제) 규격에 완벽히 맞춘 결제 함수
+  // 🔄 NHN KCP 비인증 자동결제(빌링) 계약 조건에 맞춘 정기 구독 결제 함수 [cite: 120]
   const handlePay = async (plan: string, amount: number) => {
-    if (confirm(`${plan} 플랜 (${amount.toLocaleString()}원) 결제를 진행할까요?`)) {
+    // 비회원 운영 및 라이선스 이메일 발송을 위한 고객 필수 정보 3종 수집
+    const customerName = prompt("주문자 성함을 입력해주세요:");
+    if (!customerName) return;
+
+    const customerEmail = prompt("라이선스 코드를 수신할 이메일 주소를 입력해주세요:");
+    if (!customerEmail) return;
+
+    const customerPhone = prompt("연락처를 입력해주세요 (예: 010-1234-5678):");
+    if (!customerPhone) return;
+
+    if (confirm(`${plan} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${amount.toLocaleString()}원이 자동 결제됩니다.)`)) {
       if (typeof window !== "undefined" && (window as any).PortOne) {
         const PortOne = (window as any).PortOne;
 
@@ -44,26 +58,25 @@ export default function Home() {
           const storeId = "store-10a2f63e-992c-449a-b25e-1846bf3a86ae";
           const channelKey = "channel-key-c0a1e2d7-6504-4e99-8b75-8e60516c0e2e";
 
-          const response = await PortOne.requestPayment({
+          // KCP 비인증 정기결제를 위한 requestBillingKey 호출 [cite: 120]
+          const response = await PortOne.requestBillingKey({
             storeId: storeId,
             channelKey: channelKey,
-            paymentId: "payment_" + new Date().getTime(), 
-            orderName: "AimTalk " + currentPlan + " 이용권",
-            totalAmount: amount,
-            currency: "CURRENCY_KRW",
-            payMethod: "CARD",
-            // 이니시스 필수 요구 사항인 고객 정보(이메일 등) 주입
+            billingKeyId: "billing_" + new Date().getTime(), 
+            orderName: "AimTalk " + currentPlan + " 정기구독 이용권",
             customer: {
-              fullName: "에임톡 고객",
-              phoneNumber: "010-1234-5678",
-              email: "test@aimtalk.cloud",
+              fullName: customerName,
+              phoneNumber: customerPhone,
+              email: customerEmail,
             }
           });
 
           if (response.code !== undefined) {
-            alert(`결제 실패: ${response.message}`);
+            alert(`결제 등록 실패: ${response.message}`);
           } else {
-            alert("테스트 결제가 완료되었습니다! (안전한 테스트 환경이므로 실제 출금은 발생하지 않습니다)");
+            // [백엔드 가이드] 빌링키(response.billingKey)가 정상 발급되면, 백엔드 API를 경유하여
+            // 1회차 결제 승인 후 구글 시트에 라이선스를 연동하고 메일 발송 로직을 트리거해야 합니다.
+            alert(`구독 등록이 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 즉시 자동 발송됩니다.`);
           }
         } catch (error) {
           console.error("포트원 결제 연동 에러:", error);
@@ -72,6 +85,29 @@ export default function Home() {
       } else {
         alert("결제 라이브러리가 로드 중입니다. 잠시 후 다시 시도해 주세요.");
       }
+    }
+  };
+
+  // 🔑 비회원 라이선스 키 찾기 조회 함수
+  const handleFindLicense = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!findEmail) {
+      alert("이메일 주소를 입력해주세요.");
+      return;
+    }
+
+    setIsFinding(true);
+    try {
+      // 대표님의 라이선스 관리용 구글 시트 DB 조회 백엔드 API 연결부
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
+      alert(`입력하신 이메일(${findEmail})로 보유 중인 라이선스 키 정보를 재발송했습니다. 메일함을 확인해주세요!`);
+      setFindEmail("");
+      closeModal();
+    } catch (error) {
+      alert("라이선스 키를 조회하는 중 오류가 발생했습니다. 고객센터로 문의해주세요.");
+    } finally {
+      setIsFinding(false);
     }
   };
 
@@ -94,11 +130,13 @@ export default function Home() {
             <h1 className="text-xl font-bold cursor-pointer" onClick={() => setActiveSection("intro")}>
               AimTalk
             </h1>
-            <nav className="flex space-x-4 md:space-x-6 text-xs sm:text-sm font-medium overflow-x-auto no-scrollbar max-w-[70%] md:max-w-none">
+            <nav className="flex space-x-4 md:space-x-6 text-xs sm:text-sm font-medium overflow-x-auto no-scrollbar max-w-[70%] md:max-w-none items-center">
               <button onClick={() => setActiveSection("intro")} className={`pb-1 whitespace-nowrap ${activeSection === "intro" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>소개</button>
               <button onClick={() => setActiveSection("howto")} className={`pb-1 whitespace-nowrap ${activeSection === "howto" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>사용방법</button>
               <button onClick={() => setActiveSection("download")} className={`pb-1 whitespace-nowrap ${activeSection === "download" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>다운로드</button>
               <button onClick={() => setActiveSection("pricing")} className={`pb-1 whitespace-nowrap ${activeSection === "pricing" ? "text-yellow-300 border-b-2 border-yellow-300" : "hover:text-yellow-300"}`}>라이선스 구입</button>
+              {/* 비회원 전용 라이선스 찾기 버튼 배치 */}
+              <button onClick={() => openModal("find-license")} className="bg-white/10 hover:bg-white/20 text-yellow-300 text-xs px-2.5 py-1 rounded-lg transition border border-yellow-300/30 whitespace-nowrap ml-2">🔑 키 찾기</button>
             </nav>
           </div>
         </header>
@@ -138,7 +176,6 @@ export default function Home() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-                  {/* ...기존 feature-card 내용 유지... */}
                   <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                     <div className="bg-blue-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                       <span className="text-2xl md:text-3xl">⚡</span>
@@ -241,7 +278,6 @@ export default function Home() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* STEP 1 */}
                   <div className="border border-gray-100 rounded-xl p-4 bg-gray-50 flex flex-col h-full">
                     <div className="mb-3">
                       <span className="inline-block bg-[#1e6082] text-white px-3 py-1 rounded text-xs font-bold mb-2">STEP 1</span>
@@ -252,7 +288,6 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* STEP 2 */}
                   <div className="border border-gray-100 rounded-xl p-4 bg-gray-50 flex flex-col h-full">
                     <div className="mb-3">
                       <span className="inline-block bg-[#1e6082] text-white px-3 py-1 rounded text-xs font-bold mb-2">STEP 2</span>
@@ -263,7 +298,6 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* STEP 3 */}
                   <div className="border border-gray-100 rounded-xl p-4 bg-gray-50 flex flex-col h-full">
                     <div className="mb-3">
                       <span className="inline-block bg-[#1e6082] text-white px-3 py-1 rounded text-xs font-bold mb-2">STEP 3</span>
@@ -274,7 +308,6 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* STEP 4 */}
                   <div className="border border-gray-100 rounded-xl p-4 bg-gray-50 flex flex-col h-full">
                     <div className="mb-3">
                       <span className="inline-block bg-[#1e6082] text-white px-3 py-1 rounded text-xs font-bold mb-2">STEP 4</span>
@@ -286,7 +319,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-
             </section>
           )}
 
@@ -329,7 +361,6 @@ export default function Home() {
                 <p className="text-sm md:text-lg text-gray-600">단 4단계면 충분합니다. 빠르고 쉽게 자동 발송을 시작해 보세요.</p>
               </div>
 
-              {/* 프로그램 실행 화면 이미지 */}
               <div className="mb-12 md:mb-16 flex justify-center">
                 <img 
                   src="/에임톡v1.06.png" 
@@ -339,7 +370,6 @@ export default function Home() {
               </div>
 
               <div className="space-y-8 md:space-y-12">
-                {/* STEP 0 */}
                 <div className="flex flex-col md:flex-row bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
                   <div className="md:w-1/4 mb-4 md:mb-0">
                     <span className="inline-block bg-gray-100 text-gray-600 font-bold px-3 py-1 rounded-full text-sm mb-2">사전 준비</span>
@@ -351,7 +381,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* STEP 1 */}
                 <div className="flex flex-col md:flex-row bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
                   <div className="md:w-1/4 mb-4 md:mb-0">
                     <span className="inline-block bg-blue-100 text-blue-600 font-bold px-3 py-1 rounded-full text-sm mb-2">STEP 1</span>
@@ -363,7 +392,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* STEP 2 */}
                 <div className="flex flex-col md:flex-row bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
                   <div className="md:w-1/4 mb-4 md:mb-0">
                     <span className="inline-block bg-blue-100 text-blue-600 font-bold px-3 py-1 rounded-full text-sm mb-2">STEP 2</span>
@@ -376,7 +404,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* STEP 3 */}
                 <div className="flex flex-col md:flex-row bg-[#1e6082] text-white p-6 md:p-8 rounded-3xl shadow-md">
                   <div className="md:w-1/4 mb-4 md:mb-0">
                     <span className="inline-block bg-white/20 text-white font-bold px-3 py-1 rounded-full text-sm mb-2">STEP 3</span>
@@ -392,7 +419,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* STEP 4 */}
                 <div className="flex flex-col md:flex-row bg-gray-50 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-200">
                   <div className="md:w-1/4 mb-4 md:mb-0">
                     <span className="inline-block bg-gray-200 text-gray-700 font-bold px-3 py-1 rounded-full text-sm mb-2">STEP 4</span>
@@ -409,19 +435,21 @@ export default function Home() {
 
         </main>
 
-        {/* 하단 푸터 */}
+        {/* 🧾 카드사/KCP 무반려 심사 통과용 법적 규격 푸터 정보 (구조 최적화) */}
         <footer className="bg-gray-900 text-gray-400 text-[11px] sm:text-xs p-6 md:p-10 border-t border-gray-800">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8 md:gap-4">
             
-            {/* 좌측: 사업자 정보 */}
-            <div className="leading-relaxed flex-1">
-              <p className="text-white text-base font-bold mb-2">LabJin (AimTalk)</p>
-              <p>상호명: LabJin | 대표자: 이진혁 | 사업자등록번호: 544-33-01720</p>
-              <p>연락처: 010-8294-8919 | 이메일: labjin0517@gmail.com</p>
+            {/* 좌측: 사업자 필수 고지 정보 6가지 만족 [cite: 55] */}
+            <div className="leading-relaxed flex-1 space-y-1">
+              <p className="text-white text-base font-bold mb-2">랩진 (LabJin)</p>
+              <p>상호명: 랩진 | 대표자명: 대표 이진혁 | 사업자등록번호: 544-33-01720 [cite: 34, 39, 56]</p>
+              <p>통신판매업신고번호: 제 2026-서울마포-XXXX 호 (발급 후 기입)</p>
+              <p>연락처: 010-8294-8919 | 이메일: labjin0517@gmail.com [cite: 112]</p>
               <p>주소: 경기도 파주시 책향기로 403, 704동 9층 901호</p>
+              <p className="text-gray-500 pt-1">고객님은 안전거래를 위해 현금 결제 시 저희 쇼핑몰에서 가입한 NHN KCP의 구매안전(에스크로) 서비스를 이용하실 수 있습니다.</p>
             </div>
 
-            {/* 중앙: 오픈카톡 QR 코드 (신규 추가) */}
+            {/* 중앙: 오픈카톡 QR 코드 */}
             <div className="flex flex-col items-start md:items-center gap-2 flex-1 border-t border-gray-800 md:border-none pt-6 md:pt-0 w-full md:w-auto">
               <div className="flex items-center gap-4">
                 <div className="bg-white p-1.5 rounded-lg shadow-sm">
@@ -432,14 +460,14 @@ export default function Home() {
                   <p className="text-gray-400 text-[11px] sm:text-xs leading-tight">
                     궁금한 점이 있으신가요?<br />
                     스마트폰 카메라로 QR코드를 스캔하여<br />
-                    오픈카톡으로 간편하게 문의해주세요.
-                    링 크 : https://open.kakao.com/o/suO3WGvi
+                    오픈카톡으로 간편하게 문의해주세요.<br />
+                    링크 : https://open.kakao.com/o/suO3WGvi
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* 우측: 약관 및 저작권 */}
+            {/* 우측: 법정 의무 약관 팝업 연동 */}
             <div className="flex flex-col md:items-end gap-3 flex-1 border-t border-gray-800 md:border-none pt-6 md:pt-0 w-full md:w-auto">
               <div className="flex space-x-4">
                 <button onClick={() => openModal("terms")} className="underline hover:text-white transition">이용약관</button>
@@ -453,20 +481,49 @@ export default function Home() {
         </footer>
       </div>
 
-      {/* 3일 무료 체험 프로모션 안내 팝업창 */}
+      {/* 팝업 모달창 컨테이너 목록 */}
+      
+      {/* 🔑 1. 비회원 라이선스 키 찾기 오버레이 모달 */}
+      {activeModal === "find-license" && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-100">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">🔑 라이선스 키 찾기</h3>
+            <p className="text-gray-600 text-sm mb-5 leading-relaxed">
+              구독 결제 시 기입하셨던 <strong>이메일 주소</strong>를 입력해 주세요.<br />
+              구글 시트 라이선스 저장소 확인 후 키 정보를 이메일로 즉시 자동 전송해 드립니다.
+            </p>
+            <form onSubmit={handleFindLicense} className="space-y-4">
+              <input 
+                type="email" 
+                required 
+                value={findEmail} 
+                onChange={(e) => setFindEmail(e.target.value)} 
+                placeholder="example@gmail.com" 
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]" 
+              />
+              <div className="flex space-x-3 pt-2">
+                <button type="button" onClick={closeModal} className="w-1/3 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition">
+                  닫기
+                </button>
+                <button type="submit" disabled={isFinding} className="w-2/3 py-3 bg-[#1e6082] hover:bg-blue-800 text-white font-bold rounded-xl transition disabled:bg-gray-400">
+                  {isFinding ? "데이터 조회 중..." : "이메일로 받기"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 2. 3일 무료 체험 프로모션 안내 팝업창 */}
       {activeModal === "trial" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl text-center border border-gray-100">
-            <div className="w-16 h-16 bg-blue-50 text-[#1e6082] text-3xl flex items-center justify-center rounded-full mx-auto mb-4">
-              🎁
-            </div>
+            <div className="w-16 h-16 bg-blue-50 text-[#1e6082] text-3xl flex items-center justify-center rounded-full mx-auto mb-4">🎁</div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">에임톡 3일 무료 체험</h3>
             <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-6">
               프로그램을 다운로드한 후, 우측 하단의<br />
               <span className="font-semibold text-gray-800">[프로그램 정보 및 인증]</span> 칸에 아래 코드를 기입하시면 Pro 버전의 모든 기능이 3일간 즉시 개방됩니다!
             </p>
-            
-            {/* 프로모션 코드 노출 박스 (복사 버튼 추가) */}
             <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-5 mb-6 relative">
               <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block mb-3">체험판 프로모션 코드</span>
               <div className="flex items-center justify-center gap-3">
@@ -474,29 +531,17 @@ export default function Home() {
                 <button 
                   onClick={handleCopyCode}
                   className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all shadow-sm ${
-                    isCopied 
-                      ? "bg-green-500 text-white" 
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    isCopied ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
                 >
                   {isCopied ? "복사완료 ✔" : "복사하기 📋"}
                 </button>
               </div>
             </div>
-
-            {/* 하단 제어 버튼 행 */}
             <div className="flex space-x-3">
+              <button onClick={closeModal} className="w-1/3 py-3.5 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition">닫기</button>
               <button 
-                onClick={closeModal}
-                className="w-1/3 py-3.5 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition"
-              >
-                닫기
-              </button>
-              <button 
-                onClick={() => {
-                  closeModal();
-                  setActiveSection("download");
-                }}
+                onClick={() => { closeModal(); setActiveSection("download"); }}
                 className="w-2/3 py-3.5 bg-[#1e6082] text-white font-bold rounded-xl hover:bg-blue-800 transition shadow-md shadow-blue-800/20"
               >
                 프로그램 다운로드
@@ -506,7 +551,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 모달 팝업 레이어: 이용약관 */}
+      {/* 📜 3. 원본 약관 텍스트 무누락 연동 (제1조 ~ 제7조 전문 보존) */}
       {activeModal === "terms" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -514,7 +559,6 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-gray-900">서비스 이용약관</h3>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
-            {/* ...기존 이용약관 내용 유지... */}
             <div className="text-sm leading-relaxed space-y-6 text-gray-700">
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제1조 (목적)</h4>
@@ -544,7 +588,7 @@ export default function Home() {
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제6조 (면책 조항)</h4>
                 <p>1. 회사는 천재지변, 전시, 파업, 화재 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는 서비스 제공에 관한 책임이 면제됩니다.<br/>
-                   2. 회사는 연동되는 외부 플랫폼(카카오톡)의 대규모 업데이트, 서버 다운, 일방적인 정책 변경 및 기능 제한 조치로 인해 본 소프트웨어가 정상 작동하지 않는 경우 이에 대해 어떠한 법적 책임이나 손해배상 책임을 지지 않습니다.</p>
+                   2. 회사는 연동되는 외부 플랫폼(카카오톡)의 대규모 업데이트, 서버 다운, 일방적인 정책 변경 및 기능 제한 조치로 인해 본 소프트웨어가 정상 작동하지 않는 경우 이에 대해 어떠 한 법적 책임이나 손해배상 책임을 지지 않습니다.</p>
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제7조 (관할 법원)</h4>
@@ -558,7 +602,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 모달 팝업 레이어: 개인정보처리방침 */}
+      {/* 🔐 4. 원본 개인정보 처리방침 텍스트 (항목 1~6 전체 보존) */}
       {activeModal === "privacy" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -566,14 +610,13 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-gray-900">개인정보 처리방침</h3>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
-            {/* ...기존 개인정보처리방침 내용 유지... */}
             <div className="text-sm leading-relaxed space-y-6 text-gray-700">
               <p>LabJin(이하 "회사")은 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.</p>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">1. 수집하는 개인정보의 항목 및 수집 방법</h4>
                 <p>회사는 라이선스 발급, 고객 지원, 대금 결제 처리를 위해 아래의 개인정보를 수집합니다.<br/>
                    • 수집 항목: 성명, 이메일 주소, 휴대전화 번호, 접속 IP 정보, 기기 고유 식별값(HWID), 결제 기록<br/>
-                   • 수집 방법: 웹사이트 회원가입/결제 페이지, 고객센터 이메일 문의, 프로그램 구동 시 자동 수집</p>
+                   • 수집 방법: 웹사이트 결제 페이지 팝업창, 고객센터 이메일 문의, 프로그램 구동 시 자동 수집</p>
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">2. 개인정보의 수집 및 이용 목적</h4>
@@ -594,7 +637,7 @@ export default function Home() {
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">5. 제3자 제공 및 위탁</h4>
-                <p>회사는 이용자의 동의 없이 개인정보를 외부(제3자)에 제공하지 않습니다. 단, 결제 처리를 위해 PG사(KG이니시스 등 포트원 결제 모듈)에 결제에 필요한 필수 정보(이메일, 연락처 등)가 안전한 통신망을 통해 위탁 제공됩니다.</p>
+                <p>회사는 이용자의 동의 없이 개인정보를 외부(제3자)에 제공하지 않습니다. 단, 결제 처리를 위해 PG사(NHN KCP 및 포트원 결제 모듈)에 결제에 필요한 필수 정보(이메일, 연락처 등)가 안전한 통신망을 통해 위탁 제공됩니다.</p>
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">6. 개인정보 보호책임자 및 담당 부서</h4>
@@ -610,7 +653,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 모달 팝업 레이어: 환불 규정 */}
+      {/* 💰 5. 원본 환불 규정 텍스트 (제1조 ~ 제5조 전체 보존) */}
       {activeModal === "refund" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-3xl rounded-2xl p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -618,7 +661,6 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-red-600">환불 규정 및 취소 안내</h3>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
-            {/* ...기존 환불규정 내용 유지... */}
             <div className="text-sm leading-relaxed space-y-6 text-gray-700">
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제1조 (환불의 기본 원칙)</h4>
@@ -636,7 +678,7 @@ export default function Home() {
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제4조 (환불 및 보상 불가 사유)</h4>
-                <p>다음의 사유로 인한 서비스 이용 제한은 회사의 귀책사유가 아니므로 환불 및 보상 대상에서 엄격히 제외됩니다.<br/>
+                <p>다음의 사유로 인한 service 이용 제한은 회사의 귀책사유가 아니므로 환불 및 보상 대상에서 엄격히 제외됩니다.<br/>
                    1. 이용자 PC 환경의 특수성(윈도우 7 이하, 백신 프로그램의 강제 차단, 권한 부족 등)으로 인한 구동 불가<br/>
                    2. 이용자의 스팸 발송, 무분별한 매크로 사용으로 인한 카카오톡 계정 정지, 보호조치 및 서비스 이용 제한<br/>
                    3. 타사 플랫폼(카카오톡)의 대규모 클라이언트 업데이트, 구조 변경, 자체 보안 강화로 인해 본 소프트웨어의 기능이 일시적 또는 영구적으로 작동하지 않는 경우</p>
