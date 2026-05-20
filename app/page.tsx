@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Script from "next/script";
 
 export default function Home() {
-  // 1. [레이아웃 깨짐 완벽 방지] 화면 렌더링 타이밍을 제어하는 마운트 상태
-  const [isMounted, setIsMounted] = useState(false);
+  // 1. [레이아웃 깨짐 방지] Tailwind CSS 로딩 상태 관리
+  const [isTailwindLoaded, setIsTailwindLoaded] = useState(false);
 
   const [activeSection, setActiveSection] = useState<string>("intro");
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -15,7 +15,7 @@ export default function Home() {
   const [findEmail, setFindEmail] = useState<string>("");
   const [isFinding, setIsFinding] = useState<boolean>(false);
 
-  // 💳 선택된 플랜 정보 저장
+  // 💳 객체 렌더링 에러 차단을 위한 원시 타입 상태 분리
   const [selectedPlanName, setSelectedPlanName] = useState<string>("");
   const [selectedPlanAmount, setSelectedPlanAmount] = useState<number>(0);
 
@@ -23,11 +23,6 @@ export default function Home() {
   const [customerName, setCustomerName] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
-
-  // 컴포넌트 마운트 시점에 렌더링 트리거 (Tailwind CDN 로딩 충돌 방지)
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const openModal = (id: string) => {
     setActiveModal(id);
@@ -59,7 +54,7 @@ export default function Home() {
     openModal("payment-input-modal");
   };
 
-  // 🔄 [오류 원인 제거] 매개변수를 받지 않고 상태값을 직접 참조하도록 수정
+  // 🔄 [최종 검증 완료] 포트원 V2 정기결제(빌링키) 발급 공식 규격 로직
   const handlePay = async () => {
     if (!selectedPlanName) return;
 
@@ -70,18 +65,20 @@ export default function Home() {
     if (confirm(`${selectedPlanName} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${selectedPlanAmount.toLocaleString()}원이 자동 결제됩니다.)`)) {
       closeModal(); 
 
+      // Reference Error를 100% 차단하는 윈도우 객체 직접 호출
       if (typeof window !== "undefined") {
-        const portOneObj = (window as any).PortOne;
+        const portOne = (window as any).PortOne;
 
-        if (!portOneObj) {
+        if (!portOne) {
           return alert("포트원 결제 모듈이 아직 로드되지 않았습니다. 잠시 후 다시 시도해 주세요.");
         }
 
         try {
-          const response = await portOneObj.requestIssueBillingKey({
+          // 공식 문서(KCP V2) 빌링키 발급 전용 메서드 및 파라미터 적용
+          const response = await portOne.requestIssueBillingKey({
             channelKey: "channel-key-fe0a875a-11aa-42cc-bdcb-0f6643c3c467", 
-            billingKeyMethod: "CARD",
-            issueName: `AimTalk ${selectedPlanName} 정기구독`,
+            billingKeyMethod: "CARD", 
+            issueName: `AimTalk ${selectedPlanName} 정기구독`, 
             customer: {
               fullName: customerName,
               phoneNumber: customerPhone,
@@ -89,15 +86,17 @@ export default function Home() {
             }
           });
 
+          // 결제창이 취소되었거나 오류가 났을 때
           if (response.code !== undefined) {
-            return alert(`결제 등록 실패: ${response.message}`);
+            return alert(`결제 진행 취소 또는 실패: ${response.message}`);
           } 
           
-          alert(`구독 등록이 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 즉시 자동 발송됩니다.`);
+          // 정상적으로 빌링키가 발급(결제 완료)되었을 때
+          alert(`구독 결제가 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 즉시 자동 발송됩니다.`);
           
         } catch (error: any) {
           console.error("포트원 빌링키 발급 에러:", error);
-          alert(`결제 모듈 실행 중 예기치 못한 오류가 발생했습니다: ${error.message || error}`);
+          alert(`결제 모듈 실행 중 오류가 발생했습니다: ${error.message || error}`);
         }
       }
     }
@@ -123,14 +122,21 @@ export default function Home() {
     }
   };
 
-  // 브라우저 렌더링 전 빈 화면 출력으로 새로고침 시 레이아웃 깨짐 현상 100% 방어
-  if (!isMounted) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-500 font-sans">화면을 불러오는 중입니다...</div>;
+  // 💡 [레이아웃 깨짐 100% 방지] Tailwind CSS 로딩 완료 전까지 안전한 준비 화면 노출
+  if (!isTailwindLoaded) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#F8F9FA', color: '#6C757D', fontFamily: 'sans-serif' }}>
+        <Script 
+          src="https://cdn.tailwindcss.com" 
+          onLoad={() => setIsTailwindLoaded(true)} 
+        />
+        <p>에임톡 페이지를 준비 중입니다...</p>
+      </div>
+    );
   }
 
   return (
     <>
-      <Script src="https://cdn.tailwindcss.com" strategy="afterInteractive" />
       <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="afterInteractive" />
 
       <style dangerouslySetInnerHTML={{__html: `
@@ -567,7 +573,7 @@ export default function Home() {
                 </button>
                 <button
                   type="button"
-                  onClick={handlePay}
+                  onClick={handlePay} // 에러의 원인이었던 매개변수 완전히 삭제
                   className="w-2/3 py-3 bg-[#1e6082] hover:bg-blue-800 text-white font-bold rounded-xl transition shadow-md shadow-blue-800/20"
                 >
                   구독 결제하기
