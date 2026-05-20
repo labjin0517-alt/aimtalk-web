@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Script from "next/script";
 
 export default function Home() {
@@ -120,7 +120,7 @@ export default function Home() {
 
   return (
     <>
-      <Script src="https://cdn.tailwindcss.com" strategy="beforeInteractive" />
+      <Script src="https://cdn.tailwindcss.com" strategy="afterInteractive" />
       <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="afterInteractive" />
 
       <style dangerouslySetInnerHTML={{__html: `
