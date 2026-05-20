@@ -12,7 +12,7 @@ export default function Home() {
   const [findEmail, setFindEmail] = useState<string>("");
   const [isFinding, setIsFinding] = useState<boolean>(false);
 
-  // 💳 [신규 추가] 단일 모달 통합 결제 정보 입력을 위한 상태
+  // 💳 [개선] 단일 모달 통합 결제 정보 입력을 위한 상태 필드
   const [payPlan, setPayPlan] = useState<{ plan: string; amount: number } | null>(null);
   const [paymentForm, setPaymentForm] = useState({
     customerName: "",
@@ -45,35 +45,33 @@ export default function Home() {
     }
   };
 
-  // 요금제 카드에서 '결제하기' 버튼을 누를 때 prompt 대신 통합 모달창을 띄우는 함수
+  // 요금제 카드에서 '결제하기' 버튼을 누를 때 호출되는 함수 (통합 모달 오픈)
   const initiatePayment = (plan: string, amount: number) => {
     setPayPlan({ plan, amount });
     openModal("payment-input-modal");
   };
 
-  // 🔄 [수정 완료] 기존 PortOne 빌링키 발급 로직을 그대로 유지하되, prompt 창을 없애고 모달 데이터로 연동
+  // 🔄 NHN KCP 비인증 자동결제(빌링) 테스트 채널 연동 함수 (통합 데이터 바인딩)
   const handlePay = async () => {
     if (!payPlan) return;
     const { customerName, customerEmail, customerPhone } = paymentForm;
 
-    // 통합 창 유효성 검사
+    // 통합 창 필수 값 및 이메일 유효성 검사
     if (!customerName.trim()) return alert("주문자 성함을 입력해주세요.");
     if (!customerEmail.trim() || !customerEmail.includes("@")) return alert("올바른 라이선스 수신 이메일 주소를 입력해주세요.");
     if (!customerPhone.trim()) return alert("연락처를 입력해주세요.");
 
     if (confirm(`${payPlan.plan} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${payPlan.amount.toLocaleString()}원이 자동 결제됩니다.)`)) {
-      closeModal(); // 입력 모달창 닫기
+      closeModal(); // 정보 입력 모달 닫기
 
       if (typeof window !== "undefined" && (window as any).PortOne) {
         const PortOne = (window as any).PortOne;
 
         try {
           const currentPlan = payPlan.plan;
-          
-          // ⭐️ 대표님께서 발급받으신 NHN KCP 테스트용 고유 채널 키 매핑 유지
           const testChannelKey = "channel-key-fe0a875a-11aa-42cc-bdcb-0f6643c3c467";
 
-          // KCP 테스트용 비인증 정기결제 빌링키 발급창 호출
+          // KCP 테스트용 비인증 정기결제 빌링키 발급 요청
           const response = await PortOne.requestBillingKey({
             channelKey: testChannelKey, 
             billingKeyId: "billing_" + new Date().getTime(), 
@@ -341,7 +339,6 @@ export default function Home() {
                   <div>
                     <h3 className="text-xl font-bold mb-4">Basic</h3>
                     <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">8,000원 <span className="text-sm font-normal text-gray-400">/ 월</span></div>
-                    {/* [개선] prompt 대신 전용 모달 입력을 트리거하도록 바인딩 변경 */}
                     <button onClick={() => initiatePayment("Basic", 8000)} className="w-full py-4 rounded-xl border border-[#1e6082] text-[#1e6082] font-bold hover:bg-blue-50 transition mb-8">베이직 결제하기</button>
                   </div>
                   <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
@@ -356,7 +353,6 @@ export default function Home() {
                   <div>
                     <h3 className="text-xl font-bold mb-4 text-[#1e6082]">Pro</h3>
                     <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">16,000원 <span className="text-sm font-normal text-gray-400">/ 월</span></div>
-                    {/* [개선] prompt 대신 전용 모달 입력을 트리거하도록 바인딩 변경 */}
                     <button onClick={() => initiatePayment("Pro", 16000)} className="w-full py-4 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg transition mb-8">프로 결제하기</button>
                   </div>
                   <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
@@ -405,7 +401,7 @@ export default function Home() {
                     <h3 className="text-xl font-bold text-[#1e6082]">명단 로드 (엑셀 업로드)</h3>
                   </div>
                   <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-2">
-                    <p>• 작성하신 엑셀 파일을 프로그램 좌측 영역에 <strong>드래그 앤 드롭</strong> 하거나, <strong>[📂 엑셀 업로드]</strong> 버튼을 눌러 불러옵니다.</p>
+                    <p>• 가공하신 엑셀 파일을 프로그램 좌측 영역에 <strong>드래그 앤 드롭</strong> 하거나, <strong>[📂 엑셀 업로드]</strong> 버튼을 눌러 불러옵니다.</p>
                     <p>• 수신 거부 명단이 있다면 자동으로 필터링되며, 리스트에서 마우스 클릭으로 특정 인원만 체크하여 발송할 수도 있습니다.</p>
                   </div>
                 </div>
@@ -513,7 +509,7 @@ export default function Home() {
                 value={findEmail} 
                 onChange={(e) => setFindEmail(e.target.value)} 
                 placeholder="example@gmail.com" 
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]" 
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-2 focus:ring-[#1e6082]" 
               />
               <div className="flex space-x-3 pt-2">
                 <button type="button" onClick={closeModal} className="w-1/3 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition">
@@ -528,7 +524,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 💳 ✨ [신규 추가] 주문자명, 핸드폰번호, 메일주소를 창 하나에서 모두 입력받는 통합 결제 정보 모달 */}
+      {/* 💳 ✨ [통합 완료] 이름, 핸드폰번호, 메일주소를 단 한 창에서 입력받는 팝업 모달 */}
       {activeModal === "payment-input-modal" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-100 relative space-y-4">
@@ -578,7 +574,7 @@ export default function Home() {
                   onClick={handlePay}
                   className="w-2/3 py-3 bg-[#1e6082] hover:bg-blue-800 text-white font-bold rounded-xl transition shadow-md shadow-blue-800/20"
                 >
-                  구독 구독 결제하기
+                  구독 결제하기
                 </button>
               </div>
             </div>
