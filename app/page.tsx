@@ -12,7 +12,7 @@ export default function Home() {
   const [findEmail, setFindEmail] = useState<string>("");
   const [isFinding, setIsFinding] = useState<boolean>(false);
 
-  // 💳 [수정1] React child 에러(객체 렌더링 오류)를 방지하기 위해 상태값을 원시 타입으로 분리
+  // 💳 객체 렌더링 에러를 차단하는 원시 타입 상태 (선택된 플랜 정보)
   const [selectedPlanName, setSelectedPlanName] = useState<string>("");
   const [selectedPlanAmount, setSelectedPlanAmount] = useState<number>(0);
 
@@ -45,14 +45,13 @@ export default function Home() {
     }
   };
 
-  // 요금제 카드에서 '결제하기' 버튼 클릭 시
   const initiatePayment = (planName: string, amount: number) => {
     setSelectedPlanName(planName);
     setSelectedPlanAmount(amount);
     openModal("payment-input-modal");
   };
 
-  // 🔄 [수정2] 대표님의 원래 PG 모듈인 Bootpay(부트페이) 완벽 복구 및 적용
+  // 🔄 [공식 문서 V2 반영] NHN KCP 정기결제(빌링키) 발급 전용 로직
   const handlePay = async () => {
     if (!selectedPlanName) return;
 
@@ -63,38 +62,36 @@ export default function Home() {
     if (confirm(`${selectedPlanName} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${selectedPlanAmount.toLocaleString()}원이 자동 결제됩니다.)`)) {
       closeModal(); 
 
-      // Bootpay 객체가 로드되었는지 확인
+      // PortOne 객체 로드 검증
       if (typeof window !== "undefined") {
-        if (!(window as any).Bootpay) {
-          return alert("결제 모듈이 아직 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.");
+        if (!(window as any).PortOne) {
+          return alert("포트원 결제 모듈이 아직 로드되지 않았습니다. 잠시 후 다시 시도해 주세요.");
         }
 
         try {
-          // 대표님의 Bootpay Application ID 적용
-          const response = await (window as any).Bootpay.requestPayment({
-            application_id: "6602bf41b8cbd0144d18fa7b", 
-            price: selectedPlanAmount,
-            order_name: "AimTalk " + selectedPlanName + " 정기구독 이용권",
-            order_id: "ORDER_" + new Date().getTime(),
-            pg: "kcp",
-            method: "card_rebill",
-            user: {
-              id: customerEmail,
-              username: customerName,
-              phone: customerPhone,
+          // ⭐️ V2 빌링키(정기결제) 발급 전용 함수 및 필수 파라미터 적용
+          const response = await (window as any).PortOne.requestIssueBillingKey({
+            channelKey: "channel-key-fe0a875a-11aa-42cc-bdcb-0f6643c3c467", 
+            billingKeyMethod: "CARD", // 필수: 빌링키 결제 수단
+            issueName: `AimTalk ${selectedPlanName} 정기구독`, // 필수: V2 빌링키 전용 상품명 파라미터
+            customer: {
+              fullName: customerName,
+              phoneNumber: customerPhone,
               email: customerEmail,
-            },
-            extra: {
-              subscribe_test_payment: true, // 테스트 결제 옵션
-            },
+            }
           });
 
-          if (response.event === "done" || response.event === "confirm") {
-            alert(`결제가 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 즉시 자동 발송됩니다.`);
-          }
+          // response.code가 존재하는 경우 예외(취소/실패) 처리
+          if (response.code !== undefined) {
+            return alert(`결제 등록 실패: ${response.message}`);
+          } 
+          
+          // 발급 성공 시 (response.billingKey 반환됨)
+          alert(`구독 등록이 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 즉시 자동 발송됩니다.`);
+          
         } catch (error: any) {
-          console.error("결제 모듈 에러:", error);
-          alert(`결제 중 오류가 발생했거나 취소되었습니다: ${error.message || error}`);
+          console.error("포트원 빌링키 발급 에러:", error);
+          alert(`결제 모듈 실행 중 예기치 못한 오류가 발생했습니다: ${error.message || error}`);
         }
       }
     }
@@ -122,9 +119,9 @@ export default function Home() {
 
   return (
     <>
-      <Script src="https://cdn.tailwindcss.com" />
-      {/* 🚀 Bootpay 스크립트 모듈 로드 */}
-      <Script src="https://js.bootpay.co.kr/bootpay-4.3.4.min.js" />
+      <Script src="https://cdn.tailwindcss.com" strategy="beforeInteractive" />
+      {/* 🚀 포트원 V2 브라우저 SDK (우선 로드) */}
+      <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="afterInteractive" />
 
       <style dangerouslySetInnerHTML={{__html: `
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght=400;600;700&display=swap');
