@@ -84,7 +84,7 @@ export default function Home() {
     if (!email || !email.includes("@")) return alert("올바른 라이선스 수신 이메일 주소를 입력해주세요.");
     if (!phone) return alert("연락처를 입력해주세요.");
 
-    if (PORTONE_STORE_ID === "여기에_대표님의_storeId_입력") {
+    if (PORTONE_STORE_ID === "store-10a2f63e-992c-494a-b25e-1846bf3a86ae") {
       return alert("코드 최상단(11번째 줄)의 PORTONE_STORE_ID를 대표님의 실제 가맹점 식별코드로 입력해 주세요!");
     }
 
