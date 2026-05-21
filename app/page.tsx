@@ -72,54 +72,33 @@ export default function Home() {
     openModal("payment-input-modal");
   };
 
- // 🔄 [최종 수정] billingKeyMethod 에러 해결을 위한 파라미터 재구성
+ /// [수정] 아래 코드로 handlePay 함수 전체를 교체하세요
   const handlePay = async () => {
     if (!selectedPlanName) return;
-
     const name = customerName.trim();
     const email = customerEmail.trim();
     const phone = customerPhone.trim();
 
-    if (!name) return alert("주문자 성함을 입력해주세요.");
-    if (!email || !email.includes("@")) return alert("올바른 라이선스 수신 이메일 주소를 입력해주세요.");
-    if (!phone) return alert("연락처를 입력해주세요.");
+    if (!name || !email.includes("@") || !phone) return alert("입력 정보를 확인해주세요.");
 
-    if (confirm(`${selectedPlanName} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${selectedPlanAmount.toLocaleString()}원이 자동 결제됩니다.)`)) {
-      closeModal(); 
+    if (typeof window !== "undefined") {
+      const PortOne = (window as any).PortOne;
+      if (!PortOne) return alert("결제 모듈이 로드되지 않았습니다.");
 
-      if (typeof window !== "undefined") {
-        const portOne = (window as any).PortOne;
-
-        if (!portOne) {
-          return alert("포트원 결제 모듈이 아직 로드되지 않았습니다. 페이지를 새로고침 한 뒤 다시 시도해 주세요.");
-        }
-
-        try {
-          // ⭐️ 에러 해결 핵심: billingKeyMethod를 명시적 파라미터로 명확히 전달
-          const response = await portOne.requestIssueBillingKey({
-            storeId: PORTONE_STORE_ID, 
-            channelKey: PORTONE_CHANNEL_KEY, 
-            billingKeyMethod: "CARD", // 에러 해결 핵심 파라미터
-            issueName: `AimTalk ${selectedPlanName} 정기구독`, 
-            customer: {
-              fullName: name,
-              phoneNumber: phone,
-              email: email,
-            }
-          });
-
-          // response.code가 있는 경우 포트원이 정한 실패 케이스
-          if (response && response.code !== undefined) {
-            console.error("포트원 에러 응답:", response);
-            return alert(`결제 진행 실패: ${response.message || "빌링키 발급 오류"}`);
-          } 
-          
-          alert(`성공! 구독 결제가 완료되었습니다.\n입력하신 이메일(${email})로 라이선스 키가 즉시 자동 발송됩니다.`);
-          
-        } catch (error: any) {
-          console.error("포트원 시스템 에러:", error);
-          alert(`결제 처리 중 예상치 못한 오류가 발생했습니다.`);
-        }
+      try {
+        // [수정] requestIssueBillingKey 대신 requestPayment 사용
+        await PortOne.requestPayment({
+          storeId: PORTONE_STORE_ID,
+          channelKey: PORTONE_CHANNEL_KEY,
+          paymentId: `pay_${new Date().getTime()}`, // 필수: 결제 고유 ID 추가
+          orderName: `AimTalk ${selectedPlanName} 정기구독`,
+          totalAmount: selectedPlanAmount,
+          currency: "CURRENCY_KRW",
+          payMethod: "CARD",
+          customer: { fullName: name, phoneNumber: phone, email: email },
+        });
+      } catch (e: any) {
+        alert("결제창 호출 실패: " + e.message);
       }
     }
   };
