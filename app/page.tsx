@@ -54,18 +54,23 @@ export default function Home() {
     openModal("payment-input-modal");
   };
 
-  // 🔄 [최종 검증 완료] 포트원 V2 정기결제(빌링키) 발급 공식 규격 로직
+  // 🔄 [수정 완료] 빈 값 전송 원천 차단 및 파라미터 매핑 강화
   const handlePay = async () => {
     if (!selectedPlanName) return;
 
-    if (!customerName.trim()) return alert("주문자 성함을 입력해주세요.");
-    if (!customerEmail.trim() || !customerEmail.includes("@")) return alert("올바른 라이선스 수신 이메일 주소를 입력해주세요.");
-    if (!customerPhone.trim()) return alert("연락처를 입력해주세요.");
+    // 1. 공백 제거 후 지역 변수에 할당 (React 상태 비동기 지연 방지)
+    const name = customerName.trim();
+    const email = customerEmail.trim();
+    const phone = customerPhone.trim();
+
+    // 2. 완벽한 빈 값 방어 로직
+    if (!name) return alert("주문자 성함을 입력해주세요.");
+    if (!email || !email.includes("@")) return alert("올바른 라이선스 수신 이메일 주소를 입력해주세요.");
+    if (!phone) return alert("연락처를 입력해주세요.");
 
     if (confirm(`${selectedPlanName} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${selectedPlanAmount.toLocaleString()}원이 자동 결제됩니다.)`)) {
       closeModal(); 
 
-      // Reference Error를 100% 차단하는 윈도우 객체 직접 호출
       if (typeof window !== "undefined") {
         const portOne = (window as any).PortOne;
 
@@ -74,26 +79,24 @@ export default function Home() {
         }
 
         try {
-          // 공식 문서(KCP V2) 빌링키 발급 전용 메서드 및 파라미터 적용
+          // 3. 포트원 API로 넘길 때 검증된 지역 변수(name, phone, email)를 강제 주입
           const response = await portOne.requestIssueBillingKey({
-            storeId: "store-10a2f63e-992c-494a-b25e-1846bf3a86ae", // ⭐️ [필수 추가] 포트원 관리자에서 확인한 storeId (예: store-12345678-xxxx)
+            storeId: "store-438676bf-8bd6-4c31-89cc-7fec2d98c2ca", 
             channelKey: "channel-key-fe0a875a-11aa-42cc-bdcb-0f6643c3c467", 
             billingKeyMethod: "CARD", 
             issueName: `AimTalk ${selectedPlanName} 정기구독`, 
             customer: {
-              fullName: customerName,
-              phoneNumber: customerPhone,
-              email: customerEmail,
+              fullName: name,         // 상태값(customerName) 대신 검증된 지역 변수 사용
+              phoneNumber: phone,     // 상태값(customerPhone) 대신 검증된 지역 변수 사용
+              email: email,           // 상태값(customerEmail) 대신 검증된 지역 변수 사용
             }
           });
 
-          // 결제창이 취소되었거나 오류가 났을 때
           if (response.code !== undefined) {
             return alert(`결제 진행 취소 또는 실패: ${response.message}`);
           } 
           
-          // 정상적으로 빌링키가 발급(결제 완료)되었을 때
-          alert(`구독 결제가 성공적으로 완료되었습니다!\n입력하신 이메일(${customerEmail})로 라이선스 키가 즉시 자동 발송됩니다.`);
+          alert(`구독 결제가 성공적으로 완료되었습니다!\n입력하신 이메일(${email})로 라이선스 키가 즉시 자동 발송됩니다.`);
           
         } catch (error: any) {
           console.error("포트원 빌링키 발급 에러:", error);
