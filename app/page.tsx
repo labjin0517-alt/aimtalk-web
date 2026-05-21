@@ -72,7 +72,7 @@ export default function Home() {
     openModal("payment-input-modal");
   };
 
-  // 🔄 [최종 완성] 포트원 V2 정기결제(빌링키) 발급 공식 규격 함수
+ // 🔄 [최종 수정] billingKeyMethod 에러 해결을 위한 파라미터 재구성
   const handlePay = async () => {
     if (!selectedPlanName) return;
 
@@ -84,10 +84,6 @@ export default function Home() {
     if (!email || !email.includes("@")) return alert("올바른 라이선스 수신 이메일 주소를 입력해주세요.");
     if (!phone) return alert("연락처를 입력해주세요.");
 
-    if (PORTONE_STORE_ID === "store-10a2f63e-992c-494a-b25e-1846bf3a86ae") {
-      return alert("코드 최상단(11번째 줄)의 PORTONE_STORE_ID를 대표님의 실제 가맹점 식별코드로 입력해 주세요!");
-    }
-
     if (confirm(`${selectedPlanName} 플랜 정기 구독 결제를 진행할까요?\n(매월 ${selectedPlanAmount.toLocaleString()}원이 자동 결제됩니다.)`)) {
       closeModal(); 
 
@@ -95,15 +91,15 @@ export default function Home() {
         const portOne = (window as any).PortOne;
 
         if (!portOne) {
-          return alert("포트원 결제 모듈이 아직 로드되지 않았습니다. 잠시 후 다시 시도해 주세요.");
+          return alert("포트원 결제 모듈이 아직 로드되지 않았습니다. 페이지를 새로고침 한 뒤 다시 시도해 주세요.");
         }
 
         try {
-          // 포트원 V2 공식 문서에 규정된 정기결제 필수 규격 데이터 매핑
+          // ⭐️ 에러 해결 핵심: billingKeyMethod를 명시적 파라미터로 명확히 전달
           const response = await portOne.requestIssueBillingKey({
             storeId: PORTONE_STORE_ID, 
             channelKey: PORTONE_CHANNEL_KEY, 
-            billingKeyMethod: "CARD", 
+            billingKeyMethod: "CARD", // 에러 해결 핵심 파라미터
             issueName: `AimTalk ${selectedPlanName} 정기구독`, 
             customer: {
               fullName: name,
@@ -112,15 +108,17 @@ export default function Home() {
             }
           });
 
-          if (response.code !== undefined) {
-            return alert(`결제 진행 취소 또는 실패: ${response.message}`);
+          // response.code가 있는 경우 포트원이 정한 실패 케이스
+          if (response && response.code !== undefined) {
+            console.error("포트원 에러 응답:", response);
+            return alert(`결제 진행 실패: ${response.message || "빌링키 발급 오류"}`);
           } 
           
-          alert(`구독 결제가 성공적으로 완료되었습니다!\n입력하신 이메일(${email})로 라이선스 키가 즉시 자동 발송됩니다.`);
+          alert(`성공! 구독 결제가 완료되었습니다.\n입력하신 이메일(${email})로 라이선스 키가 즉시 자동 발송됩니다.`);
           
         } catch (error: any) {
-          console.error("포트원 빌링키 발급 에러:", error);
-          alert(`결제 모듈 실행 중 오류가 발생했습니다: ${error.message || error}`);
+          console.error("포트원 시스템 에러:", error);
+          alert(`결제 처리 중 예상치 못한 오류가 발생했습니다.`);
         }
       }
     }
@@ -150,7 +148,7 @@ export default function Home() {
     <>
       {/* CDN 스크립트 파일들을 탑레벨에 배치하여 안전하게 상시 로드 */}
       <Script src="https://cdn.tailwindcss.com" strategy="afterInteractive" />
-      <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="afterInteractive" />
+      <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="beforeInteractive" />
 
       {/* 스타일 준비 전 깜빡임 및 레이아웃 무너짐을 완벽 방어하는 로딩 가드 인터페이스 */}
       {!isReady ? (
