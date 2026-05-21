@@ -76,6 +76,7 @@ export default function Home() {
         try {
           // 공식 문서(KCP V2) 빌링키 발급 전용 메서드 및 파라미터 적용
           const response = await portOne.requestIssueBillingKey({
+            storeId: "store-10a2f63e-992c-494a-b25e-1846bf3a86ae", // ⭐️ [필수 추가] 포트원 관리자에서 확인한 storeId (예: store-12345678-xxxx)
             channelKey: "channel-key-fe0a875a-11aa-42cc-bdcb-0f6643c3c467", 
             billingKeyMethod: "CARD", 
             issueName: `AimTalk ${selectedPlanName} 정기구독`, 
