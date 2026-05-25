@@ -79,7 +79,15 @@ export default function Home() {
     const email = customerEmail.trim();
     const phone = customerPhone.trim();
 
-    if (!name || !email.includes("@") || !phone) return alert("입력 정보를 확인해주세요.");
+    // 💡 변경된 검증 로직: 이름, 이메일 형식 체크
+    if (!name) return alert("주문자 성함을 입력해주세요.");
+    if (!email.includes("@")) return alert("올바른 이메일 주소를 입력해주세요.");
+    
+    // 💡 휴대폰 번호가 숫자와 하이픈(-)으로만 이루어져 있고 9자 이상인지 검증 (영문 dd 입력 차단)
+    const phoneRegex = /^[0-9-]{9,15}$/;
+    if (!phone || !phoneRegex.test(phone)) {
+      return alert("올바른 연락처(휴대폰 번호)를 입력해주세요. (예: 010-1234-5678)");
+    }
 
     if (typeof window !== "undefined") {
       const PortOne = (window as any).PortOne;
