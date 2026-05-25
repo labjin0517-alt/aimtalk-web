@@ -72,21 +72,22 @@ export default function Home() {
     openModal("payment-input-modal");
   };
 
- /// [수정] 아래 코드로 handlePay 함수 전체를 교체하세요
-  const handlePay = async () => {
+ const handlePay = async () => {
     if (!selectedPlanName) return;
     const name = customerName.trim();
     const email = customerEmail.trim();
-    const phone = customerPhone.trim();
+    
+    // 💡 입력된 전화번호에서 하이픈(-)을 자동으로 모두 제거하고 숫자만 남깁니다.
+    // 예: "010-1234-5678" -> "01012345678" / "01012345678" -> "01012345678"
+    const phone = customerPhone.trim().replace(/-/g, "");
 
-    // 💡 변경된 검증 로직: 이름, 이메일 형식 체크
     if (!name) return alert("주문자 성함을 입력해주세요.");
     if (!email.includes("@")) return alert("올바른 이메일 주소를 입력해주세요.");
     
-    // 💡 휴대폰 번호가 숫자와 하이픈(-)으로만 이루어져 있고 9자 이상인지 검증 (영문 dd 입력 차단)
-    const phoneRegex = /^[0-9-]{9,15}$/;
+    // 💡 하이픈이 제거된 순수 숫자가 한국 전화번호 자릿수(9자~11자)에 맞는지 체크합니다.
+    const phoneRegex = /^0[0-9]{8,10}$/;
     if (!phone || !phoneRegex.test(phone)) {
-      return alert("올바른 연락처(휴대폰 번호)를 입력해주세요. (예: 010-1234-5678)");
+      return alert("올바른 연락처(휴대폰 번호)를 입력해주세요.");
     }
 
     if (typeof window !== "undefined") {
@@ -94,16 +95,19 @@ export default function Home() {
       if (!PortOne) return alert("결제 모듈이 로드되지 않았습니다.");
 
       try {
-        // [수정] requestIssueBillingKey 대신 requestPayment 사용
         await PortOne.requestPayment({
           storeId: PORTONE_STORE_ID,
           channelKey: PORTONE_CHANNEL_KEY,
-          paymentId: `pay_${new Date().getTime()}`, // 필수: 결제 고유 ID 추가
+          paymentId: `pay_${new Date().getTime()}`,
           orderName: `AimTalk ${selectedPlanName} 정기구독`,
           totalAmount: selectedPlanAmount,
           currency: "CURRENCY_KRW",
           payMethod: "CARD",
-          customer: { fullName: name, phoneNumber: phone, email: email },
+          customer: { 
+            fullName: name, 
+            phoneNumber: phone, // 💡 여기에 하이픈이 떨어진 깨끗한 숫자만 전달됩니다!
+            email: email 
+          },
         });
       } catch (e: any) {
         alert("결제창 호출 실패: " + e.message);
