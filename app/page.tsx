@@ -19,7 +19,9 @@ export default function Home() {
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
   // 🔑 비회원 라이선스 키 찾기 관련 상태
+  const [findName, setFindName] = useState<string>("");     // 💡 추가
   const [findEmail, setFindEmail] = useState<string>("");
+  const [findPhone, setFindPhone] = useState<string>("");   // 💡 추가
   const [isFinding, setIsFinding] = useState<boolean>(false);
 
   // 💳 선택된 플랜 정보 상태
@@ -118,16 +120,28 @@ export default function Home() {
 
   const handleFindLicense = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!findEmail) {
-      alert("이메일 주소를 입력해주세요.");
-      return;
+    const name = findName.trim();
+    const email = findEmail.trim();
+    const phone = findPhone.trim().replace(/-/g, ""); // 💡 하이픈 자동 제거
+
+    if (!name) return alert("주문자 성함을 입력해주세요.");
+    if (!email || !email.includes("@")) return alert("올바른 이메일 주소를 입력해주세요.");
+    
+    const phoneRegex = /^0[0-9]{8,10}$/;
+    if (!phone || !phoneRegex.test(phone)) {
+      return alert("올바른 연락처(휴대폰 번호)를 입력해주세요.");
     }
 
     setIsFinding(true);
     try {
+      // 💡 추후 여기에 구글 시트(Make.com)에서 이름/이메일/폰번호가 모두 일치하는지 찾는 API가 연동됩니다.
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert(`입력하신 이메일(${findEmail})로 보유 중인 라이선스 키 정보를 재발송했습니다. 메일함을 확인해주세요!`);
+      alert(`입력하신 정보가 일치하여, 등록된 이메일(${email})로 라이선스 키 정보를 재발송했습니다. 메일함을 확인해주세요!`);
+      
+      // 폼 초기화 및 닫기
+      setFindName("");
       setFindEmail("");
+      setFindPhone("");
       closeModal();
     } catch (error) {
       alert("라이선스 키를 조회하는 중 오류가 발생했습니다. 고객센터로 문의해주세요.");
@@ -514,19 +528,55 @@ export default function Home() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-100">
             <h3 className="text-xl font-bold text-gray-900 mb-2">🔑 라이선스 키 찾기</h3>
-            <p className="text-gray-600 text-sm mb-5 leading-relaxed">
-              구독 결제 시 기입하셨던 <strong>이메일 주소</strong>를 입력해 주세요.<br />
-              구글 시트 라이선스 저장소 확인 후 키 정보를 이메일로 즉시 자동 전송해 드립니다.
+            
+            {/* 🚨 강력한 중복 사용 금지 경고문 박스 추가 */}
+            <div className="bg-red-50 border border-red-200 rounded-xl p-3.5 mb-5 text-xs text-red-600 leading-relaxed font-medium">
+              <p className="font-bold text-sm mb-1">⚠️ 라이선스 이용 및 기기 제한 안내</p>
+              • 에임톡 라이선스는 <span className="underline font-bold">PC 1대당 1개의 키</span>만 사용 가능합니다.<br />
+              • 최초 등록된 컴퓨터 외에 <span className="underline font-bold">다른 기기에서는 사용이 절대 불가</span>하며, 임의 이동 사용 시 라이선스가 차단될 수 있습니다.
+            </div>
+
+            <p className="text-gray-600 text-xs mb-4 leading-relaxed">
+              구독 결제 시 기입하셨던 <strong>정보(성함, 이메일, 연락처)</strong>를 정확히 입력해 주세요. 데이터 확인 후 키 정보를 이메일로 즉시 자동 전송해 드립니다.
             </p>
-            <form onSubmit={handleFindLicense} className="space-y-4">
-              <input 
-                type="email" 
-                required 
-                value={findEmail} 
-                onChange={(e) => setFindEmail(e.target.value)} 
-                placeholder="example@gmail.com" 
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]" 
-              />
+
+            <form onSubmit={handleFindLicense} className="space-y-3.5">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">주문자 성함</label>
+                <input 
+                  type="text" 
+                  required 
+                  value={findName} 
+                  onChange={(e) => setFindName(e.target.value)} 
+                  placeholder="홍길동" 
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]" 
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">등록 이메일 주소</label>
+                <input 
+                  type="email" 
+                  required 
+                  value={findEmail} 
+                  onChange={(e) => setFindEmail(e.target.value)} 
+                  placeholder="example@gmail.com" 
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]" 
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">등록 연락처</label>
+                <input 
+                  type="tel" 
+                  required 
+                  value={findPhone} 
+                  onChange={(e) => setFindPhone(e.target.value)} 
+                  placeholder="010-1234-5678" 
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]" 
+                />
+              </div>
+
               <div className="flex space-x-3 pt-2">
                 <button type="button" onClick={closeModal} className="w-1/3 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition">
                   닫기
@@ -542,12 +592,15 @@ export default function Home() {
 
       {activeModal === "payment-input-modal" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-100 relative space-y-4">
+          {/* 💡 max-w-md를 max-w-lg로 변경하여 전체적인 창 크기를 시원하게 키웠습니다. */}
+          <div className="bg-white w-full max-w-lg rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-100 relative space-y-4">
             <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            
             <div className="border-b border-gray-100 pb-2">
               <h3 className="text-xl font-bold text-gray-900">결제 고객 정보 입력</h3>
               <p className="text-xs text-blue-600 mt-1">선택 요금제: AimTalk {selectedPlanName} 플랜 (월 {selectedPlanAmount.toLocaleString()}원)</p>
             </div>
+
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">주문자 성함</label>
@@ -559,6 +612,7 @@ export default function Home() {
                   className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]"
                 />
               </div>
+
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">라이선스 수신 이메일 주소</label>
                 <input
@@ -570,6 +624,7 @@ export default function Home() {
                 />
                 <p className="text-[11px] text-gray-400 mt-1">※ 이 이메일 주소로 프로그램 인증용 라이선스 코드가 발송됩니다.</p>
               </div>
+
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">연락처</label>
                 <input
@@ -581,35 +636,36 @@ export default function Home() {
                 />
               </div>
 
-              {/* 💡 새로 추가된 라이선스 수신 수단 선택 라디오 버튼 */}
+              {/* 💡 디자인 개선: 라디오 버튼을 세로 배정(flex-col) 및 간격을 넓혀 글자 잘림을 완전히 해결했습니다. */}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-2">라이선스 수신 수단 선택</label>
-                <div className="flex gap-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
-                  <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer flex-1">
+                <div className="flex flex-col gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                  <label className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer p-2 hover:bg-white rounded-lg transition">
                     <input
                       type="radio"
                       name="receiveMethod"
                       value="EMAIL"
                       checked={receiveMethod === "EMAIL"}
                       onChange={() => setReceiveMethod("EMAIL")}
-                      className="text-[#1e6082] focus:ring-[#1e6082]"
+                      className="text-[#1e6082] focus:ring-[#1e6082] h-4 w-4"
                     />
-                    📧 이메일로 받기 (무료 재발송 가능)
+                    <span>📧 <strong>이메일</strong>로 받기 <span className="text-xs text-gray-500">(분실 시 무료 재발송 가능)</span></span>
                   </label>
-                  <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer flex-1">
+                  <label className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer p-2 hover:bg-white rounded-lg transition">
                     <input
                       type="radio"
                       name="receiveMethod"
                       value="ALARM_TALK"
                       checked={receiveMethod === "ALARM_TALK"}
                       onChange={() => setReceiveMethod("ALARM_TALK")}
-                      className="text-[#1e6082] focus:ring-[#1e6082]"
+                      className="text-[#1e6082] focus:ring-[#1e6082] h-4 w-4"
                     />
-                    💬 카카오톡 알림톡
+                    <span>💬 <strong>카카오톡 알림톡</strong>으로 받기</span>
                   </label>
                 </div>
-                <p className="text-[10px] text-gray-400 mt-1.5">※ 분실에 따른 라이선스 키 재발송(키 찾기 기능)은 시스템 정책 상 등록하신 이메일로만 발송됩니다.</p>
+                <p className="text-[11px] text-red-500/80 mt-2 font-medium">※ 중요: 분실에 따른 재발송(키 찾기)은 시스템 정책 상 이메일로만 제공됩니다.</p>
               </div>
+
               <div className="flex space-x-3 pt-2">
                 <button type="button" onClick={closeModal} className="w-1/3 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition">
                   취소
