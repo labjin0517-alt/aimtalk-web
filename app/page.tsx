@@ -30,6 +30,7 @@ export default function Home() {
   const [customerName, setCustomerName] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
+  const [receiveMethod, setReceiveMethod] = useState<"EMAIL" | "ALARM_TALK">("EMAIL"); // 💡 추가: 수신 수단 상태 (기본값 이메일)
 
   // 새로고침 시 스타일 깜빡임 및 Hydration Mismatch 현상을 완전히 방지하는 이중 안전장치
   useEffect(() => {
@@ -76,15 +77,11 @@ export default function Home() {
     if (!selectedPlanName) return;
     const name = customerName.trim();
     const email = customerEmail.trim();
-    
-    // 💡 입력된 전화번호에서 하이픈(-)을 자동으로 모두 제거하고 숫자만 남깁니다.
-    // 예: "010-1234-5678" -> "01012345678" / "01012345678" -> "01012345678"
     const phone = customerPhone.trim().replace(/-/g, "");
 
     if (!name) return alert("주문자 성함을 입력해주세요.");
     if (!email.includes("@")) return alert("올바른 이메일 주소를 입력해주세요.");
     
-    // 💡 하이픈이 제거된 순수 숫자가 한국 전화번호 자릿수(9자~11자)에 맞는지 체크합니다.
     const phoneRegex = /^0[0-9]{8,10}$/;
     if (!phone || !phoneRegex.test(phone)) {
       return alert("올바른 연락처(휴대폰 번호)를 입력해주세요.");
@@ -105,9 +102,13 @@ export default function Home() {
           payMethod: "CARD",
           customer: { 
             fullName: name, 
-            phoneNumber: phone, // 💡 여기에 하이픈이 떨어진 깨끗한 숫자만 전달됩니다!
+            phoneNumber: phone, 
             email: email 
           },
+          // 💡 중요: Make.com(웹훅)으로 "고객이 이메일을 원치, 카톡을 원치" 전달하는 보관함입니다.
+          customData: {
+            receiveMethod: receiveMethod 
+          }
         });
       } catch (e: any) {
         alert("결제창 호출 실패: " + e.message);
@@ -578,6 +579,36 @@ export default function Home() {
                   onChange={(e) => setCustomerPhone(e.target.value)}
                   className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]"
                 />
+              </div>
+
+              {/* 💡 새로 추가된 라이선스 수신 수단 선택 라디오 버튼 */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-2">라이선스 수신 수단 선택</label>
+                <div className="flex gap-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                  <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer flex-1">
+                    <input
+                      type="radio"
+                      name="receiveMethod"
+                      value="EMAIL"
+                      checked={receiveMethod === "EMAIL"}
+                      onChange={() => setReceiveMethod("EMAIL")}
+                      className="text-[#1e6082] focus:ring-[#1e6082]"
+                    />
+                    📧 이메일로 받기 (무료 재발송 가능)
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer flex-1">
+                    <input
+                      type="radio"
+                      name="receiveMethod"
+                      value="ALARM_TALK"
+                      checked={receiveMethod === "ALARM_TALK"}
+                      onChange={() => setReceiveMethod("ALARM_TALK")}
+                      className="text-[#1e6082] focus:ring-[#1e6082]"
+                    />
+                    💬 카카오톡 알림톡
+                  </label>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-1.5">※ 분실에 따른 라이선스 키 재발송(키 찾기 기능)은 시스템 정책 상 등록하신 이메일로만 발송됩니다.</p>
               </div>
               <div className="flex space-x-3 pt-2">
                 <button type="button" onClick={closeModal} className="w-1/3 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition">
