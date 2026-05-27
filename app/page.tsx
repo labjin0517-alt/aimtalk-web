@@ -481,42 +481,54 @@ export default function Home() {
 
           </main>
 
-          <footer className="bg-gray-900 text-gray-400 text-[11px] sm:text-xs p-6 md:p-10 border-t border-gray-800">
-            <div className="max-w-xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8 md:gap-4">
+          <footer className="bg-gray-900 text-gray-400 text-xs py-10 md:py-14 border-t border-gray-800">
+            {/* 💡 컨테이너 최대 너비를 max-w-xl에서 max-w-6xl로 확장하여 시원하게 배치했습니다. */}
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-start">
               
-              <div className="leading-relaxed flex-1 space-y-1">
-                <p className="text-white text-base font-bold mb-2">랩진 (LabJin)</p>
-                <p>상호명: 랩진 | 대표자명: 대표 이진혁 | 사업자등록번호: 544-33-01720</p>
-                <p>통신판매업신고번호: 제 2026-서울마포-XXXX 호 (발급 후 기입)</p>
-                <p>연락처: 010-8294-8919 | 이메일: labjin0517@gmail.com</p>
+              {/* 1. 회사 / 사업자 정보 영역 */}
+              <div className="leading-relaxed space-y-1.5 md:pr-4">
+                <p className="text-white text-base font-bold mb-3">랩진 (LabJin)</p>
+                <p>상호명: 랩진 <span className="text-gray-600 mx-1">|</span> 대표자명: 이진혁 <span className="text-gray-600 mx-1">|</span> 사업자등록번호: 544-33-01720</p>
+                <p>통신판매업신고번호: 제 2026-경기파주-2327 호</p>
+                <p>연락처: 010-8294-8919 <span className="text-gray-600 mx-1">|</span> 이메일: labjin0517@gmail.com</p>
                 <p>주소: 경기도 파주시 책향기로 403, 704동 9층 901호</p>
-                <p className="text-gray-500 pt-1">고객님은 안전거래를 위해 현금 결제 시 저희 쇼핑몰에서 가입한 NHN KCP의 구매안전(에스크로) 서비스를 이용하실 수 있습니다.</p>
+                <p className="text-gray-500 text-[11px] pt-2 border-t border-gray-800/50 mt-2">
+                  고객님은 안전거래를 위해 현금 결제 시 저희 쇼핑몰에서 가입한 NHN KCP의 구매안전(에스크로) 서비스를 이용하실 수 있습니다.
+                </p>
               </div>
 
-              <div className="flex flex-col items-start md:items-center gap-2 flex-1 border-t border-gray-800 md:border-none pt-6 md:pt-0 w-full md:w-auto">
-                <div className="flex items-center gap-4">
-                  <div className="bg-white p-1.5 rounded-lg shadow-sm">
-                    <img src="/오픈카톡.png" alt="오픈카카오톡 이용문의 QR코드" className="w-16 h-16 sm:w-20 sm:h-20 object-cover" />
-                  </div>
-                  <div>
-                    <p className="text-white font-bold text-sm mb-1">💬 1:1 이용문의</p>
-                    <p className="text-gray-400 text-[11px] sm:text-xs leading-tight">
-                      궁금한 점이 있으신가요?<br />
-                      스마트폰 카메라로 QR코드를 스캔하여<br />
-                      오픈카톡으로 간편하게 문의해주세요.<br />
-                      링크 : https://open.kakao.com/o/suO3WGvi
-                    </p>
-                  </div>
+              {/* 2. 1:1 이용문의 영역 (QR코드 가로 정렬 및 자름 방지) */}
+              <div className="bg-gray-800/30 p-4 rounded-xl border border-gray-800/60 flex items-start gap-4 w-full">
+                <div className="bg-white p-1.5 rounded-lg shadow-sm shrink-0">
+                  <img src="/오픈카톡.png" alt="오픈카카오톡 이용문의 QR코드" className="w-16 h-16 sm:w-20 sm:h-20 object-cover" />
+                </div>
+                <div className="space-y-1 min-w-0">
+                  <p className="text-white font-bold text-sm mb-1 flex items-center gap-1">💬 1:1 이용문의</p>
+                  <p className="text-gray-400 text-[11px] sm:text-xs leading-normal break-keep">
+                    궁금한 점이 있으신가요?<br />
+                    스마트폰 카메라로 QR코드를 스캔하여 오픈카톡으로 간편하게 문의해주세요.
+                  </p>
+                  <a 
+                    href="https://open.kakao.com/o/suO3WGvi" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-blue-400 hover:underline block text-[11px] truncate mt-1"
+                  >
+                    링크 : https://open.kakao.com/o/suO3WGvi
+                  </a>
                 </div>
               </div>
 
-              <div className="flex flex-col md:items-end gap-3 flex-1 border-t border-gray-800 md:border-none pt-6 md:pt-0 w-full md:w-auto">
-                <div className="flex space-x-4">
+              {/* 3. 약관 및 카피라이트 영역 (우측 정렬) */}
+              <div className="flex flex-col md:items-end justify-between h-full gap-4 pt-4 md:pt-0 border-t border-gray-800 md:border-none w-full">
+                <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
                   <button onClick={() => openModal("terms")} className="underline hover:text-white transition">이용약관</button>
-                  <button onClick={() => openModal("privacy")} className="underline hover:text-yellow-500 transition">개인정보처리방침</button>
+                  <button onClick={() => openModal("privacy")} className="underline hover:text-yellow-500 transition font-medium">개인정보처리방침</button>
                   <button onClick={() => openModal("refund")} className="underline hover:text-white transition">환불규정</button>
                 </div>
-                <p>© 2026 Lab.Jin. All rights reserved.</p>
+                <p className="text-gray-500 text-[11px] md:text-right md:mt-auto">
+                  © 2026 Lab.Jin. All rights reserved.
+                </p>
               </div>
 
             </div>
