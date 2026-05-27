@@ -485,10 +485,11 @@ export default function Home() {
             {/* 💡 컨테이너 최대 너비를 max-w-xl에서 max-w-6xl로 확장하여 시원하게 배치했습니다. */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-start">
               
-              {/* 1. 회사 / 사업자 정보 영역 */}
+             {/* 1. 회사 / 사업자 정보 영역 (글자 자름 방지 정렬) */}
               <div className="leading-relaxed space-y-1.5 md:pr-4">
                 <p className="text-white text-base font-bold mb-3">랩진 (LabJin)</p>
-                <p>상호명: 랩진 <span className="text-gray-600 mx-1">|</span> 대표자명: 이진혁 <span className="text-gray-600 mx-1">|</span> 사업자등록번호: 544-33-01720</p>
+                <p>상호명: 랩진 <span className="text-gray-600 mx-1">|</span> 대표자명: 이진혁</p>
+                <p>사업자등록번호: 544-33-01720</p>
                 <p>통신판매업신고번호: 제 2026-경기파주-2327 호</p>
                 <p>연락처: 010-8294-8919 <span className="text-gray-600 mx-1">|</span> 이메일: labjin0517@gmail.com</p>
                 <p>주소: 경기도 파주시 책향기로 403, 704동 9층 901호</p>
