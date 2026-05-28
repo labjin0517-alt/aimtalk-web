@@ -32,7 +32,7 @@ export default function Home() {
   const [customerName, setCustomerName] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
-  const [receiveMethod, setReceiveMethod] = useState<"EMAIL" | "ALARM_TALK">("EMAIL"); // 💡 추가: 수신 수단 상태 (기본값 이메일)
+  const receiveMethod = "EMAIL"; // 📧 상태 변경 함수를 제거하고 'EMAIL' 상수로 완벽히 고정
 
   // 새로고침 시 스타일 깜빡임 및 Hydration Mismatch 현상을 완전히 방지하는 이중 안전장치
   useEffect(() => {
