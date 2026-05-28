@@ -71,7 +71,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ 
         success: true, 
         processMode: "REUSE",
-        message: `[인증 전 환불] 미인증 키이므로 등급을 '${finalTier}'로 변경하고 개인정보 열들을 안전하게 재고 환원 조치했습니다.` 
+        message: `[인증 전 환불] 미인증 키이므로 등급을 '${originalTier}'로 변경하고 개인정보 열들을 안전하게 재고 환원 조치했습니다.` 
       });
 
     } else {

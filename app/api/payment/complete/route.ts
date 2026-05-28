@@ -67,7 +67,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, message: "구글 시트에 발급 가능한 라이선스 데이터가 없습니다." }, { status: 500 });
     }
 
-    // 결제 요금제(Basic/Pro)와 일치하고, 아직 주인이 없는(HWID가 빈칸인) 예비 키 탐색
+    // 결제 요금제(Basic/Pro)와 일치하고, 기존 환불 이력조차 없는 완전히 깨끗한 예비 키 탐색
     let targetRowIndex = -1;
     let licenseKey = "";
 
@@ -76,9 +76,12 @@ export async function POST(req: Request) {
       const sheetKey = row[0]; // LicenseKey
       const sheetHwid = row[1] ? row[1].trim() : ""; // HWID
       const sheetTier = row[2] ? row[2].trim().toLowerCase() : ""; // Tier
+      
+      // 💡 [개선] E열(Name)에 적힌 기존 텍스트가 있는지 검사합니다.
+      const sheetName = row[4] ? row[4].trim() : ""; 
 
-      // 시트의 Tier와 고객이 결제한 플랜명이 일치하고 HWID가 비어있는 칸 매칭
-      if (sheetTier === planName.toLowerCase() && sheetHwid === "") {
+      // 💡 [철통 방어] 요금제가 일치하고, HWID도 비어있고, 'Name(E열)까지 완벽히 비어있는' 진짜 새 제품만 매칭합니다!
+      if (sheetTier === planName.toLowerCase() && sheetHwid === "" && sheetName === "") {
         targetRowIndex = i + 1; // 엑셀 실제 행 번호 계산 보정 (헤더 포함)
         licenseKey = sheetKey;
         break;
@@ -98,7 +101,7 @@ export async function POST(req: Request) {
     const expireDate = new Date(today.getTime() + 31 * 24 * 60 * 60 * 1000);
     const expireDateStr = expireDate.toISOString().split("T")[0]; // YYYY-MM-DD
 
-    // 💡 [구조 변경 완료] 지정한 행의 E(이름), F(전화번호), G(이메일) 열에 찢어서 저장합니다.
+    // 최종 구글 시트 주입 칸은 원래대로 깨끗하게 새 고객 정보를 밀어 넣습니다.
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
       range: `license!B${targetRowIndex}:G${targetRowIndex}`,
