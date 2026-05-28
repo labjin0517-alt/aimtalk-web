@@ -58,16 +58,13 @@ export async function POST(req: Request) {
     // 3. HWID 유무에 따른 스마트 자동화 분기 처리
     if (currentHwid === "") {
       // [분기 A. 키 재사용 공정] 아직 PC 정품 인증을 진행하지 않은 클린 키인 경우
-      // 💡 [안전 장치 보강] 이미 '[환불]' 머리말이 붙어있는 중복 처리를 방어합니다.
-      const finalTier = originalTier.startsWith("[환불]") ? originalTier : `[환불] ${originalTier}`;
-
-      // G열 확장 구조에 맞추어 등급(C)은 식별용 전환, 만료일(D)부터 개인정보(E,F,G)는 완벽 청소
+      // 💡 [개선] 등급(C열)은 원래 등급 그대로 보존하여 재사용이 가능하게 만들고, E열(Name)에 환불 이력을 남깁니다.
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
         range: `license!C${targetRowIndex}:G${targetRowIndex}`,
         valueInputOption: "RAW",
         requestBody: {
-          values: [[finalTier, "", "", "", ""]] // Tier만 유지 후 Expire, Name, Phone, Email은 빈칸 초기화
+          values: [[originalTier, "", "[인증전환불]", "", ""]] // C열(등급) 보존, D열(만료일) 삭제, E열(Name)에 기록, F·G열 삭제
         }
       });
       
