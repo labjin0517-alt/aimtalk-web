@@ -32,7 +32,7 @@ export default function Home() {
   const [customerName, setCustomerName] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
-  const [receiveMethod, setReceiveMethod] = useState<"EMAIL" | "ALARM_TALK">("EMAIL"); // 💡 추가: 수신 수단 상태 (기본값 이메일)
+  const receiveMethod = "EMAIL";
 
   // 새로고침 시 스타일 깜빡임 및 Hydration Mismatch 현상을 완전히 방지하는 이중 안전장치
   useEffect(() => {
@@ -94,8 +94,7 @@ export default function Home() {
       if (!PortOne) return alert("결제 모듈이 로드되지 않았습니다.");
 
       try {
-        // [포트원v2 결제 요청 전송 및 결과 객체 확보]
-        const paymentResponse = await PortOne.requestPayment({
+        await PortOne.requestPayment({
           storeId: PORTONE_STORE_ID,
           channelKey: PORTONE_CHANNEL_KEY,
           paymentId: `pay_${new Date().getTime()}`,
@@ -108,42 +107,13 @@ export default function Home() {
             phoneNumber: phone, 
             email: email 
           },
+          // 💡 중요: Make.com(웹훅)으로 "고객이 이메일을 원치, 카톡을 원치" 전달하는 보관함입니다.
           customData: {
             receiveMethod: receiveMethod 
           }
         });
-
-        // 사용자가 결제창을 닫았거나 결제 도중 취소/실패한 경우
-        if (paymentResponse.code != null) {
-          return alert(`결제에 실패했습니다: ${paymentResponse.message}`);
-        }
-
-        // 💡 [실시간 백엔드 결제 검증 및 구글 시트 등록 / 이메일 자동 발송 시작]
-        const verifyRes = await fetch("/api/payment/complete", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            paymentId: paymentResponse.paymentId,
-            customerName: name,
-            customerEmail: email,
-            customerPhone: phone,
-            receiveMethod: receiveMethod,
-            planName: selectedPlanName,
-            amount: selectedPlanAmount
-          })
-        });
-
-        const verifyResult = await verifyRes.json();
-
-        if (verifyResult.success) {
-          alert(`🎉 결제 및 라이선스 발급 완료!\n\n${email} 메일함으로 정품 인증키가 발송되었습니다.\n\n발급된 라이선스 키: ${verifyResult.licenseKey}`);
-          closeModal();
-        } else {
-          alert(`🚨 결제 후 라이선스 발급 실패: ${verifyResult.message}\n이중 결제가 방지되었으니 화면을 캡처한 뒤 고객센터로 문의바랍니다.`);
-        }
-
       } catch (e: any) {
-        alert("결제 처리 중 예상치 못한 네트워크 오류 발생: " + e.message);
+        alert("결제창 호출 실패: " + e.message);
       }
     }
   };
@@ -679,34 +649,13 @@ export default function Home() {
                 />
               </div>
 
-              {/* 💡 디자인 개선: 라디오 버튼을 세로 배정(flex-col) 및 간격을 넓혀 글자 잘림을 완전히 해결했습니다. */}
+              {/* 라이선스 이메일 수신 안내 문구로 대체 */}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-2">라이선스 수신 수단 선택</label>
-                <div className="flex flex-col gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
-                  <label className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer p-2 hover:bg-white rounded-lg transition">
-                    <input
-                      type="radio"
-                      name="receiveMethod"
-                      value="EMAIL"
-                      checked={receiveMethod === "EMAIL"}
-                      onChange={() => setReceiveMethod("EMAIL")}
-                      className="text-[#1e6082] focus:ring-[#1e6082] h-4 w-4"
-                    />
-                    <span>📧 <strong>이메일</strong>로 받기 <span className="text-xs text-gray-500">(분실 시 무료 재발송 가능)</span></span>
-                  </label>
-                  <label className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer p-2 hover:bg-white rounded-lg transition">
-                    <input
-                      type="radio"
-                      name="receiveMethod"
-                      value="ALARM_TALK"
-                      checked={receiveMethod === "ALARM_TALK"}
-                      onChange={() => setReceiveMethod("ALARM_TALK")}
-                      className="text-[#1e6082] focus:ring-[#1e6082] h-4 w-4"
-                    />
-                    <span>💬 <strong>카카오톡 알림톡</strong>으로 받기</span>
-                  </label>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">라이선스 수신 안내</label>
+                <div className="p-3.5 bg-blue-50 border border-blue-100 rounded-xl text-xs text-[#1e6082] leading-relaxed font-medium">
+                  • 결제가 완료되면 위 입력하신 <strong>이메일 주소</strong>로 라이선스 코드가 즉시 자동 발송됩니다.<br />
+                  • 메일 분실 시 상단의 <strong>[🔑 키 찾기]</strong> 메뉴를 통해 언제든지 무료로 재발송 받으실 수 있습니다.
                 </div>
-                <p className="text-[11px] text-red-500/80 mt-2 font-medium">※ 중요: 분실에 따른 재발송(키 찾기)은 시스템 정책 상 이메일로만 제공됩니다.</p>
               </div>
 
               <div className="flex space-x-3 pt-2">
