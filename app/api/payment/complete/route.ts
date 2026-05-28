@@ -4,16 +4,8 @@ import nodemailer from "nodemailer";
 
 // 대표님 license_manager.py에 정의되어 있던 동일한 구글 DB 구조 매핑
 const GOOGLE_CLIENT_EMAIL = "autotalk-robot@autotalk-491805.iam.gserviceaccount.com";
-// 개인키는 환경변수로 읽어와 줄바꿈(\n)을 완벽히 복원해 보안 유지
 const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY || "";
 const SPREADSHEET_ID = "1LiOLcF6mi03mgpBzIOvTJh9Jnl8A-otVi1GF6rYRnC8"; // 대표님의 구글 시트 고유 ID
-
-function generateLicenseKey(): string {
-  /** 12자리의 고유 정품 인증키 자동 생성기 (Format: XXXX-XXXX-XXXX) */
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  const genPart = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-  return `${genPart()}-${genPart()}-${genPart()}`;
-}
 
 export async function POST(req: Request) {
   try {
@@ -44,13 +36,15 @@ export async function POST(req: Request) {
 
     const paymentData = await paymentRes.json();
 
-    // 3. 결제 위변조 해킹 방지를 위한 단가 철저 비교 검증 (정품 요금제 단가 8,000원 / 16,000원 세팅)
+    // 3. 결제 위변조 해킹 방지를 위한 단가 철저 비교 검증
     if (paymentData.status !== "PAID") {
       return NextResponse.json({ success: false, message: "결제가 완료되지 않은 거래건입니다." }, { status: 400 });
     }
 
-    // 서버 단에서 요금제별 정확한 금액 대조 가드라인 설정
-    const expectedAmount = planName.toLowerCase() === "pro" ? 16000 : 8000;
+    // 💡 [임시 수정] 가상 테스트 결제(100원) 통과를 위한 가이드라인 보정
+    // 추후 실결제(정식 오픈) 전환 시 아래 주석을 해제하고 100 대신 원래 금액(16000 / 8000)을 적어주시면 됩니다.
+    const expectedAmount = 100; 
+    // const expectedAmount = planName.toLowerCase() === "pro" ? 16000 : 8000;
 
     if (paymentData.amount.total !== expectedAmount || amount !== expectedAmount) {
       return NextResponse.json({ success: false, message: "실제 결제 금액과 에임톡 정품 요금제 단가가 일치하지 않습니다." }, { status: 400 });
@@ -106,23 +100,22 @@ export async function POST(req: Request) {
     const expireDate = new Date(today.getTime() + 31 * 24 * 60 * 60 * 1000);
     const expireDateStr = expireDate.toISOString().split("T")[0]; // YYYY-MM-DD
 
-    // 찾아낸 기존 행의 빈칸(B열:HWID부터 E열:Memo까지)에 고객 정보 덮어쓰기 업데이트 진행
+    // 💡 [수정] 데이터 입력 범위를 G열까지 확장하고, 이름(E), 연락처(F), 이메일(G)을 각각 분리하여 저장합니다.
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-      range: `license!B${targetRowIndex}:E${targetRowIndex}`, //
+      range: `license!B${targetRowIndex}:G${targetRowIndex}`,
       valueInputOption: "RAW",
       requestBody: {
-        // HWID는 빈칸 유지, Tier 재확인, 만료일 주입, 신규 추가하신 Memo(E열)에 고객 인적사항 기록
-        values: [["", planName, expireDateStr, `${customerName}(${customerPhone})`]]
+        values: [["", planName, expireDateStr, customerName, customerPhone, customerEmail]]
       }
     });
 
-    // 6. Nodemailer 기반 결제 완료 및 정품키 이메일 전송 (Gmail / Naver 등 SMTP 사용)
+    // 7. Nodemailer 기반 결제 완료 및 정품키 이메일 전송
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: process.env.EMAIL_USER, // 발송용 구글 이메일
-        pass: process.env.EMAIL_PASS  // 구글 앱 비밀번호 16자리
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS  
       }
     });
 
@@ -146,21 +139,18 @@ export async function POST(req: Request) {
             <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 12px; color: #1f2937;">
               <li>에임톡 라이선스는 <strong>PC 1대당 1개의 고유 인증키</strong>만 허용합니다.</li>
               <li>최초로 정품 등록을 마친 해당 컴퓨터 본체 이외의 다른 PC에서는 사용이 불가합니다.</li>
-              <li>만료기한: <strong>${expireDateStr}</strong> (이후 자동 만료되며, 100% 미사용 시에만 청약 철회가 지원됩니다.)</li>
+              <li>만료기한: <strong>${expireDateStr}</strong></li>
             </ul>
           </div>
 
           <p style="font-size: 14px; margin-bottom: 30px;">프로그램을 실행한 뒤 우측 하단 <strong>[정품 인증]</strong> 란에 위 발급받으신 인증키를 입력하시면 모든 제한이 즉시 해제됩니다.</p>
-          
-          <a href="https://aimtalk.cloud/" style="display: block; width: 100%; text-align: center; background-color: #1e6082; color: #ffffff; text-decoration: none; padding: 15px 0; border-radius: 10px; font-weight: bold;">에임톡 다운로드 페이지 바로가기</a>
-          
+          <a href="https://aimtalk.cloud/#download" style="display: block; width: 100%; text-align: center; background-color: #1e6082; color: #ffffff; text-decoration: none; padding: 15px 0; border-radius: 10px; font-weight: bold;">에임톡 다운로드 페이지 바로가기</a>
           <p style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px;">© 2026 Lab.Jin. All rights reserved. 본 메일은 발신전용 메일입니다.</p>
         </div>
       `
     };
 
     await transporter.sendMail(mailOptions);
-
     return NextResponse.json({ success: true, licenseKey });
 
   } catch (error: any) {

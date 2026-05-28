@@ -18,7 +18,7 @@ export default function Home() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
-  // 🔑 비회원 라이선스 키 찾기 관련 상태
+  // 🔑 비회원 라이선스 코드 찾기 관련 상태
   const [findName, setFindName] = useState<string>("");     // 💡 추가
   const [findEmail, setFindEmail] = useState<string>("");
   const [findPhone, setFindPhone] = useState<string>("");   // 💡 추가
@@ -99,7 +99,7 @@ export default function Home() {
           storeId: PORTONE_STORE_ID,
           channelKey: PORTONE_CHANNEL_KEY,
           paymentId: `pay_${new Date().getTime()}`,
-          orderName: `AimTalk ${selectedPlanName} 1개월 이용권`,
+          orderName: `AimTalk ${selectedPlanName} 30일 이용권`,
           totalAmount: selectedPlanAmount,
           currency: "CURRENCY_KRW",
           payMethod: "CARD",
@@ -136,10 +136,10 @@ export default function Home() {
         const verifyResult = await verifyRes.json();
 
         if (verifyResult.success) {
-          alert(`🎉 결제 및 라이선스 발급 완료!\n\n${email} 메일함으로 정품 인증키가 발송되었습니다.\n\n발급된 라이선스 키: ${verifyResult.licenseKey}`);
+          alert(`🎉 결제 완료!\n\n${email} 작성하신 메일주소로 라이선스 코드가 발송되었습니다.`);
           closeModal();
         } else {
-          alert(`🚨 결제 후 라이선스 발급 실패: ${verifyResult.message}\n이중 결제가 방지되었으니 화면을 캡처한 뒤 고객센터로 문의바랍니다.`);
+          alert(`🚨 결제 실패: ${verifyResult.message}\n이중 결제가 방지되었으니 화면을 캡처한 뒤 고객센터로 문의바랍니다.`);
         }
 
       } catch (e: any) {
@@ -166,7 +166,7 @@ export default function Home() {
     try {
       // 💡 추후 여기에 구글 시트(Make.com)에서 이름/이메일/폰번호가 모두 일치하는지 찾는 API가 연동됩니다.
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert(`입력하신 정보가 일치하여, 등록된 이메일(${email})로 라이선스 키 정보를 재발송했습니다. 메일함을 확인해주세요!`);
+      alert(`입력하신 정보가 일치하여, 등록된 이메일(${email})로 라이선스 코드를 재발송했습니다. 메일함을 확인해주세요!`);
       
       // 폼 초기화 및 닫기
       setFindName("");
@@ -174,7 +174,7 @@ export default function Home() {
       setFindPhone("");
       closeModal();
     } catch (error) {
-      alert("라이선스 키를 조회하는 중 오류가 발생했습니다. 고객센터로 문의해주세요.");
+      alert("라이선스 코드를 조회하는 중 오류가 발생했습니다. 고객센터로 문의해주세요.");
     } finally {
       setIsFinding(false);
     }
@@ -452,7 +452,7 @@ export default function Home() {
                       <h3 className="text-xl font-bold text-[#1e6082]">라이선스 인증 및 양식 다운로드</h3>
                     </div>
                     <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-2">
-                      <p>• 프로그램 우측 하단 <strong>[프로그램 정보 및 인증]</strong> 란에 구매하신 라이선스 키를 입력하고 인증해 주세요.</p>
+                      <p>• 프로그램 우측 하단 <strong>[프로그램 정보 및 인증]</strong> 란에 구매하신 라이선스 코드를 입력하고 인증해 주세요.</p>
                       <p>• 좌측 상단의 <strong>[📋 양식]</strong> 버튼을 눌러 에임톡 전용 엑셀 업로드 양식을 다운로드합니다.</p>
                     </div>
                   </div>
@@ -570,7 +570,7 @@ export default function Home() {
       {activeModal === "find-license" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-100">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">🔑 라이선스 키 찾기</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">🔑 라이선스 코드 찾기</h3>
             
             {/* 🚨 강력한 중복 사용 금지 경고문 박스 추가 */}
             <div className="bg-red-50 border border-red-200 rounded-xl p-3.5 mb-5 text-xs text-red-600 leading-relaxed font-medium">
@@ -684,9 +684,9 @@ export default function Home() {
                 <label className="block text-xs font-semibold text-gray-600 mb-1">라이선스 발송 방식</label>
                 <div className="p-3.5 bg-blue-50/60 border border-blue-200/60 rounded-xl flex items-center gap-2.5 text-sm text-blue-900 font-medium">
                   <span>📧</span>
-                  <span>기입하신 이메일 주소로 정품 인증키가 <strong>즉시 안전하게 자동 전송</strong>됩니다.</span>
+                  <span>기입하신 이메일 주소로 라이선스 코드가 <strong>즉시 안전하게 자동 전송</strong>됩니다.</span>
                 </div>
-                <p className="text-[11px] text-gray-400 mt-1.5">※ 카카오톡 분실 정책 변동으로 인해 라이선스 키 관리는 전액 이메일 전송 체계로 통합 운영됩니다.</p>
+                <p className="text-[11px] text-gray-400 mt-1.5">※ 카카오톡 분실 정책 변동으로 인해 라이선스 코드 관리는 전액 이메일 전송 체계로 통합 운영됩니다.</p>
               </div>
 
               <div className="flex space-x-3 pt-2">
@@ -898,9 +898,9 @@ function RefundFormInsideModalComponent({ closeModal }: { closeModal: () => void
   const handleRefundSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const key = licenseKey.trim().toUpperCase();
-    if (!key) return alert("환불 반납할 라이선스 키를 정확히 입력해 주세요.");
+    if (!key) return alert("환불할 라이선스 코드를 정확히 입력해 주세요.");
 
-    if (!confirm("⚠️ 정말로 환불을 신청하시겠습니까?\n온라인 접수 즉시 해당 인증키는 원격 폐기 또는 재고 회수 처리되어 프로그램 사용이 전면 차단됩니다.")) {
+    if (!confirm("⚠️ 정말로 환불을 신청하시겠습니까?\n온라인 접수 즉시 해당 라이선스 코드는 원격 폐기되어 프로그램 사용이 전면 차단됩니다.")) {
       return;
     }
 
@@ -921,7 +921,7 @@ function RefundFormInsideModalComponent({ closeModal }: { closeModal: () => void
         alert(`✅ 온라인 환불 접수가 정상 완료되었습니다.\n\n최종 결제 취소까지 평일 기준 3~5일이 소요됩니다.\n\n시스템 조치 결과: ${result.message}`);
         closeModal();
       } else {
-        alert(`🚨 환불 실패: ${result.message}\n라이선스 키 정보를 다시 확인하시거나 고객센터로 문의 바랍니다.`);
+        alert(`🚨 환불 실패: ${result.message}\n라이선스 코드 정보를 다시 확인하시거나 고객센터로 문의 바랍니다.`);
       }
     } catch (err: any) {
       alert("네트워크 통신 오류 발생: " + err.message);
@@ -946,7 +946,7 @@ function RefundFormInsideModalComponent({ closeModal }: { closeModal: () => void
           <h5 className="text-base font-bold text-gray-900 flex items-center gap-1">💸 온라인 환불 신청서 작성</h5>
           <form onSubmit={handleRefundSubmit} className="space-y-3.5">
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">반납할 라이선스 키 (12자리)</label>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">반납할 라이선스 코드 (12자리)</label>
               <input 
                 type="text" 
                 required 

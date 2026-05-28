@@ -58,34 +58,30 @@ export async function POST(req: Request) {
     // 3. [핵심 알고리즘] HWID 유무에 따른 스마트 자동화 분기 처리
     if (currentHwid === "") {
       // [분기 A. 키 재사용 공정] 아직 PC 정품 인증을 진행하지 않은 클린 키인 경우
-      // 💡 [보완] 다음 결제 시 중복 분배 오류를 방지하기 위해, 등급(C열)부터 메모(E열)까지 완전히 빈칸으로 통초기화합니다.
+      const refundTier = `[환불] ${rows[targetRowIndex-1][2] || "basic"}`; 
+
+      // 💡 [수정] 범위와 빈칸 배열을 G열까지 늘려서 환불 시 개인정보(이름, 전번, 메일)를 전부 깨끗하게 지웁니다.
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
-        range: `license!C${targetRowIndex}:E${targetRowIndex}`,
+        range: `license!C${targetRowIndex}:G${targetRowIndex}`,
         valueInputOption: "RAW",
         requestBody: {
-          values: [["", "", ""]] // C열(Tier), D열(Expire), E열(Memo)을 모두 빈칸으로 싹 지웁니다.
+          values: [[refundTier, "", "", "", ""]] 
         }
-      });
-      
-      return NextResponse.json({ 
-        success: true, 
-        processMode: "REUSE",
-        message: `[인증 전 환불] 라이선스(${matchedKey})가 미인증 상태이므로 만료일 및 구매 이력을 초기화하여 재사용 재고로 정상 환원했습니다.` 
       });
 
     } else {
       // [분기 B. 키 영구 폐기 공정] 이미 특정 컴퓨터에 등록되어 조작 중인 라이선스인 경우
-      // 만료 기한(D열)을 과거 시간인 '2000-01-01'로 강제 수정하여 원격 잠금 가동
       const blockDateStr = "2000-01-01";
       const blockMemo = `[환불차단사유: ${refundReason || "단순변심"}]`;
 
+      // 💡 [수정] 이미 인증된 키는 차단 사유(E열)만 기록하고, 기존 정보(F, G열)는 보존하기 위해 범위를 유지합니다.
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
         range: `license!D${targetRowIndex}:E${targetRowIndex}`,
         valueInputOption: "RAW",
         requestBody: {
-          values: [[blockDateStr, blockMemo]] // 과거 날짜 주입 및 메모에 차단 표기 기록
+          values: [[blockDateStr, blockMemo]] 
         }
       });
 
