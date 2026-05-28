@@ -12,13 +12,12 @@ export async function POST(req: Request) {
     // 포트원 결제 고유 취소 키(paymentId) 또는 차단 타겟 라이선스 키 수신
     const { paymentId, targetLicenseKey, refundReason } = body;
 
-    // 1. 구글 서비스 계정 인증 및 AimTalk_License_DB 로드
-    const auth = new google.auth.JWT(
-      GOOGLE_CLIENT_EMAIL,
-      undefined,
-      GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-      ["https://www.googleapis.com/auth/spreadsheets"]
-    );
+    // 1. 구글 서비스 계정 인증 및 AimTalk_License_DB 로드 (최신 객체 구조로 변경)
+    const auth = new google.auth.JWT({
+      email: GOOGLE_CLIENT_EMAIL,
+      key: GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
     const sheets = google.sheets({ version: "v4", auth });
 
     // 2. 현재 시트에 등록된 정품키 리스트 전건 스캔

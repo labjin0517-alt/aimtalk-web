@@ -32,7 +32,7 @@ export default function Home() {
   const [customerName, setCustomerName] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
-  const receiveMethod = "EMAIL";
+  const receiveMethod = "EMAIL"; // 📧 상태 변경 함수를 제거하고 'EMAIL' 상수로 고정
 
   // 새로고침 시 스타일 깜빡임 및 Hydration Mismatch 현상을 완전히 방지하는 이중 안전장치
   useEffect(() => {
@@ -94,7 +94,8 @@ export default function Home() {
       if (!PortOne) return alert("결제 모듈이 로드되지 않았습니다.");
 
       try {
-        await PortOne.requestPayment({
+        // [포트원v2 결제 요청 전송 및 결과 객체 확보]
+        const paymentResponse = await PortOne.requestPayment({
           storeId: PORTONE_STORE_ID,
           channelKey: PORTONE_CHANNEL_KEY,
           paymentId: `pay_${new Date().getTime()}`,
@@ -107,13 +108,42 @@ export default function Home() {
             phoneNumber: phone, 
             email: email 
           },
-          // 💡 중요: Make.com(웹훅)으로 "고객이 이메일을 원치, 카톡을 원치" 전달하는 보관함입니다.
           customData: {
             receiveMethod: receiveMethod 
           }
         });
+
+        // 사용자가 결제창을 닫았거나 결제 도중 취소/실패한 경우
+        if (paymentResponse.code != null) {
+          return alert(`결제에 실패했습니다: ${paymentResponse.message}`);
+        }
+
+        // 💡 [실시간 백엔드 결제 검증 및 구글 시트 등록 / 이메일 자동 발송 시작]
+        const verifyRes = await fetch("/api/payment/complete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            paymentId: paymentResponse.paymentId,
+            customerName: name,
+            customerEmail: email,
+            customerPhone: phone,
+            receiveMethod: receiveMethod,
+            planName: selectedPlanName,
+            amount: selectedPlanAmount
+          })
+        });
+
+        const verifyResult = await verifyRes.json();
+
+        if (verifyResult.success) {
+          alert(`🎉 결제 및 라이선스 발급 완료!\n\n${email} 메일함으로 정품 인증키가 발송되었습니다.\n\n발급된 라이선스 키: ${verifyResult.licenseKey}`);
+          closeModal();
+        } else {
+          alert(`🚨 결제 후 라이선스 발급 실패: ${verifyResult.message}\n이중 결제가 방지되었으니 화면을 캡처한 뒤 고객센터로 문의바랍니다.`);
+        }
+
       } catch (e: any) {
-        alert("결제창 호출 실패: " + e.message);
+        alert("결제 처리 중 예상치 못한 네트워크 오류 발생: " + e.message);
       }
     }
   };
@@ -649,13 +679,14 @@ export default function Home() {
                 />
               </div>
 
-              {/* 라이선스 이메일 수신 안내 문구로 대체 */}
+              {/* 📧 수신 수단 고정 및 안내 안내 문구 맵 변화 */}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">라이선스 수신 안내</label>
-                <div className="p-3.5 bg-blue-50 border border-blue-100 rounded-xl text-xs text-[#1e6082] leading-relaxed font-medium">
-                  • 결제가 완료되면 위 입력하신 <strong>이메일 주소</strong>로 라이선스 코드가 즉시 자동 발송됩니다.<br />
-                  • 메일 분실 시 상단의 <strong>[🔑 키 찾기]</strong> 메뉴를 통해 언제든지 무료로 재발송 받으실 수 있습니다.
+                <label className="block text-xs font-semibold text-gray-600 mb-1">라이선스 발송 방식</label>
+                <div className="p-3.5 bg-blue-50/60 border border-blue-200/60 rounded-xl flex items-center gap-2.5 text-sm text-blue-900 font-medium">
+                  <span>📧</span>
+                  <span>기입하신 이메일 주소로 정품 인증키가 <strong>즉시 안전하게 자동 전송</strong>됩니다.</span>
                 </div>
+                <p className="text-[11px] text-gray-400 mt-1.5">※ 카카오톡 분실 정책 변동으로 인해 라이선스 키 관리는 전액 이메일 전송 체계로 통합 운영됩니다.</p>
               </div>
 
               <div className="flex space-x-3 pt-2">
@@ -845,12 +876,112 @@ export default function Home() {
                 <p>환불을 원하시는 이용자는 결제 내역(주문번호, 연락처)과 환불 사유를 작성하여 고객센터 이메일(labjin0517@gmail.com)로 접수하셔야 합니다. 환불 승인 시 PG사(결제대행사)의 정책에 따라 영업일 기준 3~7일 내에 승인 취소 처리가 완료됩니다.</p>
               </section>
             </div>
-            <div className="mt-8 pt-4 border-t border-gray-200">
-              <button onClick={closeModal} className="w-full py-3.5 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 hover:text-red-700 transition shadow-sm border border-red-100">규정 동의 및 닫기</button>
-            </div>
+
+            {/* 🔥 [은닉형 환불 컴포넌트 장착 구역] */}
+            <RefundFormInsideModalComponent closeModal={closeModal} />
           </div>
         </div>
       )}
     </>
+  );
+}
+
+// =================================================================
+// 💸 [하단 결합형] 환불 규정 동의 후 노출되는 백엔드 연동 환불 접수 모듈
+// =================================================================
+function RefundFormInsideModalComponent({ closeModal }: { closeModal: () => void }) {
+  const [showForm, setShowForm] = React.useState(false);
+  const [licenseKey, setLicenseKey] = React.useState("");
+  const [reason, setReason] = React.useState("단순변심");
+  const [isProcessing, setIsProcessing] = React.useState(false);
+
+  const handleRefundSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const key = licenseKey.trim().toUpperCase();
+    if (!key) return alert("환불 반납할 라이선스 키를 정확히 입력해 주세요.");
+
+    if (!confirm("⚠️ 정말로 환불을 신청하시겠습니까?\n온라인 접수 즉시 해당 인증키는 원격 폐기 또는 재고 회수 처리되어 프로그램 사용이 전면 차단됩니다.")) {
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const res = await fetch("/api/payment/refund", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetLicenseKey: key,
+          refundReason: reason
+        })
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        alert(`✅ 온라인 환불 접수가 정상 완료되었습니다.\n\n최종 결제 취소까지 평일 기준 3~5일이 소요됩니다.\n\n시스템 조치 결과: ${result.message}`);
+        closeModal();
+      } else {
+        alert(`🚨 환불 실패: ${result.message}\n라이선스 키 정보를 다시 확인하시거나 고객센터로 문의 바랍니다.`);
+      }
+    } catch (err: any) {
+      alert("네트워크 통신 오류 발생: " + err.message);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <div className="mt-8 pt-6 border-t border-gray-200">
+      {!showForm ? (
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button onClick={closeModal} className="w-full sm:w-1/2 py-3.5 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition shadow-sm">
+            규정 확인 및 닫기
+          </button>
+          <button onClick={() => setShowForm(true)} className="w-full sm:w-1/2 py-3.5 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition shadow-sm border border-red-100">
+            위 규정에 동의하며 환불 신청하기
+          </button>
+        </div>
+      ) : (
+        <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 space-y-4">
+          <h5 className="text-base font-bold text-gray-900 flex items-center gap-1">💸 온라인 환불 신청서 작성</h5>
+          <form onSubmit={handleRefundSubmit} className="space-y-3.5">
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">반납할 라이선스 키 (12자리)</label>
+              <input 
+                type="text" 
+                required 
+                value={licenseKey}
+                onChange={(e) => setLicenseKey(e.target.value)}
+                placeholder="XXXX-XXXX-XXXX" 
+                className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm font-mono text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-[#1e6082] bg-white" 
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">취소 사유 선택</label>
+              <select 
+                value={reason} 
+                onChange={(e) => setReason(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1e6082]"
+              >
+                <option value="단순변심">단순 변심 / 서비스 불필요</option>
+                <option value="기능불만족">소프트웨어 기능 불만족</option>
+                <option value="PC사양미지원">내 컴퓨터 환경 미지원</option>
+                <option value="기타">기타 사유</option>
+              </select>
+            </div>
+
+            <div className="flex space-x-3 pt-2">
+              <button type="button" onClick={() => setShowForm(false)} className="w-1/3 py-2.5 bg-gray-200 text-gray-600 font-bold rounded-xl text-xs transition">
+                이전으로
+              </button>
+              <button type="submit" disabled={isProcessing} className="w-2/3 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition disabled:bg-gray-400">
+                {isProcessing ? "서버 정산 중..." : "최종 환불 접수"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </div>
   );
 }

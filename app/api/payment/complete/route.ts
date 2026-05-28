@@ -57,12 +57,11 @@ export async function POST(req: Request) {
     }
 
     // 4. 구글 서비스 계정 인증 및 AimTalk_License_DB 연동
-    const auth = new google.auth.JWT(
-      GOOGLE_CLIENT_EMAIL,
-      undefined,
-      GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-      ["https://www.googleapis.com/auth/spreadsheets"]
-    );
+    const auth = new google.auth.JWT({
+      email: GOOGLE_CLIENT_EMAIL,
+      key: GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
     const sheets = google.sheets({ version: "v4", auth });
 
     // 5. 구글 시트에서 미리 생성해두신 라이선스 목록 가져오기
