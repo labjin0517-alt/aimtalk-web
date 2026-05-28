@@ -52,13 +52,12 @@ export async function POST(req: Request) {
     }
 
     if (targetRowIndex === -1) {
-      return NextResponse.json({ success: false, message: "취소 요청 건에 매칭되는 라이선스 키를 시트에서 찾을 수 없습니다." }, { status: 404 });
+      return NextResponse.json({ success: false, message: "취소 요청 건에 매칭되는 라이선스 코드를 시트에서 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // 3. HWID 유무에 따른 스마트 자동화 분기 처리
+    // 3. [핵심 알고리즘] HWID 유무에 따른 철저한 온라인 환불 제한 가드라인 가동
     if (currentHwid === "") {
-      // [분기 A. 키 재사용 공정] 아직 PC 정품 인증을 진행하지 않은 클린 키인 경우
-      // 💡 [개선] 등급(C열)은 원래 등급 그대로 보존하여 재사용이 가능하게 만들고, E열(Name)에 환불 이력을 남깁니다.
+      // [분기 A] 아직 PC 정품 인증을 진행하지 않은 클린 키인 경우에만 환불 허용!
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
         range: `license!C${targetRowIndex}:G${targetRowIndex}`,
@@ -71,29 +70,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ 
         success: true, 
         processMode: "REUSE",
-        message: `[인증 전 환불] 미인증 키이므로 등급을 '${originalTier}'로 변경하고 개인정보 열들을 안전하게 재고 환원 조치했습니다.` 
+        message: `[인증 전 환불] 미인증 라이선스 코드이므로 환불 조치했습니다.` 
       });
 
     } else {
-      // [분기 B. 키 영구 폐기 공정] 이미 특정 컴퓨터에 등록되어 조작 중인 라이선스인 경우
-      const blockDateStr = "2000-01-01";
-      const blockMemo = `[환불차단사유: ${refundReason || "단순변심"}]`;
-
-      // 이미 기기에 등록된 건은 만료 기한(D)과 사유 표기(E) 영역에 기록 가동
-      await sheets.spreadsheets.values.update({
-        spreadsheetId: SPREADSHEET_ID,
-        range: `license!D${targetRowIndex}:E${targetRowIndex}`,
-        valueInputOption: "RAW",
-        requestBody: {
-          values: [[blockDateStr, blockMemo]]
-        }
-      });
-
+      // 💡 [철통 방어] HWID가 채워져 있는 경우 (이미 PC에 정품 인증을 완료한 경우) 환불을 원천 차단합니다!
       return NextResponse.json({ 
-        success: true, 
-        processMode: "BLOCK",
-        message: `[인증 후 환불] 사용 중인 라이선스의 만료일을 ${blockDateStr}로 강제 변경하여 원격 차단 시스템을 가동했습니다.` 
-      });
+        success: false, 
+        message: "🚨 이미 PC 기기 등록(인증 완료)이 완료되어 사용 중인 라이선스는 온라인 자동 환불이 불가능합니다. 환불 관련 사항은 에임톡 오픈카톡으로 직접 문의해 주시기 바랍니다." 
+      }, { status: 400 }); // 승인 거절 상태코드(400) 전달
     }
 
   } catch (error: any) {
