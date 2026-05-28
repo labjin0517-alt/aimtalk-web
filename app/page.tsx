@@ -8,7 +8,7 @@ import Script from "next/script";
 // 포트원 관리자 콘솔 -> [결제 연동] -> [식별코드/API Keys] -> '가맹점 식별코드' (store-로 시작함)
 // =================================================================
 const PORTONE_STORE_ID = "store-10a2f63e-992c-494a-b25e-1846bf3a86ae"; 
-const PORTONE_CHANNEL_KEY = "channel-key-ec8110db-8e02-4384-ac23-41df0920c1a3";
+const PORTONE_CHANNEL_KEY = "channel-key-042e0286-21e3-43d0-9204-b714e50e3719";
 
 export default function Home() {
   // 💡 [새로고침 깨짐 방지] Tailwind CSS 및 브라우저 환경이 완벽히 준비되었는지 검증하는 상태
