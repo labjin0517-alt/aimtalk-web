@@ -4,7 +4,7 @@ import { google } from "googleapis";
 // 대표님 라이선스 DB 및 구글 클라우드 로봇 계정 연동 정보
 const GOOGLE_CLIENT_EMAIL = "autotalk-robot@autotalk-491805.iam.gserviceaccount.com";
 const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY || "";
-const SPREADSHEET_ID = "1g6R1A9q_D8I8Y9gY9y99Y9Y99y9Y9Y9Y9y9yYyY_9Y";
+const SPREADSHEET_ID = "1LiOLcF6mi03mgpBzIOvTJh9Jnl8A-otVi1GF6rYRnC8";
 
 export async function POST(req: Request) {
   try {
@@ -58,13 +58,13 @@ export async function POST(req: Request) {
     // 3. [핵심 알고리즘] HWID 유무에 따른 스마트 자동화 분기 처리
     if (currentHwid === "") {
       // [분기 A. 키 재사용 공정] 아직 PC 정품 인증을 진행하지 않은 클린 키인 경우
-      // 만료일(D열)과 비고 메모(E열)를 완벽히 빈칸으로 초기화하여 다음 결제자가 재활용할 수 있게 재고로 환원
+      // 💡 [보완] 다음 결제 시 중복 분배 오류를 방지하기 위해, 등급(C열)부터 메모(E열)까지 완전히 빈칸으로 통초기화합니다.
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
-        range: `license!D${targetRowIndex}:E${targetRowIndex}`,
+        range: `license!C${targetRowIndex}:E${targetRowIndex}`,
         valueInputOption: "RAW",
         requestBody: {
-          values: [["", ""]] // 시트의 만료일과 구매 내역 메모를 빈칸으로 삭제 조치
+          values: [["", "", ""]] // C열(Tier), D열(Expire), E열(Memo)을 모두 빈칸으로 싹 지웁니다.
         }
       });
       

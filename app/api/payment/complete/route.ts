@@ -6,7 +6,7 @@ import nodemailer from "nodemailer";
 const GOOGLE_CLIENT_EMAIL = "autotalk-robot@autotalk-491805.iam.gserviceaccount.com";
 // 개인키는 환경변수로 읽어와 줄바꿈(\n)을 완벽히 복원해 보안 유지
 const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY || "";
-const SPREADSHEET_ID = "1g6R1A9q_D8I8Y9gY9y99Y9Y99y9Y9Y9Y9y9yYyY_9Y"; // 대표님의 구글 시트 고유 ID
+const SPREADSHEET_ID = "1LiOLcF6mi03mgpBzIOvTJh9Jnl8A-otVi1GF6rYRnC8"; // 대표님의 구글 시트 고유 ID
 
 function generateLicenseKey(): string {
   /** 12자리의 고유 정품 인증키 자동 생성기 (Format: XXXX-XXXX-XXXX) */
