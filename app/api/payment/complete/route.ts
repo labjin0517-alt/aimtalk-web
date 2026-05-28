@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { google } from "googleapis";
 import nodemailer from "nodemailer";
 
-// 대표님 license_manager.py에 정의되어 있던 동일한 구글 DB 구조 매핑
+// 대표님 라이선스 DB 및 구글 클라우드 로봇 계정 연동 정보
 const GOOGLE_CLIENT_EMAIL = "autotalk-robot@autotalk-491805.iam.gserviceaccount.com";
 const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY || "";
 const SPREADSHEET_ID = "1LiOLcF6mi03mgpBzIOvTJh9Jnl8A-otVi1GF6rYRnC8"; // 대표님의 구글 시트 고유 ID
@@ -41,10 +41,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, message: "결제가 완료되지 않은 거래건입니다." }, { status: 400 });
     }
 
-    // 💡 [임시 수정] 가상 테스트 결제(100원) 통과를 위한 가이드라인 보정
-    // 추후 실결제(정식 오픈) 전환 시 아래 주석을 해제하고 100 대신 원래 금액(16000 / 8000)을 적어주시면 됩니다.
-    const expectedAmount = 100; 
-    // const expectedAmount = planName.toLowerCase() === "pro" ? 16000 : 8000;
+    // 💡 [금액 검증 원복] 대표님 요청에 따라 가상/실결제 단가를 원래 정품 요금제 기준으로 매칭합니다.
+    const expectedAmount = planName.toLowerCase() === "pro" ? 16000 : 8000;
 
     if (paymentData.amount.total !== expectedAmount || amount !== expectedAmount) {
       return NextResponse.json({ success: false, message: "실제 결제 금액과 에임톡 정품 요금제 단가가 일치하지 않습니다." }, { status: 400 });
@@ -61,7 +59,7 @@ export async function POST(req: Request) {
     // 5. 구글 시트에서 미리 생성해두신 라이선스 목록 가져오기
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: "license!A:E", // A:LicenseKey, B:HWID, C:Tier, D:Expire, E:Memo 순서
+      range: "license!A:G", // 늘어난 G열까지 전건 스캔
     });
 
     const rows = response.data.values;
@@ -100,7 +98,7 @@ export async function POST(req: Request) {
     const expireDate = new Date(today.getTime() + 31 * 24 * 60 * 60 * 1000);
     const expireDateStr = expireDate.toISOString().split("T")[0]; // YYYY-MM-DD
 
-    // 💡 [수정] 데이터 입력 범위를 G열까지 확장하고, 이름(E), 연락처(F), 이메일(G)을 각각 분리하여 저장합니다.
+    // 💡 [구조 변경 완료] 지정한 행의 E(이름), F(전화번호), G(이메일) 열에 찢어서 저장합니다.
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
       range: `license!B${targetRowIndex}:G${targetRowIndex}`,
@@ -124,7 +122,7 @@ export async function POST(req: Request) {
       to: customerEmail,
       subject: `🎉 [AimTalk] 구매하신 ${planName} 에디션 라이선스 키가 성공적으로 발급되었습니다.`,
       html: `
-        <div style="font-family: '맑은 고딕', sans-serif; max-w-lg: 600px; border: 1px solid #e2e8f0; border-radius: 16px; padding: 30px; color: #1e293b; line-height: 1.6;">
+        <div style="font-family: '맑은 고딕', sans-serif; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 16px; padding: 30px; color: #1e293b; line-height: 1.6;">
           <h2 style="color: #1e6082; font-size: 22px; font-weight: bold; margin-bottom: 20px;">AimTalk를 이용해 주셔서 감사합니다!</h2>
           <p>안녕하세요, <strong>${customerName} 대표님</strong>.</p>
           <p>카카오톡 고속 발송의 자동화 솔루션 <strong>AimTalk ${planName} 에디션 1개월 이용권</strong>이 결제 완료되어 라이선스 키가 정상 발급되었습니다.</p>
