@@ -275,10 +275,30 @@ export default function Home() {
                     <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
                       <div className="bg-orange-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                         <span className="text-2xl md:text-3xl">💬</span>
-                    </div>
+                      </div>
                       <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">그룹별 멀티 타겟 메시징</h4>
                       <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">엑셀 파일 내 그룹 분류 정보를 연동하여 최대 5개 그룹마다 완벽히 분리된 개별 맞춤형 본문과 첨부파일을 동시 전송합니다.</p>
                       <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">최대 5개 그룹 개별 타겟팅</span>
+                    </div>
+
+                    {/* ✨ 새로 제작한 인사말 설정 카드 */}
+                    <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
+                      <div className="bg-amber-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
+                        <span className="text-2xl md:text-3xl">✨</span>
+                      </div>
+                      <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">수신자 맞춤형 인사말 치환</h4>
+                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">고객 성함의 글자 수(N글자)를 자동 계산하여 말머리나 말꼬리에 "안녕하세요 홍길동님"과 같은 정교한 1:1 맞춤형 문구를 일괄 삽입합니다.</p>
+                      <span className="text-xs font-bold text-amber-500 bg-amber-50 px-2 py-1 rounded">성함 매핑 및 다이나믹 본문 결합</span>
+                    </div>
+
+                    {/* ✨ 새로 제작한 중간보고 스위치 카드 */}
+                    <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
+                      <div className="bg-teal-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
+                        <span className="text-2xl md:text-3xl text-teal-600">📢</span>
+                      </div>
+                      <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">실시간 중간 브리핑 보고</h4>
+                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">유저가 지정한 실시간 인원 도달 주기마다, 현재 발송 진행률과 성공/실패 수치를 운영자 개인 카카오톡 채팅방으로 즉시 자동 브리핑합니다.</p>
+                      <span className="text-xs font-bold text-teal-500 bg-teal-50 px-2 py-1 rounded">나에게 보내기 기반 현황 알림</span>
                     </div>
                   </div>
                 </div>
@@ -421,8 +441,9 @@ export default function Home() {
                 </div>
 
                 <div className="mb-12 md:mb-16 flex justify-center">
+                  {/* 💡 슬래시(/)를 앞에 붙이고 폴더 내 파일명과 완벽히 일치시켜 사진 안 나오던 현상을 100% 해결했습니다. */}
                   <img 
-                    src="에임톡.png" 
+                    src="/에임톡.png" 
                     alt="에임톡 프로그램 메인 화면" 
                     className="w-full max-w-4xl rounded-xl shadow-lg border border-gray-200"
                   />
