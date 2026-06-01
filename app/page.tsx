@@ -422,7 +422,7 @@ export default function Home() {
 
                 <div className="mb-12 md:mb-16 flex justify-center">
                   <img 
-                    src="/에임톡.png" 
+                    src="에임톡.png" 
                     alt="에임톡 프로그램 메인 화면" 
                     className="w-full max-w-4xl rounded-xl shadow-lg border border-gray-200"
                   />
