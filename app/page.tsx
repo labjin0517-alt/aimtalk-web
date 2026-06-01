@@ -383,7 +383,7 @@ export default function Home() {
                   <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-200 text-center hover:shadow-lg transition flex flex-col justify-between">
                     <div>
                       <h3 className="text-xl font-bold mb-4">Basic</h3>
-                      <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">8,000원 <span className="text-sm font-normal text-gray-400">/ 월</span></div>
+                      <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">8,000원 <span className="text-sm font-normal text-gray-400">/ 30일</span></div>
                       <button onClick={() => initiatePayment("Basic", 8000)} className="w-full py-4 rounded-xl border border-[#1e6082] text-[#1e6082] font-bold hover:bg-blue-50 transition mb-8">베이직 결제하기</button>
                     </div>
                     <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
@@ -397,7 +397,7 @@ export default function Home() {
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md">추천</div>
                     <div>
                       <h3 className="text-xl font-bold mb-4 text-[#1e6082]">Pro</h3>
-                      <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">16,000원 <span className="text-sm font-normal text-gray-400">/ 월</span></div>
+                      <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">16,000원 <span className="text-sm font-normal text-gray-400">/ 30일</span></div>
                       <button onClick={() => initiatePayment("Pro", 16000)} className="w-full py-4 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg transition mb-8">프로 결제하기</button>
                     </div>
                     <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">

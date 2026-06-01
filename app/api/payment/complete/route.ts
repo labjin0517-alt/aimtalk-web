@@ -96,9 +96,9 @@ export async function POST(req: Request) {
       }, { status: 500 });
     }
 
-    // 6. 오늘 결제일 기준 정확한 만료일 계산 (+31일)
+    // 6. 오늘 결제일 기준 정확한 만료일 계산 (+30일)
     const today = new Date();
-    const expireDate = new Date(today.getTime() + 31 * 24 * 60 * 60 * 1000);
+    const expireDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
     const expireDateStr = expireDate.toISOString().split("T")[0]; // YYYY-MM-DD
 
     // 최종 구글 시트 주입 칸은 원래대로 깨끗하게 새 고객 정보를 밀어 넣습니다.
