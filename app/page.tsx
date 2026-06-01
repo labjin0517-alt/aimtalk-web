@@ -443,7 +443,7 @@ export default function Home() {
                 <div className="mb-12 md:mb-16 flex justify-center">
                   {/* 💡 src 경로 맨 앞에 슬래시(/)를 추가하여 public 폴더의 루트 주소로 정밀 매핑했습니다. */}
                   <img 
-                    src="/에임톡.png" 
+                    src="/Aimtalk.png" 
                     alt="에임톡 프로그램 메인 화면" 
                     className="w-full max-w-4xl rounded-xl shadow-lg border border-gray-200"
                   />
