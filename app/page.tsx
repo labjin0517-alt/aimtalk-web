@@ -441,7 +441,7 @@ export default function Home() {
                 </div>
 
                 <div className="mb-12 md:mb-16 flex justify-center">
-                  {/* 💡 슬래시(/)를 앞에 붙이고 폴더 내 파일명과 완벽히 일치시켜 사진 안 나오던 현상을 100% 해결했습니다. */}
+                  {/* 💡 src 경로 맨 앞에 슬래시(/)를 추가하여 public 폴더의 루트 주소로 정밀 매핑했습니다. */}
                   <img 
                     src="/에임톡.png" 
                     alt="에임톡 프로그램 메인 화면" 
