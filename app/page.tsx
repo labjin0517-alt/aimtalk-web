@@ -328,11 +328,12 @@ export default function Home() {
                   <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200 flex flex-col justify-between">
                     <h3 className="text-lg font-bold mb-4 flex items-center text-gray-900"><span className="mr-2">🚀</span> 설치 방법</h3>
                     <ol className="text-sm text-gray-600 space-y-3 mb-8">
-                      <li>1. 하단 버튼 클릭 후 깃허브 이동</li>
-                      <li>2. 최신 릴리즈의 <code className="bg-gray-100 text-red-500 px-1 rounded">.exe</code> 파일 다운로드</li>
-                      <li>3. 실행 후 안내에 따라 인증 및 사용</li>
-                    </ol>
-                    <a href="https://github.com/labjin0517-alt/AimTalk-Updates/releases" target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-[#1e6082] text-white text-center font-bold rounded-xl hover:bg-blue-800 shadow-lg transition">에임톡 최신 버전 다운로드</a>
+                    <li>1. 하단 버튼을 클릭하여 프로그램 즉시 다운로드</li>
+                    <li>2. 다운로드된 <code className="bg-gray-100 text-blue-500 px-1 rounded">AimTalk.zip</code> 파일 압축 해제</li>
+                    <li>3. 실행 후 안내에 따라 인증 및 사용</li>
+                  </ol>
+                  {/* 변경 후: 클릭 시 사이트로 안 가고 파일이 바로 다운로드됨 */}
+                  <a href="https://github.com/labjin0517-alt/AimTalk-Updates/releases/latest/download/AimTalk.zip" target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-[#1e6082] text-white text-center font-bold rounded-xl hover:bg-blue-800 shadow-lg transition">🚀 에임톡 프로그램 바로 다운로드</a>
                   </div>
                 </div>
 
