@@ -480,15 +480,15 @@ export default function Home() {
                     <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-3">
                       <div>
                         <p className="font-semibold text-gray-900">• ⚡ 발송 속도 및 순서 제어</p>
-                        <p className="text-gray-500 pl-4">원하는 시간당 발송 수량을 입력하고(Pro 최대 600명), <strong>[📁 파일 우선]</strong> 또는 <strong>[💬 텍스트 우선]</strong> 버튼을 클릭해 카톡 메시지와 첨부파일 중 무엇을 먼저 전송할지 설계합니다.</p>
+                        <p className="text-gray-500 pl-4">원하는 시간당 발송 수량을 입력하고(Pro버전 최대 600명), <strong>[📁 파일 우선]</strong> 또는 <strong>[💬 텍스트 우선]</strong> 버튼을 클릭해 카톡 메시지와 첨부파일 중 무엇을 먼저 전송할지 설계합니다.</p>
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900">• 🛡️ 신규개설 (초) [ON / OFF 스위치 기능]</p>
-                        <p className="text-gray-500 pl-4">기존 대화방이 없는 고객에게 친구 탭을 탐색하여 새 창을 열고 발송하는 초정밀 기능입니다. 우측 상단의 <strong>[신규개설 (초) [ON]] 초록색 헤더 버튼을 마우스로 클릭</strong>하면 단숨에 기능이 켜지거나(ON) 꺼지며(OFF), 하단 스핀박스로 개설 간격(초)을 커스텀 제어할 수 있습니다.</p>
+                        <p className="text-gray-500 pl-4">기존 대화방이 없는 고객에게 친구 탭을 탐색하여 새 창을 열고 발송하는 기능입니다. 우측 상단의 <strong>[신규개설 (초) [ON]] 초록색 헤더 버튼을 마우스로 클릭</strong>하면 기능이 켜지거나(ON) 꺼지며(OFF), 하단 스핀박스로 개설 간격(초)을 조절할 수 있습니다(신규 채팅을 빠르게 많이 개설하면 카카오톡 내부정책에 의거 프로그램이 꺼질 수 있습니다. 10명 이상이라면 개설 간격은 30초 이상을 추천합니다).</p>
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900">• 📢 중간보고 (명) [ON / OFF 스위치 기능]</p>
-                        <p className="text-gray-500 pl-4">마찬가지로 <strong>[중간보고 (명) [ON]] 헤더 버튼을 클릭</strong>하여 스위치를 켤 수 있으며, 설정한 주기(명)마다 내 카카오톡으로 실시간 성공/실패 통계 보고서가 자동 브리핑됩니다.</p>
+                        <p className="text-gray-500 pl-4"><strong>[중간보고 (명) [ON]] 헤더 버튼을 클릭</strong>하여 스위치를 켤 수 있으며, 설정한 주기(명)마다 내 카카오톡으로 실시간 성공/실패 통계 보고서가 자동으로 나에게 카톡 발송됩니다.</p>
                       </div>
                     </div>
                   </div>
@@ -544,7 +544,7 @@ export default function Home() {
               {/* 2. 1:1 이용문의 영역 (QR코드 가로 정렬 및 자름 방지) */}
               <div className="bg-gray-800/30 p-4 rounded-xl border border-gray-800/60 flex items-start gap-4 w-full">
                 <div className="bg-white p-1.5 rounded-lg shadow-sm shrink-0">
-                  <img src="/오픈카톡.png" alt="오픈카카오톡 이용문의 QR코드" className="w-16 h-16 sm:w-20 sm:h-20 object-cover" />
+                  <img src="/오픈카톡.png" alt="AimTalk 이용문의 오픈카카오톡 QR코드" className="w-16 h-16 sm:w-20 sm:h-20 object-cover" />
                 </div>
                 <div className="space-y-1 min-w-0">
                   <p className="text-white font-bold text-sm mb-1 flex items-center gap-1">💬 1:1 이용문의</p>
