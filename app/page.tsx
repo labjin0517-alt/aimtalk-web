@@ -250,8 +250,8 @@ export default function Home() {
                         <span className="text-2xl md:text-3xl">⚡</span>
                       </div>
                       <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">압도적인 고속 발송</h4>
-                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">Pro 라이선스 이용 시 대규모 대량 마케팅도 막힘없이 시간당 최대 <strong>500명</strong>까지 신속하게 자동 발송합니다.</p>
-                      <span className="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">Pro 전용: 최대 500명/h</span>
+                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">Pro 라이선스 이용 시 대규모 대량 마케팅도 막힘없이 시간당 최대 <strong>600명</strong>까지 신속하게 자동 발송합니다.</p>
+                      <span className="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">Pro 전용: 최대 600명/h</span>
                     </div>
 
                     <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
@@ -259,8 +259,8 @@ export default function Home() {
                         <span className="text-2xl md:text-3xl">📁</span>
                       </div>
                       <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">모든 파일 무제한 첨부</h4>
-                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">기본형과 달리 이미지 포맷 제한이 없으며 복수의 문서, 파일 등 다양한 포맷을 용량/개수 제한 없이 무제한 전송합니다.</p>
-                      <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded">모든 파일 &amp; 무제한 전송</span>
+                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">기본형(Basic)의 이미지 전용 제한을 탈피하여, 복수의 문서·압축파일 등 비즈니스에 필요한 모든 포맷을 무제한 전송합니다.</p>
+                      <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded">모든 포맷 파일 무제한 전송</span>
                     </div>
 
                     <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
@@ -276,27 +276,9 @@ export default function Home() {
                       <div className="bg-orange-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
                         <span className="text-2xl md:text-3xl">💬</span>
                     </div>
-                      <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">신규 대화방 자동 개설 발송</h4>
-                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">기존에 카카오톡 대화 기록이 전혀 없는 새로운 고객이신가요? 문제없습니다! 에임톡은 채팅방이 없어도 친구 목록을 탐색하여 새로운 1:1 채팅방을 엽니다.</p>
-                      <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">친구 탭 기반 정밀 탐색</span>
-                    </div>
-
-                    <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
-                      <div className="bg-red-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
-                        <span className="text-2xl md:text-3xl">📊</span>
-                    </div>
-                      <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">내 카톡방 실시간 현황 보고</h4>
-                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">지정한 발송 인원수 도달 주기마다 현재 진행 성공/실패율 수치를 운영자 개인 카카오톡 채팅방으로 즉시 자동 브리핑합니다.</p>
-                      <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded">실시간 메신저 알림 보고</span>
-                    </div>
-
-                    <div className="feature-card p-6 md:p-8 bg-gray-50 rounded-3xl border border-gray-100 shadow-sm">
-                      <div className="bg-teal-100 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-6">
-                        <span className="text-2xl md:text-3xl text-teal-600">✨</span>
-                      </div>
                       <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">그룹별 멀티 타겟 메시징</h4>
-                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">엑셀 시트 내 &apos;그룹&apos; 분류 필터링 정보를 연동하여 생성된 탭 레이아웃마다 완벽히 분리된 맞춤형 본문과 첨부 문서를 할당합니다.</p>
-                      <span className="text-xs font-bold text-teal-500 bg-teal-50 px-2 py-1 rounded">엑셀 그룹 탭 연동</span>
+                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">엑셀 파일 내 그룹 분류 정보를 연동하여 최대 5개 그룹마다 완벽히 분리된 개별 맞춤형 본문과 첨부파일을 동시 전송합니다.</p>
+                      <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">최대 5개 그룹 개별 타겟팅</span>
                     </div>
                   </div>
                 </div>
@@ -419,10 +401,10 @@ export default function Home() {
                       <button onClick={() => initiatePayment("Pro", 16000)} className="w-full py-4 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg transition mb-8">프로 결제하기</button>
                     </div>
                     <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
-                      <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 고속 발송 (시간당 500명)</li>
-                      <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 모든 파일 무제한 첨부 지원</li>
-                      <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 스마트 예약 발송 &amp; 맞춤형 인사말 시스템</li>
-                      <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 실시간 테스트발송 및 중간·최종 결과 현황보고</li>
+                      <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 고속 발송 (시간당 600명, 텍스트 발송 기준)</li>
+                      <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 모든 종류 파일 전송 지원 및 무제한 첨부</li>
+                      <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 최대 5개 그룹 분리 타겟팅 및 예약 발송</li>
+                      <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 실시간 테스트발송 및 신규 대화방 자동 개설 엔진</li>
                     </ul>
                   </div>
 
@@ -440,7 +422,7 @@ export default function Home() {
 
                 <div className="mb-12 md:mb-16 flex justify-center">
                   <img 
-                    src="/에임톡v1.06.png" 
+                    src="/에임톡.png" 
                     alt="에임톡 프로그램 메인 화면" 
                     className="w-full max-w-4xl rounded-xl shadow-lg border border-gray-200"
                   />
@@ -453,8 +435,8 @@ export default function Home() {
                       <h3 className="text-xl font-bold text-[#1e6082]">라이선스 인증 및 양식 다운로드</h3>
                     </div>
                     <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-2">
-                      <p>• 프로그램 우측 하단 <strong>[프로그램 정보 및 인증]</strong> 란에 구매하신 라이선스 코드를 입력하고 인증해 주세요.</p>
-                      <p>• 좌측 상단의 <strong>[📋 양식]</strong> 버튼을 눌러 에임톡 전용 엑셀 업로드 양식을 다운로드합니다.</p>
+                      <p>• 프로그램 우측 하단 <strong>[정품 인증 부근]</strong> 입력창에 구매하신 코드를 넣고 <strong>[인증 활성화]</strong> 버튼을 눌러 권한을 획득하세요.</p>
+                      <p>• 좌측 상단의 <strong>[📋 기본 양식]</strong> 버튼을 눌러 에임톡 전용 엑셀 업로드 양식을 다운로드합니다. (안정적인 구동을 위해 그룹 분류는 최대 5개 이하로 구성을 권장합니다.)</p>
                     </div>
                   </div>
 
@@ -464,20 +446,29 @@ export default function Home() {
                       <h3 className="text-xl font-bold text-[#1e6082]">명단 로드 (엑셀 업로드)</h3>
                     </div>
                     <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-2">
-                      <p>• 가공하신 엑셀 파일을 프로그램 좌측 영역에 <strong>드래그 앤 드롭</strong> 하거나, <strong>[📂 엑셀 업로드]</strong> 버튼을 눌러 불러옵니다.</p>
-                      <p>• 수신 거부 명단이 있다면 자동으로 필터링되며, 리스트에서 마우스 클릭으로 특정 인원만 체크하여 발송할 수도 있습니다.</p>
+                      <p>• 가공하신 엑셀 파일을 프로그램 화면 좌측 영역에 <strong>드래그 앤 드롭(마우스로 끌어놓기)</strong> 하거나, <strong>[📂 엑셀 데이터 파일 불러오기]</strong> 버튼으로 간편하게 가져옵니다.</p>
+                      <p>• 기존 수신 거부자나 수동으로 추가한 명단은 실시간 표 데이터에 즉시 반영되며, 표 내부의 <strong>[☑ / ☐] 체크박스를 마우스로 클릭</strong>해 발송 대상을 개별 조율할 수 있습니다.</p>
                     </div>
                   </div>
 
                   <div className="flex flex-col md:flex-row bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
                     <div className="md:w-1/4 mb-4 md:mb-0">
                       <span className="inline-block bg-blue-100 text-blue-600 font-bold px-3 py-1 rounded-full text-sm mb-2">STEP 2</span>
-                      <h3 className="text-xl font-bold text-[#1e6082]">메시지 및 첨부파일 설정</h3>
+                      <h3 className="text-xl font-bold text-[#1e6082]">정밀 발송 환경 설정 (Pro 핵심 기능)</h3>
                     </div>
-                    <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-2">
-                      <p>• 우측 상단의 <strong>[STEP 3. 발송 설정]</strong> 영역에서 발송 속도(명/시간)와 파일/텍스트 발송 순서를 세팅합니다.</p>
-                      <p>• 하단 그룹 탭을 클릭하여 전송할 메시지를 입력합니다.</p>
-                      <p>• 첨부할 이미지나 문서는 우측 파일 리스트 박스에 <strong>드래그 앤 드롭</strong>으로 쉽게 추가 및 순서 변경이 가능합니다. (Basic 요금제는 이미지 2개로 제한됩니다.)</p>
+                    <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-3">
+                      <div>
+                        <p className="font-semibold text-gray-900">• ⚡ 발송 속도 및 순서 제어</p>
+                        <p className="text-gray-500 pl-4">원하는 시간당 발송 수량을 입력하고(Pro 최대 600명), <strong>[📁 파일 우선]</strong> 또는 <strong>[💬 텍스트 우선]</strong> 버튼을 클릭해 카톡 메시지와 첨부파일 중 무엇을 먼저 전송할지 설계합니다.</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">• 🛡️ 신규개설 (초) [ON / OFF 스위치 기능]</p>
+                        <p className="text-gray-500 pl-4">기존 대화방이 없는 고객에게 친구 탭을 탐색하여 새 창을 열고 발송하는 초정밀 기능입니다. 우측 상단의 <strong>[신규개설 (초) [ON]] 초록색 헤더 버튼을 마우스로 클릭</strong>하면 단숨에 기능이 켜지거나(ON) 꺼지며(OFF), 하단 스핀박스로 개설 간격(초)을 커스텀 제어할 수 있습니다.</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">• 📢 중간보고 (명) [ON / OFF 스위치 기능]</p>
+                        <p className="text-gray-500 pl-4">마찬가지로 <strong>[중간보고 (명) [ON]] 헤더 버튼을 클릭</strong>하여 스위치를 켤 수 있으며, 설정한 주기(명)마다 내 카카오톡으로 실시간 성공/실패 통계 보고서가 자동 브리핑됩니다.</p>
+                      </div>
                     </div>
                   </div>
 
@@ -874,7 +865,7 @@ export default function Home() {
               </section>
               <section>
                 <h4 className="font-bold text-gray-900 mb-2">제5조 (환불 절차)</h4>
-                <p>환불을 원하시는 이용자는 하단의 "위 규정에 동의하며 환불 신청하기" 버튼을 통해 환불가능합니다.환불 시 PG사의 정책에 따라 영업일 기준 3~7일 내에 승인 취소 처리가 완료됩니다.</p>
+                <p>환불을 원하시는 이용자는 하단의 "위 규정에 동의하며 환불 신청하기" 버튼을 통해 환불가능합니다. 환불 시 PG사의 정책에 따라 영업일 기준 3~7일 내에 승인 취소 처리가 완료되며, <strong>카드 결제 및 전자결제(PG) 수수료가 발생할 경우 환불 금액은 해당 수수료를 제한 금액으로 지급됩니다.</strong></p>
               </section>
             </div>
 
@@ -945,6 +936,12 @@ function RefundFormInsideModalComponent({ closeModal }: { closeModal: () => void
       ) : (
         <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 space-y-4">
           <h5 className="text-base font-bold text-gray-900 flex items-center gap-1">💸 온라인 환불 신청서 작성</h5>
+          
+          {/* 🔥 대표님, 소비자가 명확히 인지하도록 폼 내부에 미니 알림 박스를 장착했습니다. */}
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-600 leading-relaxed font-medium">
+            <strong>⚠️ 정산 안내:</strong> 환불 처리는 규정에 따라 진행되며, 카드 결제 및 전자결제(PG) 수수료가 발생한 경우 해당 수수료를 차감한 금액으로 환불 정산됩니다.
+          </div>
+
           <form onSubmit={handleRefundSubmit} className="space-y-3.5">
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">반납할 라이선스 코드 (12자리)</label>
