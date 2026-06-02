@@ -160,7 +160,7 @@ export default function Home() {
           if (purchaseType === "NEW") {
             alert(`🎉 결제 완료!\n\n${email} 작성하신 메일주소로 라이선스 코드가 발송되었습니다.`);
           } else if (purchaseType === "EXTEND") {
-            alert(`🎉 라이선스 연장 완료!\n\n기존 라이선스 코드의 만료일이 30일 연장되었습니다.`);
+            alert(`🎉 라이선스 연장 완료!\n\n보너스 기간을 포함하여 기존 라이선스 코드의 만료일이 33일 연장되었습니다.`);
           } else if (purchaseType === "UPGRADE") {
             alert(`🎉 요금제 변경 완료!\n\nPro 등급 업그레이드 및 잔여 보장 기간 재정산이 완료되었습니다.`);
           }
@@ -446,15 +446,21 @@ export default function Home() {
                   </div>
 
                   {/* Pro 요금제 카드 */}
-                  <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center relative flex flex-col justify-between mt-6 sm:mt-0">
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md z-10">추천</div>
+                  <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center flex flex-col justify-between mt-6 sm:mt-0 relative">
+                    {/* 💡 flex-정렬 버그 방지를 위해 absolute 요소를 카드 최상단 독립 배치하고 축을 left-1/2 및 -translate-x-1/2로 고정 */}
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-max bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md z-50">
+                      추천
+                    </div>
                     <div>
-                      <h3 className="text-xl font-bold mb-2 text-[#1e6082]">Pro</h3>
+                      <h3 className="text-xl font-bold mb-2 text-[#1e6082] mt-2">Pro</h3>
                       <div className="text-3xl sm:text-4xl font-bold mb-6 text-[#1e6082]">16,000원 <span className="text-sm font-normal text-gray-400">/ 30일</span></div>
                       <div className="flex flex-col gap-2 mb-6">
                         <button onClick={() => initiatePayment("Pro", 16000, "NEW")} className="w-full py-3 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg transition text-sm">신규 이용권 결제</button>
                         <div className="grid grid-cols-2 gap-2">
-                          <button onClick={() => initiatePayment("Pro", 16000, "EXTEND")} className="py-2.5 rounded-xl bg-gray-50 text-gray-700 border border-gray-300 font-medium hover:bg-gray-100 transition text-xs">Pro 기간 연장</button>
+                          <button onClick={() => initiatePayment("Pro", 16000, "EXTEND")} className="py-2.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-bold hover:bg-blue-100 transition text-xs flex flex-col items-center justify-center">
+                            <span>프로 기간 연장</span>
+                            <span className="text-[10px] text-blue-600 font-extrabold tracking-tight">🔥 3일 추가!</span>
+                          </button>
                           <button onClick={() => initiatePayment("Pro", 16000, "UPGRADE")} className="py-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-300 font-bold hover:bg-amber-100 transition text-xs">Basic ➡️ Pro 변경</button>
                         </div>
                       </div>
@@ -700,17 +706,32 @@ export default function Home() {
 
             <div className="space-y-4">
               {(purchaseType === "EXTEND" || purchaseType === "UPGRADE") && (
-                <div>
-                  <label className="block text-xs font-semibold text-red-600 mb-1">보유 중인 기존 라이선스 코드 (필수)</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="XXXX-XXXX-XXXX-XXXX"
-                    value={existingLicenseKey}
-                    onChange={(e) => setExistingLicenseKey(e.target.value)}
-                    className="w-full border-2 border-red-200 rounded-xl px-4 py-2.5 text-sm font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-50/40"
-                  />
-                  <p className="text-[11px] text-red-500 mt-1">※ 정보를 갱신 처리할 대상을 판별하기 위해 사용되니 정확히 기입바랍니다.</p>
+                <div className="space-y-2">
+                  <div>
+                    <label className="block text-xs font-semibold text-red-600 mb-1">보유 중인 기존 라이선스 코드 (필수)</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="XXXX-XXXX-XXXX-XXXX"
+                      value={existingLicenseKey}
+                      onChange={(e) => setExistingLicenseKey(e.target.value)}
+                      className="w-full border-2 border-red-200 rounded-xl px-4 py-2.5 text-sm font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-50/40"
+                    />
+                  </div>
+                  
+                  {/* 💡 연장 결제 시 안내 박스 */}
+                  {purchaseType === "EXTEND" && (
+                    <div className="bg-blue-50 border border-blue-200 text-blue-800 text-xs p-3 rounded-xl font-medium leading-relaxed">
+                      🎁 <strong>연장 감사 보너스 이벤트:</strong> 지금 기존 라이선스를 연장하시면 기본 30일에 <span className="underline font-bold">보너스 기간 3일이 추가되어 총 33일</span>이 누적 연장됩니다!
+                    </div>
+                  )}
+
+                  {/* 💡 업그레이드 결제 시 안내 박스 */}
+                  {purchaseType === "UPGRADE" && (
+                    <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3 rounded-xl font-medium leading-relaxed">
+                      ⚙️ <strong>등급 변경 정산 안내:</strong> Pro 플랜 전환 결제 시, 보유하고 계신 기존 Basic 요금제의 <span className="underline font-bold">잔여 이용 기한이 절반(1/2)으로 일합 환산</span>되어 신규 Pro 이용 기한 30일에 합산 추가 제공됩니다. (소수점 올림 처리)
+                    </div>
+                  )}
                 </div>
               )}
 
