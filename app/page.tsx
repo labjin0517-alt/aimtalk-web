@@ -436,7 +436,7 @@ export default function Home() {
                       <div className="text-3xl sm:text-4xl font-bold mb-6 text-[#1e6082]">8,000원 <span className="text-sm font-normal text-gray-400">/ 30일</span></div>
                       <div className="flex flex-col gap-2 mb-6">
                         <button onClick={() => initiatePayment("Basic", 8000, "NEW")} className="w-full py-3 rounded-xl bg-white border border-[#1e6082] text-[#1e6082] font-bold hover:bg-blue-50 transition text-sm">신규 이용권 결제</button>
-                        <button onClick={() => initiatePayment("Basic", 8000, "EXTEND")} className="w-full py-2.5 rounded-xl bg-gray-50 text-gray-700 border border-gray-300 font-medium hover:bg-gray-100 transition text-xs">기존 라이선스 기간 연장</button>
+                        <button onClick={() => initiatePayment("Basic", 8000, "EXTEND")} className="w-full py-2.5 rounded-xl bg-gray-50 text-gray-700 border border-gray-300 font-medium hover:bg-gray-100 transition text-xs">Basic 기간 연장</button>
                       </div>
                     </div>
                     <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
@@ -447,14 +447,14 @@ export default function Home() {
 
                   {/* Pro 요금제 카드 */}
                   <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center relative flex flex-col justify-between mt-6 sm:mt-0">
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md z-10">추천</div>
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md z-10">추천</div>
                     <div>
                       <h3 className="text-xl font-bold mb-2 text-[#1e6082]">Pro</h3>
                       <div className="text-3xl sm:text-4xl font-bold mb-6 text-[#1e6082]">16,000원 <span className="text-sm font-normal text-gray-400">/ 30일</span></div>
                       <div className="flex flex-col gap-2 mb-6">
                         <button onClick={() => initiatePayment("Pro", 16000, "NEW")} className="w-full py-3 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg transition text-sm">신규 이용권 결제</button>
                         <div className="grid grid-cols-2 gap-2">
-                          <button onClick={() => initiatePayment("Pro", 16000, "EXTEND")} className="py-2.5 rounded-xl bg-gray-50 text-gray-700 border border-gray-300 font-medium hover:bg-gray-100 transition text-xs">프로 기간 연장</button>
+                          <button onClick={() => initiatePayment("Pro", 16000, "EXTEND")} className="py-2.5 rounded-xl bg-gray-50 text-gray-700 border border-gray-300 font-medium hover:bg-gray-100 transition text-xs">Pro 기간 연장</button>
                           <button onClick={() => initiatePayment("Pro", 16000, "UPGRADE")} className="py-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-300 font-bold hover:bg-amber-100 transition text-xs">Basic ➡️ Pro 변경</button>
                         </div>
                       </div>
