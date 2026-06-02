@@ -430,42 +430,48 @@ export default function Home() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-10">
                   
                   {/* Basic 요금제 카드 */}
-                  <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-200 text-center hover:shadow-lg transition flex flex-col justify-between">
+                  <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-200 text-center hover:shadow-lg transition flex flex-col justify-between relative pt-10">
                     <div>
                       <h3 className="text-xl font-bold mb-2">Basic</h3>
                       <div className="text-3xl sm:text-4xl font-bold mb-6 text-[#1e6082]">8,000원 <span className="text-sm font-normal text-gray-400">/ 30일</span></div>
                       <div className="flex flex-col gap-2 mb-6">
                         <button onClick={() => initiatePayment("Basic", 8000, "NEW")} className="w-full py-3 rounded-xl bg-white border border-[#1e6082] text-[#1e6082] font-bold hover:bg-blue-50 transition text-sm">신규 이용권 결제</button>
-                        <button onClick={() => initiatePayment("Basic", 8000, "EXTEND")} className="w-full py-2.5 rounded-xl bg-gray-50 text-gray-700 border border-gray-300 font-medium hover:bg-gray-100 transition text-xs">Basic 기간 연장</button>
+                        <button onClick={() => initiatePayment("Basic", 8000, "EXTEND")} className="w-full py-2.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-bold hover:bg-blue-100 transition text-xs flex flex-col items-center justify-center">
+                          <span>기존 라이선스 기간 연장</span>
+                          <span className="text-[10px] text-blue-600 font-extrabold tracking-tight">🎁 3일 추가 보너스!</span>
+                        </button>
                       </div>
                     </div>
                     <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
+                      <li className="font-bold text-blue-600 flex items-center gap-2"><span>📢</span> 기간 갱신 연장 결제 시 3일 즉시 추가 지급!</li>
                       <li className="flex items-center gap-2"><span className="text-[#1e6082]">✔</span> 기본 메시지 자동 발송 (시간당 300명)</li>
                       <li className="flex items-center gap-2"><span className="text-[#1e6082]">✔</span> 이미지 최대 2개 첨부 제한</li>
                     </ul>
                   </div>
 
-                  {/* Pro 요금제 카드 */}
-                  <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center flex flex-col justify-between mt-6 sm:mt-0 relative">
-                    {/* 💡 flex-정렬 버그 방지를 위해 absolute 요소를 카드 최상단 독립 배치하고 축을 left-1/2 및 -translate-x-1/2로 고정 */}
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-max bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md z-50">
-                      추천
+                  {/* Pro 요금제 카드 (상단 패딩 분리 및 배지 정렬 정밀 보정 완료) */}
+                  <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center flex flex-col justify-between mt-6 sm:mt-0 relative pt-10">
+                    <div className="absolute -top-4 left-0 w-full flex justify-center z-50">
+                      <span className="bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md block w-max">
+                        추천
+                      </span>
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold mb-2 text-[#1e6082] mt-2">Pro</h3>
+                      <h3 className="text-xl font-bold mb-2 text-[#1e6082]">Pro</h3>
                       <div className="text-3xl sm:text-4xl font-bold mb-6 text-[#1e6082]">16,000원 <span className="text-sm font-normal text-gray-400">/ 30일</span></div>
                       <div className="flex flex-col gap-2 mb-6">
                         <button onClick={() => initiatePayment("Pro", 16000, "NEW")} className="w-full py-3 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg transition text-sm">신규 이용권 결제</button>
                         <div className="grid grid-cols-2 gap-2">
                           <button onClick={() => initiatePayment("Pro", 16000, "EXTEND")} className="py-2.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-bold hover:bg-blue-100 transition text-xs flex flex-col items-center justify-center">
                             <span>프로 기간 연장</span>
-                            <span className="text-[10px] text-blue-600 font-extrabold tracking-tight">🔥 3일 추가!</span>
+                            <span className="text-[10px] text-blue-600 font-extrabold tracking-tight">🎁 3일 추가 보너스!</span>
                           </button>
                           <button onClick={() => initiatePayment("Pro", 16000, "UPGRADE")} className="py-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-300 font-bold hover:bg-amber-100 transition text-xs">Basic ➡️ Pro 변경</button>
                         </div>
                       </div>
                     </div>
                     <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
+                      <li className="font-bold text-blue-600 flex items-center gap-2"><span>📢</span> 기간 갱신 연장 결제 시 3일 즉시 추가 지급!</li>
                       <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 고속 발송 (시간당 600명, 텍스트 발송 기준)</li>
                       <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 모든 종류 파일 전송 지원 및 무제한 첨부</li>
                       <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 최대 5개 그룹 분리 타겟팅 및 예약 발송</li>
