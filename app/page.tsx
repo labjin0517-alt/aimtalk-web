@@ -28,11 +28,15 @@ export default function Home() {
   const [selectedPlanName, setSelectedPlanName] = useState<string>("");
   const [selectedPlanAmount, setSelectedPlanAmount] = useState<number>(0);
 
-  // 💳 통합 결제 모달 폼 입력 상태
+  // 💳 통합 결제 모달 폼 입력 상태[cite: 1]
   const [customerName, setCustomerName] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const receiveMethod = "EMAIL"; // 📧 상태 변경 함수를 제거하고 'EMAIL' 상수로 고정
+
+  // 💡 [여기에 아래 2줄을 그대로 추가해주세요]
+  const [purchaseType, setPurchaseType] = useState<"NEW" | "EXTEND" | "UPGRADE">("NEW");
+  const [existingLicenseKey, setExistingLicenseKey] = useState<string>("");
 
   // 새로고침 시 스타일 깜빡임 및 Hydration Mismatch 현상을 완전히 방지하는 이중 안전장치
   useEffect(() => {
@@ -54,6 +58,11 @@ export default function Home() {
 
   const closeModal = () => {
     setActiveModal(null);
+    // 💡 다음 모달을 열 때 데이터가 꼬이지 않도록 입력 필드 상태를 안전하게 초기화합니다.
+    setCustomerName("");
+    setCustomerEmail("");
+    setCustomerPhone("");
+    setExistingLicenseKey("");
     if (typeof document !== "undefined") {
       document.body.style.overflow = "auto";
     }
@@ -69,17 +78,20 @@ export default function Home() {
     }
   };
 
-  const initiatePayment = (planName: string, amount: number) => {
+    const initiatePayment = (planName: string, amount: number, type: "NEW" | "EXTEND" | "UPGRADE") => {
     setSelectedPlanName(planName);
     setSelectedPlanAmount(amount);
+    setPurchaseType(type); // 💡 새롭게 추가한 상태 지정 함수
+    setExistingLicenseKey(""); // 💡 모달이 열릴 때 입력값 초기화
     openModal("payment-input-modal");
   };
 
- const handlePay = async () => {
+  const handlePay = async () => {
     if (!selectedPlanName) return;
     const name = customerName.trim();
     const email = customerEmail.trim();
     const phone = customerPhone.trim().replace(/-/g, "");
+    const extKey = existingLicenseKey.trim().toUpperCase();
 
     if (!name) return alert("주문자 성함을 입력해주세요.");
     if (!email.includes("@")) return alert("올바른 이메일 주소를 입력해주세요.");
@@ -89,17 +101,24 @@ export default function Home() {
       return alert("올바른 연락처(휴대폰 번호)를 입력해주세요.");
     }
 
+    if ((purchaseType === "EXTEND" || purchaseType === "UPGRADE") && !extKey) {
+      return alert("변경 또는 갱신을 적용할 기존 라이선스 코드를 입력해주세요.");
+    }
+
     if (typeof window !== "undefined") {
       const PortOne = (window as any).PortOne;
       if (!PortOne) return alert("결제 모듈이 로드되지 않았습니다.");
 
       try {
-        // [포트원v2 결제 요청 전송 및 결과 객체 확보]
+        let orderName = `AimTalk ${selectedPlanName} 30일 이용권`;
+        if (purchaseType === "EXTEND") orderName = `AimTalk ${selectedPlanName} 30일 기간 연장 결제`;
+        if (purchaseType === "UPGRADE") orderName = `AimTalk Basic ➡️ Pro 등급 업그레이드 결제`;
+
         const paymentResponse = await PortOne.requestPayment({
           storeId: PORTONE_STORE_ID,
           channelKey: PORTONE_CHANNEL_KEY,
           paymentId: `pay_${new Date().getTime()}`,
-          orderName: `AimTalk ${selectedPlanName} 30일 이용권`,
+          orderName: orderName,
           totalAmount: selectedPlanAmount,
           currency: "CURRENCY_KRW",
           payMethod: "CARD",
@@ -109,16 +128,16 @@ export default function Home() {
             email: email 
           },
           customData: {
-            receiveMethod: receiveMethod 
+            receiveMethod: receiveMethod,
+            purchaseType: purchaseType,
+            extKey: extKey
           }
         });
 
-        // 사용자가 결제창을 닫았거나 결제 도중 취소/실패한 경우
         if (paymentResponse.code != null) {
           return alert(`결제에 실패했습니다: ${paymentResponse.message}`);
         }
 
-        // 💡 [실시간 백엔드 결제 검증 및 구글 시트 등록 / 이메일 자동 발송 시작]
         const verifyRes = await fetch("/api/payment/complete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -129,14 +148,22 @@ export default function Home() {
             customerPhone: phone,
             receiveMethod: receiveMethod,
             planName: selectedPlanName,
-            amount: selectedPlanAmount
+            amount: selectedPlanAmount,
+            purchaseType: purchaseType,
+            existingLicenseKey: extKey
           })
         });
 
         const verifyResult = await verifyRes.json();
 
         if (verifyResult.success) {
-          alert(`🎉 결제 완료!\n\n${email} 작성하신 메일주소로 라이선스 코드가 발송되었습니다.`);
+          if (purchaseType === "NEW") {
+            alert(`🎉 결제 완료!\n\n${email} 작성하신 메일주소로 라이선스 코드가 발송되었습니다.`);
+          } else if (purchaseType === "EXTEND") {
+            alert(`🎉 라이선스 연장 완료!\n\n기존 라이선스 코드의 만료일이 30일 연장되었습니다.`);
+          } else if (purchaseType === "UPGRADE") {
+            alert(`🎉 요금제 변경 완료!\n\nPro 등급 업그레이드 및 잔여 보장 기간 재정산이 완료되었습니다.`);
+          }
           closeModal();
         } else {
           alert(`🚨 결제 실패: ${verifyResult.message}\n이중 결제가 방지되었으니 화면을 캡처한 뒤 고객센터로 문의바랍니다.`);
@@ -148,33 +175,36 @@ export default function Home() {
     }
   };
 
-  const handleFindLicense = async (e: React.FormEvent) => {
+    const handleFindLicense = async (e: React.FormEvent) => {
     e.preventDefault();
     const name = findName.trim();
     const email = findEmail.trim();
-    const phone = findPhone.trim().replace(/-/g, ""); // 💡 하이픈 자동 제거
+    const phone = findPhone.trim().replace(/-/g, "");
 
     if (!name) return alert("주문자 성함을 입력해주세요.");
     if (!email || !email.includes("@")) return alert("올바른 이메일 주소를 입력해주세요.");
     
     const phoneRegex = /^0[0-9]{8,10}$/;
-    if (!phone || !phoneRegex.test(phone)) {
-      return alert("올바른 연락처(휴대폰 번호)를 입력해주세요.");
-    }
+    if (!phone || !phoneRegex.test(phone)) return alert("올바른 연락처를 입력해주세요.");
 
     setIsFinding(true);
     try {
-      // 💡 추후 여기에 구글 시트(Make.com)에서 이름/이메일/폰번호가 모두 일치하는지 찾는 API가 연동됩니다.
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert(`입력하신 정보가 일치하여, 등록된 이메일(${email})로 라이선스 코드를 재발송했습니다. 메일함을 확인해주세요!`);
-      
-      // 폼 초기화 및 닫기
-      setFindName("");
-      setFindEmail("");
-      setFindPhone("");
-      closeModal();
+      const res = await fetch("/api/payment/find-key", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, phone })
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        alert(`입력하신 정보가 일치하여, 등록된 이메일(${email})로 코드를 재발송했습니다.`);
+        setFindName(""); setFindEmail(""); setFindPhone("");
+        closeModal();
+      } else {
+        alert(`🚨 조회 실패: ${result.message}`);
+      }
     } catch (error) {
-      alert("라이선스 코드를 조회하는 중 오류가 발생했습니다. 고객센터로 문의해주세요.");
+      alert("라이선스 코드를 조회하는 중 오류가 발생했습니다.");
     } finally {
       setIsFinding(false);
     }
@@ -402,9 +432,12 @@ export default function Home() {
                   {/* Basic 요금제 카드 */}
                   <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-200 text-center hover:shadow-lg transition flex flex-col justify-between">
                     <div>
-                      <h3 className="text-xl font-bold mb-4">Basic</h3>
-                      <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">8,000원 <span className="text-sm font-normal text-gray-400">/ 30일</span></div>
-                      <button onClick={() => initiatePayment("Basic", 8000)} className="w-full py-4 rounded-xl border border-[#1e6082] text-[#1e6082] font-bold hover:bg-blue-50 transition mb-8">베이직 결제하기</button>
+                      <h3 className="text-xl font-bold mb-2">Basic</h3>
+                      <div className="text-3xl sm:text-4xl font-bold mb-6 text-[#1e6082]">8,000원 <span className="text-sm font-normal text-gray-400">/ 30일</span></div>
+                      <div className="flex flex-col gap-2 mb-6">
+                        <button onClick={() => initiatePayment("Basic", 8000, "NEW")} className="w-full py-3 rounded-xl bg-white border border-[#1e6082] text-[#1e6082] font-bold hover:bg-blue-50 transition text-sm">신규 이용권 결제</button>
+                        <button onClick={() => initiatePayment("Basic", 8000, "EXTEND")} className="w-full py-2.5 rounded-xl bg-gray-50 text-gray-700 border border-gray-300 font-medium hover:bg-gray-100 transition text-xs">기존 라이선스 기간 연장</button>
+                      </div>
                     </div>
                     <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
                       <li className="flex items-center gap-2"><span className="text-[#1e6082]">✔</span> 기본 메시지 자동 발송 (시간당 300명)</li>
@@ -413,12 +446,18 @@ export default function Home() {
                   </div>
 
                   {/* Pro 요금제 카드 */}
-                  <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center relative mt-6 sm:mt-0 flex flex-col justify-between">
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md">추천</div>
+                  <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border-2 border-[#1e6082] text-center relative flex flex-col justify-between mt-6 sm:mt-0">
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#1e6082] text-white px-6 py-1.5 rounded-full text-sm font-extrabold tracking-wide shadow-md z-10">추천</div>
                     <div>
-                      <h3 className="text-xl font-bold mb-4 text-[#1e6082]">Pro</h3>
-                      <div className="text-3xl sm:text-4xl font-bold mb-8 text-[#1e6082]">16,000원 <span className="text-sm font-normal text-gray-400">/ 30일</span></div>
-                      <button onClick={() => initiatePayment("Pro", 16000)} className="w-full py-4 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg transition mb-8">프로 결제하기</button>
+                      <h3 className="text-xl font-bold mb-2 text-[#1e6082]">Pro</h3>
+                      <div className="text-3xl sm:text-4xl font-bold mb-6 text-[#1e6082]">16,000원 <span className="text-sm font-normal text-gray-400">/ 30일</span></div>
+                      <div className="flex flex-col gap-2 mb-6">
+                        <button onClick={() => initiatePayment("Pro", 16000, "NEW")} className="w-full py-3 rounded-xl bg-[#1e6082] text-white font-bold hover:bg-blue-800 shadow-lg transition text-sm">신규 이용권 결제</button>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button onClick={() => initiatePayment("Pro", 16000, "EXTEND")} className="py-2.5 rounded-xl bg-gray-50 text-gray-700 border border-gray-300 font-medium hover:bg-gray-100 transition text-xs">프로 기간 연장</button>
+                          <button onClick={() => initiatePayment("Pro", 16000, "UPGRADE")} className="py-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-300 font-bold hover:bg-amber-100 transition text-xs">Basic ➡️ Pro 변경</button>
+                        </div>
+                      </div>
                     </div>
                     <ul className="text-gray-600 space-y-4 text-left text-sm pt-6 border-t border-gray-100">
                       <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 고속 발송 (시간당 600명, 텍스트 발송 기준)</li>
@@ -646,18 +685,35 @@ export default function Home() {
         </div>
       )}
 
+      {/* 💳 결제 정보 입력 모달 구역 */}
       {activeModal === "payment-input-modal" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
-          {/* 💡 max-w-md를 max-w-lg로 변경하여 전체적인 창 크기를 시원하게 키웠습니다. */}
           <div className="bg-white w-full max-w-lg rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-100 relative space-y-4">
             <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
             
             <div className="border-b border-gray-100 pb-2">
               <h3 className="text-xl font-bold text-gray-900">결제 고객 정보 입력</h3>
-              <p className="text-xs text-blue-600 mt-1">선택 요금제: AimTalk {selectedPlanName} 플랜 (월 {selectedPlanAmount.toLocaleString()}원)</p>
+              <p className="text-xs text-blue-600 mt-1">
+                타입: {purchaseType === "NEW" ? "신규 구독" : purchaseType === "EXTEND" ? "기한 연장 갱신" : "Pro 등급 업그레이드"} / 플랜: AimTalk {selectedPlanName} ({selectedPlanAmount.toLocaleString()}원)
+              </p>
             </div>
 
             <div className="space-y-4">
+              {(purchaseType === "EXTEND" || purchaseType === "UPGRADE") && (
+                <div>
+                  <label className="block text-xs font-semibold text-red-600 mb-1">보유 중인 기존 라이선스 코드 (필수)</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="XXXX-XXXX-XXXX-XXXX"
+                    value={existingLicenseKey}
+                    onChange={(e) => setExistingLicenseKey(e.target.value)}
+                    className="w-full border-2 border-red-200 rounded-xl px-4 py-2.5 text-sm font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-50/40"
+                  />
+                  <p className="text-[11px] text-red-500 mt-1">※ 정보를 갱신 처리할 대상을 판별하기 위해 사용되니 정확히 기입바랍니다.</p>
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">주문자 성함</label>
                 <input
@@ -678,7 +734,7 @@ export default function Home() {
                   onChange={(e) => setCustomerEmail(e.target.value)}
                   className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]"
                 />
-                <p className="text-[11px] text-gray-400 mt-1">※ 이 이메일 주소로 프로그램 인증용 라이선스 코드가 발송됩니다.</p>
+                <p className="text-[11px] text-gray-400 mt-1">※ 신규 구매 시 이 이메일 주소로 프로그램 인증용 라이선스 코드가 자동 발송됩니다.</p>
               </div>
 
               <div>
@@ -692,14 +748,12 @@ export default function Home() {
                 />
               </div>
 
-              {/* 📧 수신 수단 고정 및 안내 안내 문구 맵 변화 */}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">라이선스 발송 방식</label>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">라이선스 정산 및 인도 방식</label>
                 <div className="p-3.5 bg-blue-50/60 border border-blue-200/60 rounded-xl flex items-center gap-2.5 text-sm text-blue-900 font-medium">
                   <span>📧</span>
-                  <span>기입하신 이메일 주소로 라이선스 코드가 <strong>즉시 안전하게 자동 전송</strong>됩니다.</span>
+                  <span>결제가 완료되면 시스템 데이터베이스와 동기화되어 즉시 실시간 원격 자동 반영됩니다.</span>
                 </div>
-                <p className="text-[11px] text-gray-400 mt-1.5">※ 카카오톡 분실 정책 변동으로 인해 라이선스 코드 관리는 전액 이메일 전송 체계로 통합 운영됩니다.</p>
               </div>
 
               <div className="flex space-x-3 pt-2">
