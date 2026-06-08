@@ -307,8 +307,8 @@ export default function Home() {
                         <span className="text-2xl md:text-3xl">💬</span>
                       </div>
                       <h4 className="text-lg md:text-xl font-bold mb-3 text-gray-900">그룹별 멀티 타겟 메시징</h4>
-                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">엑셀 파일 내 그룹 분류 정보를 연동하여 최대 5개 그룹마다 완벽히 분리된 개별 맞춤형 본문과 첨부파일을 동시 전송합니다.</p>
-                      <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">최대 5개 그룹 개별 타겟팅</span>
+                      <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4">엑셀 파일 내 그룹 분류 정보를 연동하여 최대 20개 그룹마다 완벽히 분리된 개별 맞춤형 본문과 첨부파일을 동시 전송합니다.</p>
+                      <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">최대 20개 그룹 개별 타겟팅</span>
                     </div>
 
                     {/* ✨ 새로 제작한 인사말 설정 카드 */}
@@ -474,7 +474,7 @@ export default function Home() {
                       <li className="font-bold text-blue-600 flex items-center gap-2"><span>📢</span> 기간 갱신 연장 결제 시 3일 즉시 추가 지급!</li>
                       <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 고속 발송 (시간당 600명, 텍스트 발송 기준)</li>
                       <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 모든 종류 파일 전송 지원 및 무제한 첨부</li>
-                      <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 최대 5개 그룹 분리 타겟팅 및 예약 발송</li>
+                      <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 최대 20개 그룹 분리 타겟팅 및 예약 발송</li>
                       <li className="font-bold text-gray-800 flex items-center gap-2"><span className="text-green-600">✔</span> 실시간 테스트발송 및 신규 대화방 자동 개설 엔진</li>
                     </ul>
                   </div>
@@ -508,7 +508,7 @@ export default function Home() {
                     </div>
                     <div className="md:w-3/4 md:pl-8 text-gray-600 text-sm md:text-base leading-relaxed space-y-2">
                       <p>• 프로그램 우측 하단 <strong>[정품 인증 부근]</strong> 입력창에 구매하신 코드를 넣고 <strong>[인증 활성화]</strong> 버튼을 눌러 권한을 획득하세요.</p>
-                      <p>• 좌측 상단의 <strong>[📋 기본 양식]</strong> 버튼을 눌러 에임톡 전용 엑셀 업로드 양식을 다운로드합니다. (안정적인 구동을 위해 그룹 분류는 최대 5개 이하로 구성을 권장합니다.)</p>
+                      <p>• 좌측 상단의 <strong>[📋 기본 양식]</strong> 버튼을 눌러 에임톡 전용 엑셀 업로드 양식을 다운로드합니다. (안정적인 구동을 위해 그룹 분류는 최대 20개 이하로 구성을 권장합니다.)</p>
                     </div>
                   </div>
 
