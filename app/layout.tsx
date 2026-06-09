@@ -16,9 +16,12 @@ export const metadata: Metadata = {
   title: "AimTalk (에임톡) - 스마트 카톡 자동 발송 솔루션",
   description: "엑셀 명단 기반 카카오톡 메시지 및 파일 자동 발송, 그룹별 맞춤 메시지 설정으로 업무 효율을 극대화하세요.",
 
-  // 💡 이 부분을 추가하고 저장 후 push(배포) 하시면 됩니다!
+  // 👑 구글 최신 진짜 키와 네이버 키를 규격에 맞게 연동 완료했습니다.
   verification: {
-    google: "google4a972b3f1f184003",
+    google: "w_V-gY1EyUpzHca4Tui-Veq1awkqP98ydp_5XV2fkls", // 구글 연동 키 수정
+    other: {
+      "naver-site-verification": ["4c128d2284024f99c640b769548d4937cf10c6e4"], // 네이버 연동 키 추가
+    }
   },
 };
 
