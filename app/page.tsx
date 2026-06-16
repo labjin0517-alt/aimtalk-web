@@ -783,16 +783,16 @@ export default function Home() {
                 <label className="block text-xs font-semibold text-gray-600 mb-1">추천인 코드 (선택)</label>
                 <input
                   type="text"
-                  placeholder="4자리 코드 입력 (예: 086H)"
+                  placeholder="4자리 코드 입력 (예: A7AP)"
                   maxLength={4}
                   value={referralCode}
                   onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
                   className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-[#1e6082]"
                 />
-                <p className="text-[11px] text-blue-600 mt-1">🎁 추천인 코드를 입력하시면 5일의 보너스 기간이 추가로 제공됩니다!</p>
+                <p className="text-[11px] text-blue-600 mt-1">🎁 추천인 코드를 입력하시면 5일의 보너스 기간이 추가됩니다! (본인코드 사용 불가)</p>
                 {/* 💡 이 경고 문구를 하나 추가해 두시면 CS 문의를 획기적으로 줄일 수 있습니다. */}
                 {(purchaseType === "EXTEND" || purchaseType === "UPGRADE") && (
-                  <p className="text-[11px] text-red-500 mt-1 font-medium">⚠️ 주의: 본인의 코드를 입력하시면 결제 시스템 오류가 발생하여 권한이 지급되지 않습니다.</p>
+                  <p className="text-[11px] text-red-500 mt-1 font-medium">⚠️ 주의: 본인의 코드를 입력하시면 결제 시스템 오류가 발생하여 보너스가 지급되지 않습니다.</p>
                 )}
               </div>
 

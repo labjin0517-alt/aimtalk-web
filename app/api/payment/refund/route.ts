@@ -20,10 +20,10 @@ export async function POST(req: Request) {
     });
     const sheets = google.sheets({ version: "v4", auth });
 
-    // 2. 현재 시트에 등록된 정품키 리스트 전건 스캔 (G열까지 확장)
+    // 2. 현재 시트에 등록된 정품키 리스트 전건 스캔 (I열까지 확장)
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: "license!A:G",
+      range: "license!A:I", // 💡 I열(사용한 추천인 코드)까지 스캔
     });
 
     const rows = response.data.values;
@@ -38,6 +38,7 @@ export async function POST(req: Request) {
     // 💡 메일 발송에 사용할 고객 정보 변수 사전 정의
     let customerName = "미확인 고객";
     let customerEmail = "이메일 미등록";
+    let usedReferralCode = ""; // 💡 [추가] 사용한 추천인 코드 보관
 
     // 시트 내부에서 환불 대상 키 위치 역추적
     for (let i = 1; i < rows.length; i++) {
@@ -53,9 +54,10 @@ export async function POST(req: Request) {
         currentHwid = sheetHwid;
         originalTier = sheetTier;
         
-        // 💡 [변경] 구글 시트에서 고객명(E열)과 이메일(G열) 정보가 있다면 가져옵니다.
+        // 💡 [변경] 구글 시트에서 고객명(E열), 이메일(G열), 사용추천인코드(I열) 정보 가져오기
         if (row[4]) customerName = row[4].trim();
         if (row[6]) customerEmail = row[6].trim();
+        if (row[8]) usedReferralCode = row[8].trim().toUpperCase(); // I열 데이터 추출
         break;
       }
     }
@@ -66,17 +68,46 @@ export async function POST(req: Request) {
 
     // 3. [핵심 알고리즘] HWID 유무에 따른 철저한 온라인 환불 제한 가드라인 가동
     if (currentHwid === "") {
-      // [분기 A] 아직 PC 정품 인증을 진행하지 않은 클린 키인 경우에만 환불 허용!
+
+      // 💡 [추가] 3-1. 사용한 추천인 코드가 있다면 추천인의 5일 기간 회수(차감)
+      if (usedReferralCode) {
+        let referrerRowIndex = -1;
+        let referrerCurrentExpireStr = "";
+        
+        for (let i = 1; i < rows.length; i++) {
+          if ((rows[i][7] || "").trim().toUpperCase() === usedReferralCode) { // H열 매칭
+            referrerRowIndex = i + 1;
+            referrerCurrentExpireStr = rows[i][3] || "";
+            break;
+          }
+        }
+
+        if (referrerRowIndex !== -1 && referrerCurrentExpireStr) {
+          const referrerDate = new Date(referrerCurrentExpireStr);
+          referrerDate.setDate(referrerDate.getDate() - 5); // 💡 5일 차감
+          const newReferrerExpireStr = referrerDate.toISOString().split("T")[0];
+
+          await sheets.spreadsheets.values.update({
+            spreadsheetId: SPREADSHEET_ID,
+            range: `license!D${referrerRowIndex}`,
+            valueInputOption: "RAW",
+            requestBody: { values: [[newReferrerExpireStr]] }
+          });
+        }
+      }
+
+      // 💡 [변경] 3-2. 환불 대상자 라이선스 정보 초기화 (I열의 추천인 사용 기록도 같이 삭제)
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
-        range: `license!C${targetRowIndex}:G${targetRowIndex}`,
+        range: `license!C${targetRowIndex}:I${targetRowIndex}`, // I열까지 확장
         valueInputOption: "RAW",
         requestBody: {
-          values: [[originalTier, "", "[인증전환불]", "", ""]] // C열(등급) 보존, D열(만료일) 삭제, E열(Name)에 기록, F·G열 삭제
+          // 본인 고유 추천인코드(H열)는 유지하고 나머지만 비웁니다.
+          values: [[originalTier, "", "[인증전환불]", "", "", rows[targetRowIndex - 1][7] || "", ""]] 
         }
       });
       
-      // 💡 [변경] 4. 대표님 알림용 Nodemailer 이메일 발송 로직 추가
+      // 💡 [변경] 4. 고객 대상 환불 완료 이메일 발송 로직
       try {
         const transporter = nodemailer.createTransport({
           service: "Gmail",
@@ -87,40 +118,43 @@ export async function POST(req: Request) {
         });
 
         const mailOptions = {
-          from: `"에임톡 알림" <${process.env.EMAIL_USER}>`,
-          to: "labjin0517@gmail.com", // 📬 대표님 수신 메일 지정
-          subject: `🚨 [에임톡 환불접수] ${customerName} 대표님의 환불 요청이 처리되었습니다.`,
+          from: `"에임톡 고객센터" <${process.env.EMAIL_USER}>`,
+          to: customerEmail, // 📬 고객에게 직접 발송
+          bcc: "labjin0517@gmail.com", // 📬 대표님은 숨은참조로 함께 수신하여 파악
+          subject: `🚨 [AimTalk] 요청하신 에임톡 라이선스 환불 및 취소 처리가 완료되었습니다.`,
           html: `
             <div style="font-family: '맑은 고딕', sans-serif; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 16px; padding: 30px; color: #1e293b; line-height: 1.6;">
-              <h2 style="color: #dc2626; font-size: 20px; font-weight: bold; margin-bottom: 20px;">💰 온라인 환불 자동 정산 알림</h2>
-              <p>안녕하세요 관리자님, 홈페이지를 통해 다음 건에 대한 환불 신청이 완료되어 라이선스 기한이 회수되었습니다.</p>
+              <h2 style="color: #dc2626; font-size: 22px; font-weight: bold; margin-bottom: 20px;">결제 취소 및 환불 처리 안내</h2>
+              <p>안녕하세요, <strong>${customerName} 대표님</strong>.</p>
+              <p>고객님께서 홈페이지를 통해 접수해 주신 환불 요청이 시스템에 의해 정상적으로 처리 승인되었습니다.</p>
               
-              <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; margin: 25px 0;">
-                <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #1f2937; space-y: 5px;">
-                  <li><b>신청자 이름:</b> ${customerName}</li>
-                  <li><b>신청자 이메일:</b> ${customerEmail}</li>
-                  <li><b>대상 라이선스 키:</b> <strong style="color: #1e6082;">${targetLicenseKey}</strong></li>
-                  <li><b>선택한 환불 사유:</b> ${refundReason || "단순 변심"}</li>
+              <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 20px; margin: 25px 0;">
+                <p style="margin: 0 0 10px 0; font-size: 13px; color: #991b1b; font-weight: bold;">💡 회수된 라이선스 정보</p>
+                <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #7f1d1d; line-height: 1.8;">
+                  <li><b>대상 라이선스 키:</b> <strong style="font-family: 'Consolas', monospace; letter-spacing: 1px;">${targetLicenseKey}</strong></li>
+                  <li><b>선택하신 취소 사유:</b> ${refundReason || "단순 변심"}</li>
+                  <li><b>현재 상태:</b> 사용 권한 즉시 만료 및 회수 완료</li>
                 </ul>
               </div>
 
-              <p style="font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px;">
-                본 메일은 에임톡 라이선스 서버에서 환불 로직이 정상 처리된 후 자동 발송된 메일입니다.
+              <p style="font-size: 14px; margin-bottom: 30px; color: #334155;">
+                신용카드 및 간편결제의 승인 취소 처리는 PG사 정책에 따라 영업일 기준 3~5일 정도 소요될 수 있습니다.<br/><br/>
+                그동안 에임톡에 관심을 가져주셔서 대단히 감사드립니다.<br/>더 나은 서비스로 다시 모실 수 있도록 노력하겠습니다.
               </p>
+              <p style="font-size: 11px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 15px;">© 2026 Lab.Jin. All rights reserved. 본 메일은 발신전용 메일입니다.</p>
             </div>
           `
         };
 
         await transporter.sendMail(mailOptions);
       } catch (mailError) {
-        console.error("대표님 알림 메일 전송 실패 (시트는 반영됨):", mailError);
-        // 메일 전송에 실패하더라도 시트는 정상 처리되었으므로 유저에게 에러를 뿜지 않고 진행합니다.
+        console.error("고객 안내 메일 전송 실패 (시트는 반영됨):", mailError);
       }
       
       return NextResponse.json({ 
         success: true, 
         processMode: "REUSE",
-        message: `[인증 전 환불] 미인증 라이선스 코드이므로 환불 조치 및 이메일 브리핑을 전송했습니다.` 
+        message: `정상적으로 환불 조치되었으며, 고객 이메일로 취소 안내문을 발송했습니다.` 
       });
 
     } else {

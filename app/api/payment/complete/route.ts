@@ -271,6 +271,18 @@ export async function POST(req: Request) {
       });
     }
 
+    // ------------------------------------------
+    // [추가] 결제 시 입력한 추천인 코드를 환불 추적용으로 시트 I열에 저장
+    // ------------------------------------------
+    if (referralCode && targetRowIndex !== -1) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SPREADSHEET_ID,
+        range: `license!I${targetRowIndex}`,
+        valueInputOption: "RAW",
+        requestBody: { values: [[referralCode]] }
+      });
+    }
+
     // 7. Nodemailer 기반 결제 완료 및 정품키 이메일 전송
     const transporter = nodemailer.createTransport({
       service: "Gmail",
