@@ -37,6 +37,7 @@ export default function Home() {
   // 💡 [여기에 아래 2줄을 그대로 추가해주세요]
   const [purchaseType, setPurchaseType] = useState<"NEW" | "EXTEND" | "UPGRADE">("NEW");
   const [existingLicenseKey, setExistingLicenseKey] = useState<string>("");
+  const [referralCode, setReferralCode] = useState<string>(""); // 💡 추천인 코드 상태 추가
 
   // 새로고침 시 스타일 깜빡임 및 Hydration Mismatch 현상을 완전히 방지하는 이중 안전장치
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function Home() {
     setCustomerEmail("");
     setCustomerPhone("");
     setExistingLicenseKey("");
+    setReferralCode(""); // 💡 모달 닫을 때 추천인 코드 초기화
     if (typeof document !== "undefined") {
       document.body.style.overflow = "auto";
     }
@@ -83,6 +85,7 @@ export default function Home() {
     setSelectedPlanAmount(amount);
     setPurchaseType(type); // 💡 새롭게 추가한 상태 지정 함수
     setExistingLicenseKey(""); // 💡 모달이 열릴 때 입력값 초기화
+    setReferralCode(""); // 💡 결제 모달 열릴 때 추천인 코드 초기화
     openModal("payment-input-modal");
   };
 
@@ -150,7 +153,8 @@ export default function Home() {
             planName: selectedPlanName,
             amount: selectedPlanAmount,
             purchaseType: purchaseType,
-            existingLicenseKey: extKey
+            existingLicenseKey: extKey,
+            referralCode: referralCode // 💡 백엔드로 추천인 코드 전달
           })
         });
 
@@ -773,6 +777,23 @@ export default function Home() {
                   onChange={(e) => setCustomerPhone(e.target.value)}
                   className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e6082]"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">추천인 코드 (선택)</label>
+                <input
+                  type="text"
+                  placeholder="4자리 코드 입력 (예: 086H)"
+                  maxLength={4}
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-[#1e6082]"
+                />
+                <p className="text-[11px] text-blue-600 mt-1">🎁 추천인 코드를 입력하시면 5일의 보너스 기간이 추가로 제공됩니다!</p>
+                {/* 💡 이 경고 문구를 하나 추가해 두시면 CS 문의를 획기적으로 줄일 수 있습니다. */}
+                {(purchaseType === "EXTEND" || purchaseType === "UPGRADE") && (
+                  <p className="text-[11px] text-red-500 mt-1 font-medium">⚠️ 주의: 본인의 코드를 입력하시면 결제 시스템 오류가 발생하여 권한이 지급되지 않습니다.</p>
+                )}
               </div>
 
               <div>

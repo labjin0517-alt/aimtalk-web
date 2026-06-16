@@ -41,12 +41,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, message: "결제가 완료되지 않은 거래건입니다." }, { status: 400 });
     }
 
-    // 💡 [금액 검증 원복] 대표님 요청에 따라 가상/실결제 단가를 원래 정품 요금제 기준으로 매칭합니다.
     const expectedAmount = planName.toLowerCase() === "pro" ? 16000 : 8000;
 
     if (paymentData.amount.total !== expectedAmount || amount !== expectedAmount) {
       return NextResponse.json({ success: false, message: "실제 결제 금액과 에임톡 정품 요금제 단가가 일치하지 않습니다." }, { status: 400 });
     }
+
+    // 💡 [여기서부터 복사해서 추가] 백엔드 로직 오류 시 포트원 결제를 즉시 취소하는 방어 함수
+    const autoCancelPayment = async (reason: string) => {
+      try {
+        await fetch(`https://api.portone.io/payments/${paymentId}/cancel`, {
+          method: "POST",
+          headers: {
+            "Authorization": `PortOne ${process.env.PORTONE_API_SECRET}`, // 💡 process.env 추가
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ reason })
+        });
+        console.log(`[자동 환불 완료] 결제번호: ${paymentId} / 사유: ${reason}`);
+      } catch (err) {
+        console.error("자동 환불 처리 중 포트원 API 에러:", err);
+      }
+    };
+    // 💡 [여기까지 추가]
 
     // 4. 구글 서비스 계정 인증 및 AimTalk_License_DB 연동
     const auth = new google.auth.JWT({
@@ -56,10 +73,10 @@ export async function POST(req: Request) {
     });
     const sheets = google.sheets({ version: "v4", auth });
 
-    // 5. 구글 시트에서 미리 생성해두신 라이선스 목록 가져오기
+    // 5. 구글 시트에서 미리 생성해두신 라이선스 목록 가져오기 (H열 ReferralCode까지 확장 스캔)[cite: 5]
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: "license!A:G", // 늘어난 G열까지 전건 스캔
+      range: "license!A:H", // H열까지 확장하여 데이터 로드
     });
 
     const rows = response.data.values;
@@ -70,12 +87,70 @@ export async function POST(req: Request) {
     //  [수정 후 최종 백엔드 코드]
     const purchaseType = body.purchaseType || "NEW";
     const existingLicenseKey = body.existingLicenseKey || "";
+    const referralCode = (body.referralCode || "").trim().toUpperCase(); // 프론트엔드로부터 전달받은 4자리 추천인 코드
 
     let targetRowIndex = -1;
     let licenseKey = existingLicenseKey;
     let expireDateStr = "";
     const today = new Date();
     const formatDate = (d: Date) => d.toISOString().split("T")[0];
+
+    // ------------------------------------------
+    // [추천인 코드 실시간 검증 및 예외 처리]
+    // ------------------------------------------
+    let bonusDays = 0;
+
+    if (referralCode) {
+      // 1. 셀프 추천 검증 (EXTEND, UPGRADE인 경우 결제 유저 본인의 4자리 코드와 비교)
+      if (purchaseType === "EXTEND" || purchaseType === "UPGRADE") {
+        for (let i = 1; i < rows.length; i++) {
+          if (rows[i][0] === existingLicenseKey) {
+            const myOwnCode = (rows[i][7] || "").trim().toUpperCase(); 
+            if (myOwnCode && myOwnCode === referralCode) {
+              // 💡 본인 코드 입력 적발 시 즉시 환불 트리거
+              await autoCancelPayment("본인 추천인 코드 입력으로 인한 시스템 자동 취소");
+              return NextResponse.json({ success: false, message: "본인코드는 넣을 수 없습니다. 결제된 금액은 즉시 안전하게 환불(승인 취소) 처리되었습니다." }, { status: 400 });
+            }
+            break;
+          }
+        }
+      }
+
+      // 2. 추천인 존재 여부 및 대상 행(Row) 탐색 (H열 스캔)[cite: 5]
+      let referrerRowIndex = -1;
+      let referrerCurrentExpireStr = "";
+
+      for (let i = 1; i < rows.length; i++) {
+        if ((rows[i][7] || "").trim().toUpperCase() === referralCode) { // H열 코드 매칭[cite: 5]
+          referrerRowIndex = i + 1;
+          referrerCurrentExpireStr = rows[i][3] || ""; // 추천인의 기존 만료일(D열)
+          break;
+        }
+      }
+
+      // 3. 유효한 추천인 코드일 경우 양측 혜택 처리 진행
+      if (referrerRowIndex !== -1) {
+        bonusDays = 5; // 구매자(추천받은 사람)에게 부여할 추가 일수 세팅
+
+        let referrerBaseDate = new Date();
+        if (referrerCurrentExpireStr) {
+          const parsedExpire = new Date(referrerCurrentExpireStr);
+          if (parsedExpire > today) referrerBaseDate = parsedExpire;
+        }
+        referrerBaseDate.setDate(referrerBaseDate.getDate() + 5);
+        const newReferrerExpireStr = formatDate(referrerBaseDate);
+
+        // 추천한 사람(기존 유저)의 만료일(D열)에 5일 실시간 무제한 누적 연장
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: SPREADSHEET_ID,
+          range: `license!D${referrerRowIndex}`,
+          valueInputOption: "RAW",
+          requestBody: {
+            values: [[newReferrerExpireStr]]
+          }
+        });
+      }
+    }
 
     // ------------------------------------------
     // [분기 A] 기존 라이선스 기간 연장 (EXTEND)
@@ -92,7 +167,8 @@ export async function POST(req: Request) {
       }
 
       if (targetRowIndex === -1) {
-        return NextResponse.json({ success: false, message: "연장 처리할 대상 라이선스 키를 시트에서 찾을 수 없습니다." }, { status: 404 });
+        await autoCancelPayment("연장 처리할 대상 라이선스 미발견으로 인한 자동 취소");
+        return NextResponse.json({ success: false, message: "연장 처리할 대상 라이선스 키를 찾을 수 없습니다. 입력하신 키를 다시 확인해 주세요. (결제는 자동 취소되었습니다)" }, { status: 404 });
       }
 
       let baseDate = new Date();
@@ -100,8 +176,8 @@ export async function POST(req: Request) {
         const parsedExpire = new Date(currentExpireStr);
         if (parsedExpire > today) baseDate = parsedExpire;
       }
-      // 💡 대표님 요청 정책: 기본 30일 + 3일 보너스 = 총 33일 지급 연산
-      baseDate.setDate(baseDate.getDate() + 33);
+      // 💡 기본 정책 33일 + 추천 보너스 일수(5일 또는 0일) 가산 연산
+      baseDate.setDate(baseDate.getDate() + 33 + bonusDays);
       expireDateStr = formatDate(baseDate);
 
       // 기간 만료일(D열), 이름(E열), 연락처(F열), 이메일(G열) 갱신 정보 동기화
@@ -130,7 +206,8 @@ export async function POST(req: Request) {
       }
 
       if (targetRowIndex === -1) {
-        return NextResponse.json({ success: false, message: "업그레이드 처리할 대상 라이선스 키를 시트에서 찾을 수 없습니다." }, { status: 404 });
+        await autoCancelPayment("업그레이드 처리할 대상 라이선스 미발견으로 인한 자동 취소");
+        return NextResponse.json({ success: false, message: "업그레이드 처리할 대상 라이선스 키를 찾을 수 없습니다. 입력하신 키를 다시 확인해 주세요. (결제는 자동 취소되었습니다)" }, { status: 404 });
       }
 
       let remainingDays = 0;
@@ -142,9 +219,9 @@ export async function POST(req: Request) {
         }
       }
 
-      // 💡 [정책 보완]: Math.ceil(올림 변환)로 인해 17일 남았을 때 8.5일 -> 9일로 깔끔하게 1일 추가 보정됩니다.
       const creditedDays = Math.ceil(remainingDays / 2);
-      const totalProDays = 30 + creditedDays;
+      // 💡 기본 30일 + 잔여일 정산 + 추천 보너스 일수(5일 또는 0일) 가산 연산
+      const totalProDays = 30 + creditedDays + bonusDays;
 
       const newExpireDate = new Date();
       newExpireDate.setDate(newExpireDate.getDate() + totalProDays);
@@ -175,10 +252,13 @@ export async function POST(req: Request) {
       }
 
       if (targetRowIndex === -1) {
-        return NextResponse.json({ success: false, message: `현재 발급 가능한 잔여 ${planName} 라이선스 키 재고가 부족합니다.` }, { status: 500 });
+        await autoCancelPayment(`잔여 ${planName} 라이선스 키 재고 부족`);
+        return NextResponse.json({ success: false, message: `현재 발급 가능한 잔여 ${planName} 라이선스 키 재고가 부족하여 결제가 자동 취소되었습니다. 고객센터로 문의바랍니다.` }, { status: 500 });
       }
 
-      const expireDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+      // 💡 기본 30일 + 추천 보너스 일수(5일 또는 0일) 가산 연산
+      const totalNewDays = 30 + bonusDays;
+      const expireDate = new Date(today.getTime() + totalNewDays * 24 * 60 * 60 * 1000);
       expireDateStr = formatDate(expireDate);
 
       await sheets.spreadsheets.values.update({
